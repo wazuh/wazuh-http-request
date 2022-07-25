@@ -1,0 +1,18 @@
+name: cppcheck-action-test
+on: [push]
+
+jobs:
+  build:
+    name: cppcheck-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cppcheck
+        uses: Dwordcito/cppcheck-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN}}
+          enable: portability
+          std: c++17
+          other_options: --error-exitcode=1
+
