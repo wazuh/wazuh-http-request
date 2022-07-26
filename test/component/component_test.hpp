@@ -29,9 +29,6 @@ class ComponentTestInterface : public ::testing::Test
 
         ComponentTestInterface() = default;
         virtual ~ComponentTestInterface() = default;
-
-        void SetUp() override;
-        void TearDown() override;
 };
 
 class ComponentTestInternalParameters : public ::testing::Test
@@ -40,9 +37,6 @@ class ComponentTestInternalParameters : public ::testing::Test
 
         ComponentTestInternalParameters() = default;
         virtual ~ComponentTestInternalParameters() = default;
-
-        void SetUp() override;
-        void TearDown() override;
 };
 
 #endif // _COMPONENT_TEST_H

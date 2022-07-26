@@ -23,9 +23,6 @@ class UrlRequestUnitTest : public ::testing::Test
 
         UrlRequestUnitTest() = default;
         virtual ~UrlRequestUnitTest() = default;
-
-        void SetUp() override;
-        void TearDown() override;
 };
 
 

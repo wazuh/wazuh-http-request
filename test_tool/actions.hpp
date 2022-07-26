@@ -28,7 +28,7 @@ class DownloadAction final : public IAction
         std::string m_outputFile;
 
     public:
-        DownloadAction(const std::string& url, const std::string& outputFile)
+        explicit DownloadAction(const std::string& url, const std::string& outputFile)
             : m_url(url)
             , m_outputFile(outputFile)
         {}
@@ -51,7 +51,7 @@ class GetAction final : public IAction
         std::string m_url;
 
     public:
-        GetAction(const std::string& url)
+        explicit GetAction(const std::string& url)
             : m_url(url)
         {}
 
@@ -77,7 +77,7 @@ class PostAction final : public IAction
         nlohmann::json m_data;
 
     public:
-        PostAction(const std::string& url, const nlohmann::json& data)
+        explicit PostAction(const std::string& url, const nlohmann::json& data)
             : m_url(url)
             , m_data(data)
         {}
@@ -105,7 +105,7 @@ class PutAction final : public IAction
         nlohmann::json m_data;
 
     public:
-        PutAction(const std::string& url, const nlohmann::json& data)
+        explicit PutAction(const std::string& url, const nlohmann::json& data)
             : m_url(url)
             , m_data(data)
         {}
@@ -131,7 +131,7 @@ class DeleteAction final : public IAction
     private:
         std::string m_url;
     public:
-        DeleteAction(const std::string& url)
+        explicit DeleteAction(const std::string& url)
             : m_url(url)
         {}
 

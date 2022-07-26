@@ -134,7 +134,7 @@ class PostData
         std::string m_postDataString;
         std::shared_ptr<IRequestImplementator> m_handleReference;
     public:
-        PostData(std::shared_ptr<IRequestImplementator> handle)
+        explicit PostData(std::shared_ptr<IRequestImplementator> handle)
         : m_handleReference { handle }
         { }
 

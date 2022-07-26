@@ -63,11 +63,11 @@ class cURLWrapper final : public IRequestImplementator
                 throw std::runtime_error("cURL initialization failed");
             }
 
-            setOption(OPT_WRITEFUNCTION, reinterpret_cast<void *>(cURLWrapper::writeData));
+            this->setOption(OPT_WRITEFUNCTION, reinterpret_cast<void *>(cURLWrapper::writeData));
 
-            setOption(OPT_WRITEDATA, &m_returnValue);
+            this->setOption(OPT_WRITEDATA, &m_returnValue);
 
-            setOption(OPT_FAILONERROR, 1l);
+            this->setOption(OPT_FAILONERROR, 1l);
         }
 
         virtual ~cURLWrapper() = default;

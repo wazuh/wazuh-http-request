@@ -27,12 +27,6 @@ class RequestWrapper final: public IRequestImplementator
         MOCK_METHOD(void, appendHeader, (const std::string &header), (override));
 };
 
-void UrlRequestUnitTest::SetUp()
-{ }
-
-void UrlRequestUnitTest::TearDown()
-{ }
-
 constexpr OPTION_REQUEST_TYPE optCustomRequest { OPT_CUSTOMREQUEST };
 constexpr OPTION_REQUEST_TYPE optUnixSocketPath { OPT_UNIX_SOCKET_PATH };
 constexpr OPTION_REQUEST_TYPE optUrl { OPT_URL };
