@@ -47,12 +47,6 @@ class EchoServer
 
 EchoServer server;
 
-void ComponentTestInterface::SetUp()
-{ }
-
-void ComponentTestInterface::TearDown()
-{ }
-
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
     auto callbackComplete = false;
@@ -129,11 +123,6 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 }
 
 using wrapperType = cURLWrapper;
-void ComponentTestInternalParameters::SetUp()
-{ }
-
-void ComponentTestInternalParameters::TearDown()
-{ }
 
 TEST_F(ComponentTestInternalParameters, DownloadFileErrorEmptyOutput)
 {
