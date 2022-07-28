@@ -1,0 +1,55 @@
+name: RTR
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Release
+  RTR_COMMAND: python3 rtr.py
+
+jobs:
+  validate:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Static analisys (cppcheck)
+      if: ${{ false }}
+      run: $RTR_COMMAND --test cppcheck
+      env:
+        CPPCHECKARGS: '--error-exitcode=1 --force --enable="warning,style,performance,portability,unusedFunction" --quiet --std=c++14 --suppress=constParameterCallback .'
+
+    - name: Static analisys (cppcheck-actions)
+      if: always()
+      uses: jnasselle/cppcheck-action@main
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN}}
+        enable: portability
+        std: c++17
+        other_options: --error-exitcode=1
+
+    - name: Coding sytle (clang-format)
+      if: always()
+      run: $RTR_COMMAND --test format
+      env:
+        FORMATARGS: ''
+
+    - name: Build
+      if: always()
+      run: $RTR_COMMAND --test build
+      env:
+        CMAKE_BUILDDIR: '${{github.workspace}}/build'
+        CMAKE_BUILD_TYPE: $BUILD_TYPE
+
+    - name: Test
+      if: always()
+      run: $RTR_COMMAND --test tests
+      env:
+        CMAKE_BUILDDIR: '${{github.workspace}}/build'
+
+
