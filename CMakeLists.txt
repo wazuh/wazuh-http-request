@@ -53,8 +53,6 @@ foreach(loop_var ${PRECOMPILED_EXTERNAL_RES})
 endforeach(loop_var)
 
 set(BENCHMARK_ENABLE_TESTING "OFF")
-add_subdirectory(external/googletest)
-add_subdirectory(external/benchmark)
 
 include_directories(src/)
 include_directories(include/)
@@ -70,5 +68,11 @@ add_library(urlrequest ${URL_REQUEST_SRC})
 
 target_link_libraries(urlrequest curl)
 
+if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
+add_subdirectory(external/googletest)
+add_subdirectory(external/benchmark)
+endif (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
+
 add_subdirectory(test_tool)
 add_subdirectory(test)
+
