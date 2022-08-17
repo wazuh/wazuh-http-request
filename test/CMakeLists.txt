@@ -4,9 +4,6 @@ include_directories(${SRC_FOLDER}/external/googletest/googletest/include/)
 include_directories(${SRC_FOLDER}/external/googletest/googlemock/include/)
 include_directories(${SRC_FOLDER}/external/cpp-httplib/)
 
-
-link_directories(${SRC_FOLDER}/external/googletest/lib/)
-
 add_subdirectory(benchmark)
 add_subdirectory(component)
 add_subdirectory(unit)

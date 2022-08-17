@@ -5,14 +5,10 @@ file(GLOB URL_REQUEST_UNIT_TEST_SRC *.cpp)
 
 add_executable(urlrequest_unit_test ${URL_REQUEST_UNIT_TEST_SRC})
 target_link_libraries(urlrequest_unit_test urlrequest
-    debug gtestd
-    debug gmockd
-    debug gtest_maind
-    debug gmock_maind
-    optimized gtest
-    optimized gmock
-    optimized gtest_main
-    optimized gmock_main)
+    gtest
+    gmock
+    gtest_main
+    gmock_main)
 
 add_test(NAME urlrequest_unit_test
          COMMAND urlrequest_unit_test)
