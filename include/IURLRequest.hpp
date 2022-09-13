@@ -68,20 +68,24 @@ class IURLRequest
         virtual void post(const URL &url,
                           const nlohmann::json &data,
                           std::function<void(const std::string &)> onSuccess,
-                          std::function<void(const std::string &)> onError = [](auto){}) = 0;
+                          std::function<void(const std::string &)> onError = [](auto){},
+                          const std::string &fileName = "") = 0;
 
         virtual void get(const URL &url,
                          std::function<void(const std::string &)> onSuccess,
-                         std::function<void(const std::string &)> onError = [](auto){}) = 0;
+                         std::function<void(const std::string &)> onError = [](auto){},
+                         const std::string &fileName = "") = 0;
 
         virtual void update(const URL &url,
                             const nlohmann::json &data,
                             std::function<void(const std::string &)> onSuccess,
-                            std::function<void(const std::string &)> onError = [](auto){}) = 0;
+                            std::function<void(const std::string &)> onError = [](auto){},
+                            const std::string &fileName = "") = 0;
 
         virtual void delete_(const URL &url,
-                            std::function<void(const std::string &)> onSuccess,
-                            std::function<void(const std::string &)> onError = [](auto){}) = 0;
+                             std::function<void(const std::string &)> onSuccess,
+                             std::function<void(const std::string &)> onError = [](auto){},
+                             const std::string &fileName = "") = 0;
 };
 
 #endif // _URL_REQUEST_HPP

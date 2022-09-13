@@ -28,17 +28,21 @@ class UNIXSocketRequest final : public IURLRequest, public Singleton<UNIXSocketR
         void post(const URL &url,
                   const nlohmann::json &data,
                   std::function<void(const std::string &)> onSuccess,
-                  std::function<void(const std::string &)> onError = [](auto){});
+                  std::function<void(const std::string &)> onError = [](auto){},
+                  const std::string &fileName = "");
         void get(const URL &url,
                  std::function<void(const std::string &)> onSuccess,
-                 std::function<void(const std::string &)> onError = [](auto){});
+                 std::function<void(const std::string &)> onError = [](auto){},
+                 const std::string &fileName = "");
         void update(const URL &url,
                     const nlohmann::json &data,
                     std::function<void(const std::string &)> onSuccess,
-                    std::function<void(const std::string &)> onError = [](auto){});
+                    std::function<void(const std::string &)> onError = [](auto){},
+                    const std::string &fileName = "");
         void delete_(const URL &url,
                      std::function<void(const std::string &)> onSuccess,
-                     std::function<void(const std::string &)> onError = [](auto){});
+                     std::function<void(const std::string &)> onError = [](auto){},
+                     const std::string &fileName = "");
 };
 
 #endif // _UNIX_SOCKET_REQUEST_HPP

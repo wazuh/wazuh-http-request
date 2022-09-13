@@ -36,7 +36,8 @@ void HTTPRequest::download(const URL &url,
 void HTTPRequest::post(const URL &url,
                        const nlohmann::json &data,
                        std::function<void(const std::string &)> onSuccess,
-                       std::function<void(const std::string &)> onError)
+                       std::function<void(const std::string &)> onError,
+                       const std::string &fileName)
 {
     try
     {
@@ -46,6 +47,7 @@ void HTTPRequest::post(const URL &url,
             .appendHeader("Content-Type: application/json")
             .appendHeader("Accept: application/json")
             .appendHeader("Accept-Charset: utf-8")
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
@@ -58,7 +60,8 @@ void HTTPRequest::post(const URL &url,
 
 void HTTPRequest::get(const URL &url,
                       std::function<void(const std::string &)> onSuccess,
-                      std::function<void(const std::string &)> onError)
+                      std::function<void(const std::string &)> onError,
+                      const std::string &fileName)
 {
     try
     {
@@ -67,6 +70,7 @@ void HTTPRequest::get(const URL &url,
             .appendHeader("Content-Type: application/json")
             .appendHeader("Accept: application/json")
             .appendHeader("Accept-Charset: utf-8")
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
@@ -80,7 +84,8 @@ void HTTPRequest::get(const URL &url,
 void HTTPRequest::update(const URL &url,
                          const nlohmann::json &data,
                          std::function<void(const std::string &)> onSuccess,
-                         std::function<void(const std::string &)> onError)
+                         std::function<void(const std::string &)> onError,
+                         const std::string &fileName)
 {
     try
     {
@@ -90,6 +95,7 @@ void HTTPRequest::update(const URL &url,
             .appendHeader("Content-Type: application/json")
             .appendHeader("Accept: application/json")
             .appendHeader("Accept-Charset: utf-8")
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
@@ -102,7 +108,8 @@ void HTTPRequest::update(const URL &url,
 
 void HTTPRequest::delete_(const URL &url,
                           std::function<void(const std::string &)> onSuccess,
-                          std::function<void(const std::string &)> onError)
+                          std::function<void(const std::string &)> onError,
+                          const std::string &fileName)
 {
     try
     {
@@ -111,6 +118,7 @@ void HTTPRequest::delete_(const URL &url,
             .appendHeader("Content-Type: application/json")
             .appendHeader("Accept: application/json")
             .appendHeader("Accept-Charset: utf-8")
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
