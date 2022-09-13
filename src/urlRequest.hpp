@@ -41,11 +41,14 @@ static const std::map<METHOD_TYPE, std::string> METHOD_TYPE_MAP =
 template <typename T>
 class cURLRequest : public Utils::Builder<T, std::shared_ptr<IRequestImplementator>>
 {
+    using deleterFP = CustomDeleter<decltype(&fclose), fclose>;
+
     private:
         std::string m_unixSocketPath;
         std::string m_url;
         std::string m_userAgent;
         std::string m_certificate;
+        std::unique_ptr<FILE, deleterFP> m_fpHandle;
 
     protected:
         std::shared_ptr<IRequestImplementator> m_requestImplementator;
@@ -125,6 +128,28 @@ class cURLRequest : public Utils::Builder<T, std::shared_ptr<IRequestImplementat
 
             return static_cast<T&>(*this);
         }
+
+        T & outputFile(const std::string &outputFile)
+        {
+            if (!outputFile.empty())
+            {
+                m_fpHandle.reset(fopen(outputFile.c_str(), "wb"));
+
+                if (!m_fpHandle)
+                {
+                    throw std::runtime_error("Failed to open output file");
+                }
+
+                m_requestImplementator->setOption(OPT_WRITEDATA,
+                                                  m_fpHandle.get());
+
+                m_requestImplementator->setOption(OPT_WRITEFUNCTION,
+                                                  static_cast<long>(0));
+            }
+
+            return static_cast<T&>(*this);
+        }
+
 };
 
 template <typename T>
@@ -176,7 +201,6 @@ class PutRequest final : public cURLRequest<PutRequest>, public PostData<PutRequ
         {
             cURLRequest<PutRequest>::m_requestImplementator->setOption(OPT_CUSTOMREQUEST,
                                                                        METHOD_TYPE_MAP.at(METHOD_PUT));
-
         }
 
         // LCOV_EXCL_START
@@ -186,11 +210,6 @@ class PutRequest final : public cURLRequest<PutRequest>, public PostData<PutRequ
 
 class GetRequest final : public cURLRequest<GetRequest>
 {
-    using deleterFP = CustomDeleter<decltype(&fclose), fclose>;
-
-    protected:
-        std::unique_ptr<FILE, deleterFP> m_fpHandle;
-
     public:
 
         explicit GetRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
@@ -200,23 +219,6 @@ class GetRequest final : public cURLRequest<GetRequest>
                                               METHOD_TYPE_MAP.at(METHOD_GET).c_str());
         }
 
-        GetRequest & outputFile(const std::string &outputFile)
-        {
-            m_fpHandle.reset(fopen(outputFile.c_str(), "wb"));
-
-            if (!m_fpHandle)
-            {
-                throw std::runtime_error("Failed to open output file");
-            }
-
-            m_requestImplementator->setOption(OPT_WRITEDATA,
-                                              m_fpHandle.get());
-
-            m_requestImplementator->setOption(OPT_WRITEFUNCTION,
-                                              static_cast<long>(0));
-
-            return *this;
-        }
         // LCOV_EXCL_START
         virtual ~GetRequest() = default;
         // LCOV_EXCL_STOP
@@ -230,7 +232,6 @@ class DeleteRequest final : public cURLRequest<DeleteRequest>
         {
             m_requestImplementator->setOption(OPT_CUSTOMREQUEST,
                                               METHOD_TYPE_MAP.at(METHOD_DELETE).c_str());
-
         }
 
         // LCOV_EXCL_START

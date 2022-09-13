@@ -36,7 +36,8 @@ void UNIXSocketRequest::download(const URL &url,
 void UNIXSocketRequest::post(const URL &url,
                              const nlohmann::json &data,
                              std::function<void(const std::string &)> onSuccess,
-                             std::function<void(const std::string &)> onError)
+                             std::function<void(const std::string &)> onError,
+                             const std::string &fileName)
 {
     try
     {
@@ -44,6 +45,7 @@ void UNIXSocketRequest::post(const URL &url,
         req.url(url.url())
             .unixSocketPath(url.unixSocketPath())
             .postData(data)
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
@@ -56,13 +58,15 @@ void UNIXSocketRequest::post(const URL &url,
 
 void UNIXSocketRequest::get(const URL &url,
                             std::function<void(const std::string &)> onSuccess,
-                            std::function<void(const std::string &)> onError)
+                            std::function<void(const std::string &)> onError,
+                            const std::string &fileName)
 {
     try
     {
         auto req { GetRequest::builder(FactoryRequestWrapper<wrapperType>::create()) };
         req.url(url.url())
             .unixSocketPath(url.unixSocketPath())
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
@@ -76,7 +80,8 @@ void UNIXSocketRequest::get(const URL &url,
 void UNIXSocketRequest::update(const URL &url,
                                const nlohmann::json &data,
                                std::function<void(const std::string &)> onSuccess,
-                               std::function<void(const std::string &)> onError)
+                               std::function<void(const std::string &)> onError,
+                               const std::string &fileName)
 {
     try
     {
@@ -84,6 +89,7 @@ void UNIXSocketRequest::update(const URL &url,
         req.url(url.url())
             .unixSocketPath(url.unixSocketPath())
             .postData(data)
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());
@@ -96,13 +102,15 @@ void UNIXSocketRequest::update(const URL &url,
 
 void UNIXSocketRequest::delete_(const URL &url,
                                 std::function<void(const std::string &)> onSuccess,
-                                std::function<void(const std::string &)> onError)
+                                std::function<void(const std::string &)> onError,
+                                const std::string &fileName)
 {
     try
     {
         auto req { DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create()) };
         req.url(url.url())
             .unixSocketPath(url.unixSocketPath())
+            .outputFile(fileName)
             .execute();
 
         onSuccess(req.response());

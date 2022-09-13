@@ -50,7 +50,8 @@ EchoServer server;
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
     auto callbackComplete = false;
-    HTTPRequest::instance().get(HttpURL("http://localhost:44441/"), [&](const std::string &result)
+    HTTPRequest::instance().get(HttpURL("http://localhost:44441/"),
+                                [&](const std::string &result)
     {
         EXPECT_EQ(result, "Hello World!");
         callbackComplete = true;
@@ -62,7 +63,9 @@ TEST_F(ComponentTestInterface, GetHelloWorld)
 TEST_F(ComponentTestInterface, PostHelloWorld)
 {
     auto callbackComplete = false;
-    HTTPRequest::instance().post(HttpURL("http://localhost:44441/"), R"({"hello":"world"})"_json, [&](const std::string &result)
+    HTTPRequest::instance().post(HttpURL("http://localhost:44441/"),
+                                 R"({"hello":"world"})"_json,
+                                 [&](const std::string &result)
     {
         EXPECT_EQ(result, R"({"hello":"world"})");
         callbackComplete = true;
@@ -74,7 +77,9 @@ TEST_F(ComponentTestInterface, PostHelloWorld)
 TEST_F(ComponentTestInterface, PutHelloWorld)
 {
     auto callbackComplete = false;
-    HTTPRequest::instance().update(HttpURL("http://localhost:44441/"), R"({"hello":"world"})"_json, [&](const std::string &result)
+    HTTPRequest::instance().update(HttpURL("http://localhost:44441/"),
+                                   R"({"hello":"world"})"_json,
+                                   [&](const std::string &result)
     {
         EXPECT_EQ(result, R"({"hello":"world"})");
         callbackComplete = true;
@@ -88,7 +93,8 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
     auto random { std::to_string(std::rand()) };
 
     auto callbackComplete = false;
-    HTTPRequest::instance().delete_(HttpURL("http://localhost:44441/"+random), [&](const std::string &result)
+    HTTPRequest::instance().delete_(HttpURL("http://localhost:44441/"+random),
+                                    [&](const std::string &result)
     {
         EXPECT_EQ(result, random);
         callbackComplete = true;
@@ -99,7 +105,9 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
 
 TEST_F(ComponentTestInterface, DownloadFile)
 {
-    HTTPRequest::instance().download(HttpURL("http://localhost:44441/"), "./test.txt", [&](const std::string &result)
+    HTTPRequest::instance().download(HttpURL("http://localhost:44441/"),
+                                     "./test.txt",
+                                     [&](const std::string &result)
     {
         std::cout << result << std::endl;
     });
@@ -113,7 +121,9 @@ TEST_F(ComponentTestInterface, DownloadFile)
 TEST_F(ComponentTestInterface, DownloadFileError)
 {
     auto callbackComplete = false;
-    HTTPRequest::instance().download(HttpURL("http://localhost:44441/invalid_file"), "./test.txt", [&](const std::string &result)
+    HTTPRequest::instance().download(HttpURL("http://localhost:44441/invalid_file"),
+                                     "./test.txt",
+                                     [&](const std::string &result)
     {
         EXPECT_EQ(result, "HTTP response code said error");
         callbackComplete = true;
@@ -122,25 +132,67 @@ TEST_F(ComponentTestInterface, DownloadFileError)
     EXPECT_TRUE(callbackComplete);
 }
 
-using wrapperType = cURLWrapper;
-
-TEST_F(ComponentTestInternalParameters, DownloadFileErrorEmptyOutput)
+TEST_F(ComponentTestInterface, GetHelloWorldFile)
 {
-    auto callbackComplete = false;
-    try
+    HTTPRequest::instance().get(HttpURL("http://localhost:44441/"),
+                                [&](const std::string &result)
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
-            .url("wazuh.com")
-            .outputFile("")
-            .execute();
-    }
-    catch (const std::exception &ex)
-    {
-        EXPECT_EQ(std::string(ex.what()), "Failed to open output file");
-        callbackComplete = true;
-    }
-    EXPECT_TRUE(callbackComplete);
+        std::cout << result << std::endl;
+    }, [](auto){}, "./testGetHelloWorld.txt");
+
+    std::ifstream file("./testGetHelloWorld.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
 }
+
+TEST_F(ComponentTestInterface, PostHelloWorldFile)
+{
+    HTTPRequest::instance().post(HttpURL("http://localhost:44441/"),
+                                 R"({"hello":"world"})"_json,
+                                 [&](const std::string &result)
+    {
+        std::cout << result << std::endl;
+    }, [](auto){}, "./testPostHelloWorld.txt");
+
+    std::ifstream file("./testPostHelloWorld.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, R"({"hello":"world"})");
+}
+
+TEST_F(ComponentTestInterface, PutHelloWorldFile)
+{
+    HTTPRequest::instance().update(HttpURL("http://localhost:44441/"),
+                                   R"({"hello":"world"})"_json,
+                                   [&](const std::string &result)
+    {
+        std::cout << result << std::endl;
+    }, [](auto){}, "./testPutHelloWorld.txt");
+
+    std::ifstream file("./testPutHelloWorld.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, R"({"hello":"world"})");
+}
+
+TEST_F(ComponentTestInterface, DeleteRandomIDFile)
+{
+    auto random { std::to_string(std::rand()) };
+
+    HTTPRequest::instance().delete_(HttpURL("http://localhost:44441/"+random),
+                                    [&](const std::string &result)
+    {
+        std::cout << result << std::endl;
+    }, [](auto){}, "./testDeleteRandomID.txt");
+
+    std::ifstream file("./testDeleteRandomID.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, random);
+}
+
+using wrapperType = cURLWrapper;
 
 TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
 {
