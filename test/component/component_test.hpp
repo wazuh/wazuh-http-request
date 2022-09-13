@@ -23,18 +23,24 @@
 
 #include "HTTPRequest.hpp"
 
-class ComponentTestInterface : public ::testing::Test
+class ComponentTest : public ::testing::Test
 {
     protected:
+        bool m_callbackComplete;
+        virtual ~ComponentTest() = default;
+        void SetUp() override { m_callbackComplete = false; }
+};
 
+class ComponentTestInterface : public ComponentTest
+{
+    protected:
         ComponentTestInterface() = default;
         virtual ~ComponentTestInterface() = default;
 };
 
-class ComponentTestInternalParameters : public ::testing::Test
+class ComponentTestInternalParameters : public ComponentTest
 {
     protected:
-
         ComponentTestInternalParameters() = default;
         virtual ~ComponentTestInternalParameters() = default;
 };
