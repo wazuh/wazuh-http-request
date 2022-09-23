@@ -17,25 +17,24 @@
 #include <memory>
 #include <stdexcept>
 
-template <class Type>
+template<class Type>
 class FactoryRequestWrapper final
 {
-    public:
-        static std::shared_ptr<IRequestImplementator> create()
-        {
-            throw std::runtime_error("Request url initialization failed");
-        }
+public:
+    static std::shared_ptr<IRequestImplementator> create()
+    {
+        throw std::runtime_error("Request url initialization failed");
+    }
 };
 
-template <>
+template<>
 class FactoryRequestWrapper<cURLWrapper> final
 {
-    public:
-        static std::shared_ptr<IRequestImplementator> create()
-        {
-            return std::make_shared<cURLWrapper>();
-        }
+public:
+    static std::shared_ptr<IRequestImplementator> create()
+    {
+        return std::make_shared<cURLWrapper>();
+    }
 };
 
 #endif // _FACTORY_REQUEST_WRAPPER_HPP
-

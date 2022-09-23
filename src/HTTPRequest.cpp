@@ -9,16 +9,15 @@
  * Foundation.
  */
 
-
 #include "HTTPRequest.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
 
 using wrapperType = cURLWrapper;
 
-void HTTPRequest::download(const URL &url,
-                           const std::string &outputFile,
-                           std::function<void(const std::string &)> onError)
+void HTTPRequest::download(const URL& url,
+                           const std::string& outputFile,
+                           std::function<void(const std::string&)> onError)
 {
     try
     {
@@ -27,21 +26,21 @@ void HTTPRequest::download(const URL &url,
             .outputFile(outputFile)
             .execute();
     }
-    catch (const std::exception &ex)
+    catch (const std::exception& ex)
     {
         onError(ex.what());
     }
 }
 
-void HTTPRequest::post(const URL &url,
-                       const nlohmann::json &data,
-                       std::function<void(const std::string &)> onSuccess,
-                       std::function<void(const std::string &)> onError,
-                       const std::string &fileName)
+void HTTPRequest::post(const URL& url,
+                       const nlohmann::json& data,
+                       std::function<void(const std::string&)> onSuccess,
+                       std::function<void(const std::string&)> onError,
+                       const std::string& fileName)
 {
     try
     {
-        auto req { PostRequest::builder(FactoryRequestWrapper<wrapperType>::create()) };
+        auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
         req.url(url.url())
             .postData(data)
             .appendHeader("Content-Type: application/json")
@@ -52,20 +51,20 @@ void HTTPRequest::post(const URL &url,
 
         onSuccess(req.response());
     }
-    catch (const std::exception &ex)
+    catch (const std::exception& ex)
     {
         onError(ex.what());
     }
 }
 
-void HTTPRequest::get(const URL &url,
-                      std::function<void(const std::string &)> onSuccess,
-                      std::function<void(const std::string &)> onError,
-                      const std::string &fileName)
+void HTTPRequest::get(const URL& url,
+                      std::function<void(const std::string&)> onSuccess,
+                      std::function<void(const std::string&)> onError,
+                      const std::string& fileName)
 {
     try
     {
-        auto req { GetRequest::builder(FactoryRequestWrapper<wrapperType>::create()) };
+        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
         req.url(url.url())
             .appendHeader("Content-Type: application/json")
             .appendHeader("Accept: application/json")
@@ -75,21 +74,21 @@ void HTTPRequest::get(const URL &url,
 
         onSuccess(req.response());
     }
-    catch (const std::exception &ex)
+    catch (const std::exception& ex)
     {
         onError(ex.what());
     }
 }
 
-void HTTPRequest::update(const URL &url,
-                         const nlohmann::json &data,
-                         std::function<void(const std::string &)> onSuccess,
-                         std::function<void(const std::string &)> onError,
-                         const std::string &fileName)
+void HTTPRequest::update(const URL& url,
+                         const nlohmann::json& data,
+                         std::function<void(const std::string&)> onSuccess,
+                         std::function<void(const std::string&)> onError,
+                         const std::string& fileName)
 {
     try
     {
-        auto req { PutRequest::builder(FactoryRequestWrapper<wrapperType>::create()) };
+        auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
         req.url(url.url())
             .postData(data)
             .appendHeader("Content-Type: application/json")
@@ -100,20 +99,20 @@ void HTTPRequest::update(const URL &url,
 
         onSuccess(req.response());
     }
-    catch (const std::exception &ex)
+    catch (const std::exception& ex)
     {
         onError(ex.what());
     }
 }
 
-void HTTPRequest::delete_(const URL &url,
-                          std::function<void(const std::string &)> onSuccess,
-                          std::function<void(const std::string &)> onError,
-                          const std::string &fileName)
+void HTTPRequest::delete_(const URL& url,
+                          std::function<void(const std::string&)> onSuccess,
+                          std::function<void(const std::string&)> onError,
+                          const std::string& fileName)
 {
     try
     {
-        auto req { DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create()) };
+        auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
         req.url(url.url())
             .appendHeader("Content-Type: application/json")
             .appendHeader("Accept: application/json")
@@ -123,9 +122,8 @@ void HTTPRequest::delete_(const URL &url,
 
         onSuccess(req.response());
     }
-    catch (const std::exception &ex)
+    catch (const std::exception& ex)
     {
         onError(ex.what());
     }
 }
-

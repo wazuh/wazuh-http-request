@@ -31,14 +31,14 @@ enum OPTION_REQUEST_TYPE
 
 class IRequestImplementator
 {
-    public:
-        virtual ~IRequestImplementator() = default;
-        virtual void setOption(const OPTION_REQUEST_TYPE optIndex, void *ptr) = 0;
-        virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string &opt) = 0;
-        virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) = 0;
-        virtual void execute() = 0;
-        virtual inline const std::string response() = 0;
-        virtual void appendHeader(const std::string &header) = 0;
+public:
+    virtual ~IRequestImplementator() = default;
+    virtual void setOption(const OPTION_REQUEST_TYPE optIndex, void* ptr) = 0;
+    virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) = 0;
+    virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) = 0;
+    virtual void execute() = 0;
+    virtual inline const std::string response() = 0;
+    virtual void appendHeader(const std::string& header) = 0;
 };
 
 #endif // _IREQUEST_IMPLEMENTATOR_HPP
