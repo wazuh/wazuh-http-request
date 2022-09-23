@@ -12,9 +12,9 @@
 #ifndef _COMPONENT_TEST_H
 #define _COMPONENT_TEST_H
 
-#include <memory>
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include <memory>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -25,26 +25,27 @@
 
 class ComponentTest : public ::testing::Test
 {
-    protected:
-        bool m_callbackComplete;
-        virtual ~ComponentTest() = default;
-        void SetUp() override { m_callbackComplete = false; }
+protected:
+    bool m_callbackComplete = false;
+    virtual ~ComponentTest() = default;
+    void SetUp() override
+    {
+        m_callbackComplete = false;
+    }
 };
 
 class ComponentTestInterface : public ComponentTest
 {
-    protected:
-        ComponentTestInterface() = default;
-        virtual ~ComponentTestInterface() = default;
+protected:
+    ComponentTestInterface() = default;
+    virtual ~ComponentTestInterface() = default;
 };
 
 class ComponentTestInternalParameters : public ComponentTest
 {
-    protected:
-        ComponentTestInternalParameters() = default;
-        virtual ~ComponentTestInternalParameters() = default;
+protected:
+    ComponentTestInternalParameters() = default;
+    virtual ~ComponentTestInternalParameters() = default;
 };
 
 #endif // _COMPONENT_TEST_H
-
-

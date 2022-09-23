@@ -11,143 +11,141 @@
 
 #ifndef _ACTION_HPP
 #define _ACTION_HPP
-#include <iostream>
 #include "HTTPRequest.hpp"
+#include <iostream>
 
 class IAction
 {
-    public:
-        virtual ~IAction() = default;
-        virtual void execute() = 0;
+public:
+    virtual ~IAction() = default;
+    virtual void execute() = 0;
 };
 
 class DownloadAction final : public IAction
 {
-    private:
-        std::string m_url;
-        std::string m_outputFile;
+private:
+    std::string m_url;
+    std::string m_outputFile;
 
-    public:
-        explicit DownloadAction(const std::string& url, const std::string& outputFile)
-            : m_url(url)
-            , m_outputFile(outputFile)
-        {}
+public:
+    explicit DownloadAction(const std::string& url, const std::string& outputFile)
+        : m_url(url)
+        , m_outputFile(outputFile)
+    {
+    }
 
-        void execute() override
-        {
-            HTTPRequest::instance().download(HttpURL(m_url),
-                                             m_outputFile,
-            [](const std::string& msg)
-            {
-                std::cerr << msg << std::endl;
-                throw std::runtime_error(msg);
-            });
-        }
+    void execute() override
+    {
+        HTTPRequest::instance().download(HttpURL(m_url),
+                                         m_outputFile,
+                                         [](const std::string& msg)
+                                         {
+                                             std::cerr << msg << std::endl;
+                                             throw std::runtime_error(msg);
+                                         });
+    }
 };
 
 class GetAction final : public IAction
 {
-    private:
-        std::string m_url;
+private:
+    std::string m_url;
 
-    public:
-        explicit GetAction(const std::string& url)
-            : m_url(url)
-        {}
+public:
+    explicit GetAction(const std::string& url)
+        : m_url(url)
+    {
+    }
 
-        void execute() override
-        {
-            HTTPRequest::instance().get(HttpURL(m_url),
-            [](const std::string& msg)
-            {
-                std::cout << msg << std::endl;
-            },
+    void execute() override
+    {
+        HTTPRequest::instance().get(
+            HttpURL(m_url),
+            [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
             });
-        }
+    }
 };
 
 class PostAction final : public IAction
 {
-    private:
-        std::string m_url;
-        nlohmann::json m_data;
+private:
+    std::string m_url;
+    nlohmann::json m_data;
 
-    public:
-        explicit PostAction(const std::string& url, const nlohmann::json& data)
-            : m_url(url)
-            , m_data(data)
-        {}
+public:
+    explicit PostAction(const std::string& url, const nlohmann::json& data)
+        : m_url(url)
+        , m_data(data)
+    {
+    }
 
-        void execute() override
-        {
-            HTTPRequest::instance().post(HttpURL(m_url),
-                                         m_data,
-            [](const std::string& msg)
-            {
-                std::cout << msg << std::endl;
-            },
+    void execute() override
+    {
+        HTTPRequest::instance().post(
+            HttpURL(m_url),
+            m_data,
+            [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
             });
-        }
+    }
 };
 
 class PutAction final : public IAction
 {
-    private:
-        std::string m_url;
-        nlohmann::json m_data;
+private:
+    std::string m_url;
+    nlohmann::json m_data;
 
-    public:
-        explicit PutAction(const std::string& url, const nlohmann::json& data)
-            : m_url(url)
-            , m_data(data)
-        {}
+public:
+    explicit PutAction(const std::string& url, const nlohmann::json& data)
+        : m_url(url)
+        , m_data(data)
+    {
+    }
 
-        void execute() override
-        {
-            HTTPRequest::instance().update(HttpURL(m_url),
-                                           m_data,
-            [](const std::string& msg)
-            {
-                std::cout << msg << std::endl;
-            },
+    void execute() override
+    {
+        HTTPRequest::instance().update(
+            HttpURL(m_url),
+            m_data,
+            [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
             });
-        }
+    }
 };
 
 class DeleteAction final : public IAction
 {
-    private:
-        std::string m_url;
-    public:
-        explicit DeleteAction(const std::string& url)
-            : m_url(url)
-        {}
+private:
+    std::string m_url;
 
-        void execute() override
-        {
-            HTTPRequest::instance().delete_(HttpURL(m_url),
-            [](const std::string& msg)
-            {
-                std::cout << msg << std::endl;
-            },
+public:
+    explicit DeleteAction(const std::string& url)
+        : m_url(url)
+    {
+    }
+
+    void execute() override
+    {
+        HTTPRequest::instance().delete_(
+            HttpURL(m_url),
+            [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
             });
-        }
+    }
 };
 
 #endif // _ACTION_HPP

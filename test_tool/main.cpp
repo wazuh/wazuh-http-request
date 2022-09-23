@@ -9,13 +9,13 @@
  * Foundation.
  */
 
-#include <iostream>
 #include "cmdArgsParser.hpp"
 #include "factoryAction.hpp"
+#include <iostream>
 
 int main(const int argc, const char* argv[])
 {
-    auto retVal { 0 };
+    auto retVal {0};
 
     try
     {

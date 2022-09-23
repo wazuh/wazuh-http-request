@@ -12,37 +12,42 @@
 #ifndef _HTTP_REQUEST_HPP
 #define _HTTP_REQUEST_HPP
 
-#include <functional>
-#include <iostream>
-#include <string>
 #include "IURLRequest.hpp"
 #include "json.hpp"
 #include "singleton.hpp"
+#include <functional>
+#include <iostream>
+#include <string>
 
-class HTTPRequest final : public IURLRequest, public Singleton<HTTPRequest>
+class HTTPRequest final
+    : public IURLRequest
+    , public Singleton<HTTPRequest>
 {
-    public:
-        void download(const URL &url,
-                      const std::string &fileName,
-                      std::function<void(const std::string &)> onError = [](auto){});
-        void post(const URL &url,
-                  const nlohmann::json &data,
-                  std::function<void(const std::string &)> onSuccess,
-                  std::function<void(const std::string &)> onError = [](auto){},
-                  const std::string &fileName = "");
-        void get(const URL &url,
-                 std::function<void(const std::string &)> onSuccess,
-                 std::function<void(const std::string &)> onError = [](auto){},
-                 const std::string &fileName = "");
-        void update(const URL &url,
-                    const nlohmann::json &data,
-                    std::function<void(const std::string &)> onSuccess,
-                    std::function<void(const std::string &)> onError = [](auto){},
-                    const std::string &fileName = "");
-        void delete_(const URL &url,
-                     std::function<void(const std::string &)> onSuccess,
-                     std::function<void(const std::string &)> onError = [](auto){},
-                     const std::string &fileName = "");
+public:
+    void download(
+        const URL& url, const std::string& fileName, std::function<void(const std::string&)> onError = [](auto) {});
+    void post(
+        const URL& url,
+        const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&)> onError = [](auto) {},
+        const std::string& fileName = "");
+    void get(
+        const URL& url,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&)> onError = [](auto) {},
+        const std::string& fileName = "");
+    void update(
+        const URL& url,
+        const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&)> onError = [](auto) {},
+        const std::string& fileName = "");
+    void delete_(
+        const URL& url,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&)> onError = [](auto) {},
+        const std::string& fileName = "");
 };
 
 #endif // _HTTP_REQUEST_HPP

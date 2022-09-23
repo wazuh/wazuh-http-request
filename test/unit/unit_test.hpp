@@ -12,20 +12,16 @@
 #ifndef _UNIT_TEST_H
 #define _UNIT_TEST_H
 
-#include <memory>
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
 #include "urlRequest.hpp"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include <memory>
 
 class UrlRequestUnitTest : public ::testing::Test
 {
-    protected:
-
-        UrlRequestUnitTest() = default;
-        virtual ~UrlRequestUnitTest() = default;
+protected:
+    UrlRequestUnitTest() = default;
+    virtual ~UrlRequestUnitTest() = default;
 };
 
-
 #endif // _UNIT_TEST_H
-
-
