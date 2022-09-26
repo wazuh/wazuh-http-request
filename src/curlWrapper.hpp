@@ -21,7 +21,6 @@
 #include <stdexcept>
 
 using deleterCurl = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
-static const std::unique_ptr<CURL, deleterCurl> m_curlHandle {curl_easy_init()};
 
 static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP = {
     {OPT_URL, CURLOPT_URL},
@@ -50,8 +49,11 @@ private:
     }
     std::string m_returnValue;
 
+    const std::unique_ptr<CURL, deleterCurl> m_curlHandle;
+
 public:
     cURLWrapper()
+        : m_curlHandle {curl_easy_init()}
     {
         if (!m_curlHandle)
         {

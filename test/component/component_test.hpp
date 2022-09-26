@@ -23,6 +23,8 @@
 
 #include "HTTPRequest.hpp"
 
+class FakeServer;
+
 class ComponentTest : public ::testing::Test
 {
 protected:
@@ -31,6 +33,21 @@ protected:
     void SetUp() override
     {
         m_callbackComplete = false;
+    }
+
+    inline static std::unique_ptr<FakeServer> fakeFileServer;
+
+    static void SetUpTestSuite()
+    {
+        if (!fakeFileServer)
+        {
+            fakeFileServer = std::make_unique<FakeServer>();
+        }
+    }
+
+    static void TearDownTestSuite()
+    {
+        fakeFileServer.reset();
     }
 };
 

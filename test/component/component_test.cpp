@@ -14,39 +14,49 @@
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
 
-class EchoServer
+class FakeServer final
 {
+private:
+    httplib::Server m_server;
+    std::thread m_thread;
+
 public:
-    EchoServer()
+    FakeServer()
+        : m_thread(&FakeServer::run, this)
     {
-        std::thread t(
-            [&]()
-            {
-                httplib::Server server;
+        // Wait until server is ready
+        while (!m_server.is_running())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
 
-                server.Get("/",
-                           [](const httplib::Request& /*req*/, httplib::Response& res)
-                           { res.set_content("Hello World!", "text/json"); });
+    ~FakeServer()
+    {
+        m_server.stop();
+        m_thread.join();
+    }
 
-                server.Post("/",
-                            [](const httplib::Request& req, httplib::Response& res)
-                            { res.set_content(req.body, "text/json"); });
+    void run()
+    {
+        m_server.Get("/",
+                     [](const httplib::Request& /*req*/, httplib::Response& res)
+                     { res.set_content("Hello World!", "text/json"); });
 
-                server.Put("/",
-                           [](const httplib::Request& req, httplib::Response& res)
-                           { res.set_content(req.body, "text/json"); });
+        m_server.Post(
+            "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
 
-                server.Delete(R"(/(\d+))",
-                              [](const httplib::Request& req, httplib::Response& res)
-                              { res.set_content(req.matches[1], "text/json"); });
+        m_server.Put(
+            "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
 
-                server.listen("localhost", 44441);
-            });
-        t.detach();
+        m_server.Delete(R"(/(\d+))",
+                        [](const httplib::Request& req, httplib::Response& res)
+                        { res.set_content(req.matches[1], "text/json"); });
+
+        m_server.set_keep_alive_max_count(1);
+        m_server.listen("localhost", 44441);
     }
 };
-
-EchoServer server;
 
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
@@ -292,7 +302,7 @@ TEST_F(ComponentTestInternalParameters, ExecuteGetNoUrl)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "URL using bad/illegal format or missing URL");
         m_callbackComplete = true;
     }
     EXPECT_TRUE(m_callbackComplete);
@@ -306,7 +316,7 @@ TEST_F(ComponentTestInternalParameters, ExecutePostNoUrl)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "URL using bad/illegal format or missing URL");
         m_callbackComplete = true;
     }
     EXPECT_TRUE(m_callbackComplete);
@@ -320,7 +330,7 @@ TEST_F(ComponentTestInternalParameters, ExecutePutNoUrl)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "URL using bad/illegal format or missing URL");
         m_callbackComplete = true;
     }
     EXPECT_TRUE(m_callbackComplete);
@@ -334,7 +344,7 @@ TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "URL using bad/illegal format or missing URL");
         m_callbackComplete = true;
     }
     EXPECT_TRUE(m_callbackComplete);
