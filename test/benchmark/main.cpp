@@ -16,7 +16,6 @@
 
 #include "HTTPRequest.hpp"
 #include "benchmark.h"
-#include "curlWrapper.hpp"
 #include <iostream>
 
 class FakeServer final
