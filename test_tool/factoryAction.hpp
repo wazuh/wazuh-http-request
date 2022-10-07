@@ -17,9 +17,17 @@
 #include <iostream>
 #include <memory>
 
+/**
+ * @brief This class is used to build an action
+ */
 class FactoryAction final
 {
 public:
+    /**
+     * @brief Builds an action
+     * @param args Arguments
+     * @return Shared pointer to the action
+     */
     static std::unique_ptr<IAction> create(const CmdLineArgs& args)
     {
         if (0 == args.type().compare("download"))

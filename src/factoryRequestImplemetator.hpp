@@ -17,20 +17,39 @@
 #include <memory>
 #include <stdexcept>
 
+/**
+ * @brief This class is a factory for IRequestImplementator.
+ * It provides a simple interface to create a IRequestImplementator.
+ *
+ * @tparam T Type of the response body.
+ */
 template<class Type>
 class FactoryRequestWrapper final
 {
 public:
+    /**
+     * @brief TODO
+     */
     static std::shared_ptr<IRequestImplementator> create()
     {
         throw std::runtime_error("Request url initialization failed");
     }
 };
 
+/**
+ * @brief This class is a specialization of FactoryRequestWrapper for cURLRequest.
+ * It provides a simple interface to create a cURLRequest.
+ *
+ * @tparam T Type of the response body.
+ */
 template<>
 class FactoryRequestWrapper<cURLWrapper> final
 {
 public:
+    /**
+     * @brief Create a cURLRequest.
+     * @return A shared pointer to a cURLRequest.
+     */
     static std::shared_ptr<IRequestImplementator> create()
     {
         return std::make_shared<cURLWrapper>();

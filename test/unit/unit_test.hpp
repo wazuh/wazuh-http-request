@@ -17,6 +17,9 @@
 #include "gtest/gtest.h"
 #include <memory>
 
+/**
+ * @brief This class is used to test the URLRequest class.
+ */
 class UrlRequestUnitTest : public ::testing::Test
 {
 protected:

@@ -18,6 +18,9 @@
 #include "benchmark.h"
 #include <iostream>
 
+/**
+ * @brief This class is a simple HTTP server that provides a simple interface to perform HTTP requests.
+ */
 class FakeServer final
 {
 private:
@@ -41,6 +44,9 @@ public:
         m_thread.join();
     }
 
+    /**
+     * @brief This method is used to start the server.
+     */
     void run()
     {
         m_server.Get("/",
@@ -64,6 +70,11 @@ public:
 
 FakeServer g_server;
 
+/**
+ * @brief This function is a benchmark test for the HTTP GET request.
+ *
+ * @param state Benchmark state.
+ */
 static void BM_Get(benchmark::State& state)
 {
     for (auto _ : state)
@@ -73,6 +84,11 @@ static void BM_Get(benchmark::State& state)
 }
 BENCHMARK(BM_Get);
 
+/**
+ * @brief This function is a benchmark test for the HTTP POST request.
+ *
+ * @param state Benchmark state.
+ */
 static void BM_Post(benchmark::State& state)
 {
     for (auto _ : state)
@@ -83,6 +99,11 @@ static void BM_Post(benchmark::State& state)
 }
 BENCHMARK(BM_Post);
 
+/**
+ * @brief This function is a benchmark test for the HTTP UPDATE request.
+ *
+ * @param state Benchmark state.
+ */
 static void BM_Update(benchmark::State& state)
 {
     for (auto _ : state)
@@ -93,6 +114,11 @@ static void BM_Update(benchmark::State& state)
 }
 BENCHMARK(BM_Update);
 
+/**
+ * @brief This function is a benchmark test for the HTTP DELETE request.
+ *
+ * @param state Benchmark state.
+ */
 static void BM_Delete(benchmark::State& state)
 {
     for (auto _ : state)
@@ -103,6 +129,11 @@ static void BM_Delete(benchmark::State& state)
 
 BENCHMARK(BM_Delete);
 
+/**
+ * @brief This function is a benchmark test for the HTTP DOWNLOAD request.
+ *
+ * @param state Benchmark state.
+ */
 static void BM_Download(benchmark::State& state)
 {
     for (auto _ : state)

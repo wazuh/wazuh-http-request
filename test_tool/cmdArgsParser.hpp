@@ -18,9 +18,17 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief Class to parse command line arguments
+ */
 class CmdLineArgs
 {
 public:
+    /**
+     * @brief Constructor for CmdLineArgs.
+     * @param argc Number of arguments
+     * @param argv Arguments
+     */
     CmdLineArgs(const int argc, const char* argv[])
         : m_url {paramValueOf(argc, argv, "-u")}
         , m_outputFile {paramValueOf(argc, argv, "-o", {false, ""})}
@@ -41,26 +49,41 @@ public:
         }
     }
 
+    /**
+     * @brief Returns the URL.
+     */
     const std::string& url() const
     {
         return m_url;
     }
 
+    /**
+     * @brief Returns the post data.
+     */
     const nlohmann::json& postArguments() const
     {
         return m_postData;
     }
 
+    /**
+     * @brief Returns the output file.
+     */
     const std::string& outputFile() const
     {
         return m_outputFile;
     }
 
+    /**
+     * @brief Returns the type of action.
+     */
     const std::string& type() const
     {
         return m_type;
     }
 
+    /**
+     * @brief Shows the help to the user.
+     */
     static void showHelp()
     {
         std::cout << "\nUsage: urlrequester_testtool <option(s)> SOURCES \n"

@@ -19,6 +19,10 @@
 #include <iostream>
 #include <string>
 
+/**
+ * @brief This class is an abstraction of HTTP Unix socket request.
+ * It provides a simple interface to send HTTP requests.
+ */
 class UNIXSocketRequest final
     : public IURLRequest
     , public Singleton<UNIXSocketRequest>

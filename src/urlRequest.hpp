@@ -32,6 +32,12 @@ enum METHOD_TYPE
 static const std::map<METHOD_TYPE, std::string> METHOD_TYPE_MAP = {
     {METHOD_GET, "GET"}, {METHOD_POST, "POST"}, {METHOD_PUT, "PUT"}, {METHOD_DELETE, "DELETE"}};
 
+/**
+ * @brief This class is a wrapper for curl library.
+ * It provides a simple interface to perform HTTP requests.
+ *
+ * @tparam T Type of the response body.
+ */
 template<typename T>
 class cURLRequest : public Utils::Builder<T, std::shared_ptr<IRequestImplementator>>
 {
@@ -45,9 +51,17 @@ private:
     std::unique_ptr<FILE, deleterFP> m_fpHandle;
 
 protected:
+    /**
+     * @brief This variable is used to store the request implementator.
+     */
     std::shared_ptr<IRequestImplementator> m_requestImplementator;
     cURLRequest() = default;
 
+    /**
+     * @brief Create a cURLRequest object.
+     *
+     * @param requestImplementator Pointer to the request implementator.
+     */
     explicit cURLRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : m_requestImplementator {requestImplementator}
     {
@@ -62,16 +76,27 @@ public:
     virtual ~cURLRequest() = default;
     // LCOV_EXCL_STOP
 
+    /**
+     * @brief This method executes a request.
+     */
     void execute()
     {
         m_requestImplementator->execute();
     }
 
+    /**
+     * @brief This method returns the response.
+     */
     inline const std::string response() const
     {
         return m_requestImplementator->response();
     }
 
+    /**
+     * @brief This method sets the unix socket path and returns a reference to the object.
+     * @param sock Unix socket path.
+     * @return A reference to the object.
+     */
     T& unixSocketPath(const std::string& sock)
     {
         m_unixSocketPath = sock;
@@ -80,6 +105,11 @@ public:
         return static_cast<T&>(*this);
     }
 
+    /**
+     * @brief This method sets the url and returns a reference to the object.
+     * @param url Url to set.
+     * @return A reference to the object.
+     */
     T& url(const std::string& url)
     {
         m_url = url;
@@ -88,6 +118,11 @@ public:
         return static_cast<T&>(*this);
     }
 
+    /**
+     * @brief This method sets the user agent and returns a reference to the object.
+     * @param userAgent User agent to set.
+     * @return A reference to the object.
+     */
     T& userAgent(const std::string& userAgent)
     {
         m_userAgent = userAgent;
@@ -96,12 +131,22 @@ public:
         return static_cast<T&>(*this);
     }
 
+    /**
+     * @brief This method appends a header and returns a reference to the object.
+     * @param header Header to append.
+     * @return A reference to the object.
+     */
     T& appendHeader(const std::string& header)
     {
         m_requestImplementator->appendHeader(header);
         return static_cast<T&>(*this);
     }
 
+    /**
+     * @brief This method sets the timeout and returns a reference to the object.
+     * @param timeout Timeout to set.
+     * @return A reference to the object.
+     */
     T& timeout(const int timeout)
     {
         m_requestImplementator->setOption(OPT_TIMEOUT, timeout);
@@ -109,6 +154,11 @@ public:
         return static_cast<T&>(*this);
     }
 
+    /**
+     * @brief This method sets the certificate and returns a reference to the object.
+     * @param cert Certificate to set.
+     * @return A reference to the object.
+     */
     T& certificate(const std::string& cert)
     {
         m_certificate = cert;
@@ -117,6 +167,11 @@ public:
         return static_cast<T&>(*this);
     }
 
+    /**
+     * @brief This method create a file with the path given and returns a reference to the object.
+     * @param outputFile Output file path.
+     * @return A reference to the object.
+     */
     T& outputFile(const std::string& outputFile)
     {
         if (!outputFile.empty())
@@ -137,6 +192,11 @@ public:
     }
 };
 
+/**
+ * @brief This class defines generic methods for HTTP POST requests
+ *
+ * @tparam T Type of the response body.
+ */
 template<typename T>
 class PostData
 {
@@ -145,11 +205,20 @@ private:
     std::shared_ptr<IRequestImplementator> m_handleReference;
 
 public:
+    /**
+     * @brief This constructor initializes the PostData object.
+     * @param handle Shared pointer to the IRequestImplementator.
+     */
     explicit PostData(std::shared_ptr<IRequestImplementator> handle)
         : m_handleReference {handle}
     {
     }
 
+    /**
+     * @brief This method sets the post data and returns a reference to the object.
+     * @param postData Post data to set.
+     * @return A reference to the object.
+     */
     T& postData(const nlohmann::json& postData)
     {
         m_postDataString = postData.dump();
@@ -162,11 +231,18 @@ public:
     }
 };
 
+/**
+ * @brief This class is a wrapper for curl library. It provides a simple interface to perform HTTP POST requests.
+ */
 class PostRequest final
     : public cURLRequest<PostRequest>
     , public PostData<PostRequest>
 {
 public:
+    /**
+     * @brief This constructor initializes the PostRequest object.
+     * @param requestImplementator Shared pointer to the request implementator.
+     */
     explicit PostRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<PostRequest>(requestImplementator)
         , PostData<PostRequest>(requestImplementator)
@@ -178,11 +254,18 @@ public:
     // LCOV_EXCL_STOP
 };
 
+/**
+ * @brief This class is a wrapper for curl library. It provides a simple interface to perform HTTP PUT requests.
+ */
 class PutRequest final
     : public cURLRequest<PutRequest>
     , public PostData<PutRequest>
 {
 public:
+    /**
+     * @brief This constructor initializes the PutRequest object.
+     * @param requestImplementator Shared pointer to the request implementator.
+     */
     explicit PutRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<PutRequest>(requestImplementator)
         , PostData<PutRequest>(requestImplementator)
@@ -195,9 +278,16 @@ public:
     // LCOV_EXCL_STOP
 };
 
+/**
+ * @brief This class is a wrapper for curl library. It provides a simple interface to perform HTTP GET requests.
+ */
 class GetRequest final : public cURLRequest<GetRequest>
 {
 public:
+    /**
+     * @brief This constructor initializes the GetRequest object.
+     * @param requestImplementator Shared pointer to the request implementator.
+     */
     explicit GetRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<GetRequest>(requestImplementator)
     {
@@ -209,9 +299,16 @@ public:
     // LCOV_EXCL_STOP
 };
 
+/**
+ * @brief This class is a wrapper for curl library. It provides a simple interface to perform HTTP DELETE requests.
+ */
 class DeleteRequest final : public cURLRequest<DeleteRequest>
 {
 public:
+    /**
+     * @brief This constructor initializes the DeleteRequest object.
+     * @param requestImplementator Shared pointer to the request implementator.
+     */
     explicit DeleteRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<DeleteRequest>(requestImplementator)
     {

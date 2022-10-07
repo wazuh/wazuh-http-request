@@ -29,15 +29,50 @@ enum OPTION_REQUEST_TYPE
     OPT_FAILONERROR,
 };
 
+/**
+ * @brief This class is a interface for IRequestImplementator.
+ * It provides a simple interface to perform HTTP requests.
+ */
 class IRequestImplementator
 {
 public:
     virtual ~IRequestImplementator() = default;
+    /**
+     * @brief Virtual method to set options to the handle.
+     * @param optIndex The option index.
+     * @param ptr The option value.
+     */
     virtual void setOption(const OPTION_REQUEST_TYPE optIndex, void* ptr) = 0;
+
+    /**
+     * @brief Virtual method to set options to the handle.
+     * @param optIndex The option index.
+     * @param opt The option value.
+     */
     virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) = 0;
+
+    /**
+     * @brief Virtual method to set options to the handle.
+     * @param optIndex The option index.
+     * @param opt The option value.
+     */
     virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) = 0;
+
+    /**
+     * @brief Virtual method to perform the request.
+     */
     virtual void execute() = 0;
+
+    /**
+     * @brief Virtual method to get the value of the last request.
+     * @return The value of the last request.
+     */
     virtual inline const std::string response() = 0;
+
+    /**
+     * @brief Virtual method to add a header to the handle.
+     * @param header The header to be added.
+     */
     virtual void appendHeader(const std::string& header) = 0;
 };
 
