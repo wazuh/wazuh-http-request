@@ -28,7 +28,7 @@ class FactoryRequestWrapper final
 {
 public:
     /**
-     * @brief TODO
+     * @brief Templetized factory pattern.
      */
     static std::shared_ptr<IRequestImplementator> create()
     {

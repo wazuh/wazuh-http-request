@@ -43,7 +43,7 @@ public:
      * @param data Data to send
      * @param onSuccess Callback to be called in case of success
      * @param onError Callback to be called in case of error
-     * @param fileName File name to send
+     * @param fileName File name of output file
      */
     void post(
         const URL& url,
@@ -57,7 +57,7 @@ public:
      * @param url URL to send the request
      * @param onSuccess Callback to be called in case of success
      * @param onError Callback to be called in case of error
-     * @param fileName File name to send
+     * @param fileName File name of output file
      */
     void get(
         const URL& url,
@@ -71,7 +71,7 @@ public:
      * @param data Data to send
      * @param onSuccess Callback to be called in case of success
      * @param onError Callback to be called in case of error
-     * @param fileName File name to send
+     * @param fileName File name of output file
      */
     void update(
         const URL& url,
@@ -85,7 +85,7 @@ public:
      * @param url URL to send the request
      * @param onSuccess Callback to be called in case of success
      * @param onError Callback to be called in case of error
-     * @param fileName File name to send
+     * @param fileName File name of output file
      */
     void delete_(
         const URL& url,

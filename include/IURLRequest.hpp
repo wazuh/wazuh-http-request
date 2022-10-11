@@ -24,7 +24,7 @@ enum SOCKET_TYPE
 
 /**
  * @brief This class is an abstraction of URL.
- * It provides a simple interface to get information about URL.
+ * It is a baseclass to store the type/configuration of the request to made.
  */
 class URL
 {
@@ -132,7 +132,7 @@ public:
      * @param data Data to send.
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
-     * @param fileName File name to send.
+     * @param fileName File name of output file
      */
     virtual void post(
         const URL& url,
@@ -146,7 +146,7 @@ public:
      * @param url URL to send the request.
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
-     * @param fileName File name to send.
+     * @param fileName File name of output file
      */
     virtual void get(
         const URL& url,
@@ -160,7 +160,7 @@ public:
      * @param data Data to send.
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
-     * @param fileName File name to send.
+     * @param fileName File name of output file
      */
     virtual void update(
         const URL& url,
@@ -174,7 +174,7 @@ public:
      * @param url URL to send the request.
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
-     * @param fileName File name to send.
+     * @param fileName File name of output file
      */
     virtual void delete_(
         const URL& url,
