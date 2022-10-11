@@ -52,3 +52,4 @@ namespace Utils
 #pragma GCC diagnostic pop
 
 #endif // _BUILDER_PATTERN_HPP
+
