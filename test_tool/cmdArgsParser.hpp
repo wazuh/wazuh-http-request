@@ -74,7 +74,7 @@ public:
     }
 
     /**
-     * @brief Returns the type of action.
+     * @brief Returns the action type.
      */
     const std::string& type() const
     {

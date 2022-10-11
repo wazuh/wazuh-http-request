@@ -147,7 +147,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequest)
 }
 
 /**
- * @brief This test checks the API POST request whit post field.
+ * @brief This test checks the API POST request with post field.
  */
 TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
 {
@@ -174,7 +174,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
 }
 
 /**
- * @brief This test checks the API POST request whit post field and unix socket.
+ * @brief This test checks the API POST request with post field and unix socket.
  */
 TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
 {
