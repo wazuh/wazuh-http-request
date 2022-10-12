@@ -82,7 +82,7 @@ public:
     }
 
     /**
-     * @brief This method sets an option to the curl handle.
+     * @brief This method sets an option to the curl handler.
      * @param optIndex The option index.
      * @param ptr The option value.
      */
@@ -97,7 +97,7 @@ public:
     }
 
     /**
-     * @brief This method sets an option to the curl handle.
+     * @brief This method sets an option to the curl handler.
      * @param optIndex The option index.
      * @param opt The option value.
      */
@@ -112,7 +112,7 @@ public:
     }
 
     /**
-     * @brief This method sets an option to the curl handle.
+     * @brief This method sets an option to the curl handler.
      * @param optIndex The option index.
      * @param opt The option value.
      */
@@ -127,7 +127,7 @@ public:
     }
 
     /**
-     * @brief This method adds an header to the curl handle.
+     * @brief This method adds an header to the curl handler.
      * @param header The header to be added.
      */
     void appendHeader(const std::string& header) override

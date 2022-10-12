@@ -106,7 +106,7 @@ public:
     }
 
     /**
-     * @brief This method sets the url and returns a reference to the object.
+     * @brief This method sets the URL and returns a reference to the object.
      * @param url Url to set.
      * @return A reference to the object.
      */
