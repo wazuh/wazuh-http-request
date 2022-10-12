@@ -98,6 +98,7 @@ TEST_F(UrlRequestUnitTest, GetFileWithUnixSocket)
         .outputFile("/tmp/hello_world.html")
         .execute();
 }
+
 /**
  * @brief This test checks the API GET request.
  */

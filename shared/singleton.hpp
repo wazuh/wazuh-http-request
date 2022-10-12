@@ -38,3 +38,4 @@ class Singleton
 };
 
 #endif // _SINGLETON_HPP
+
