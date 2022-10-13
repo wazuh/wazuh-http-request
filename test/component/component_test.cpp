@@ -415,3 +415,28 @@ TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
     }
     EXPECT_TRUE(m_callbackComplete);
 }
+
+/**
+ * @brief This test checks the behavior of multiple threads.
+ * This test create multiple threads that exceed the size of the queue where each thread will create a cURLWrapper
+ * object.
+ */
+TEST_F(ComponentTestInternalParameters, MultipleThreads)
+{
+    std::vector<std::thread> threads;
+    for (int i = 0; i < QUEUE_SIZE * 2; ++i)
+    {
+        threads.emplace_back(
+            []()
+            {
+                EXPECT_NO_THROW(GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+                                    .url("http://localhost:44441/")
+                                    .execute());
+            });
+    }
+
+    for (auto& thread : threads)
+    {
+        EXPECT_NO_THROW(thread.join());
+    }
+}
