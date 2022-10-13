@@ -15,7 +15,7 @@
 #include <iostream>
 
 /**
- * @brief Action interface
+ * @brief Action interface.
  */
 class IAction
 {
@@ -29,7 +29,7 @@ public:
 };
 
 /**
- * @brief This class is used to perform a DOWNLOAD action
+ * @brief This class is used to perform a DOWNLOAD action.
  */
 class DownloadAction final : public IAction
 {
@@ -40,8 +40,8 @@ private:
 public:
     /**
      * @brief Constructor for DownloadAction class.
-     * @param url URL to download
-     * @param outputFile Output file
+     * @param url URL to download.
+     * @param outputFile Output file.
      */
     explicit DownloadAction(const std::string& url, const std::string& outputFile)
         : m_url(url)
@@ -50,7 +50,7 @@ public:
     }
 
     /**
-     * @brief Executes the action
+     * @brief Executes the action.
      */
     void execute() override
     {
@@ -65,7 +65,7 @@ public:
 };
 
 /**
- * @brief This class is used to perform a GET action
+ * @brief This class is used to perform a GET action.
  */
 class GetAction final : public IAction
 {
@@ -74,8 +74,8 @@ private:
 
 public:
     /**
-     * @brief Constructor of GetAction class
-     * @param url URL to perform the GET request
+     * @brief Constructor of GetAction class.
+     * @param url URL to perform the GET request.
      */
     explicit GetAction(const std::string& url)
         : m_url(url)
@@ -83,7 +83,7 @@ public:
     }
 
     /**
-     * @brief This method is used to perform the GET request
+     * @brief This method is used to perform the GET request.
      */
     void execute() override
     {
@@ -99,7 +99,7 @@ public:
 };
 
 /**
- * @brief This class is used to perform a POST action
+ * @brief This class is used to perform a POST action.
  */
 class PostAction final : public IAction
 {
@@ -109,9 +109,9 @@ private:
 
 public:
     /**
-     * @brief Constructor of PostAction class
-     * @param url URL to perform the POST request
-     * @param data Data to send in the POST request
+     * @brief Constructor of PostAction class.
+     * @param url URL to perform the POST request.
+     * @param data Data to send in the POST request.
      */
     explicit PostAction(const std::string& url, const nlohmann::json& data)
         : m_url(url)
@@ -120,7 +120,7 @@ public:
     }
 
     /**
-     * @brief This method is used to perform the POST request
+     * @brief This method is used to perform the POST request.
      */
     void execute() override
     {
@@ -137,7 +137,7 @@ public:
 };
 
 /**
- * @brief This class is used to perform a PUT action
+ * @brief This class is used to perform a PUT action.
  */
 class PutAction final : public IAction
 {
@@ -147,9 +147,9 @@ private:
 
 public:
     /**
-     * @brief Constructor of PutAction class
-     * @param url URL to perform the PUT request
-     * @param data Data to send in the PUT request
+     * @brief Constructor of PutAction class.
+     * @param url URL to perform the PUT request.
+     * @param data Data to send in the PUT request.
      */
     explicit PutAction(const std::string& url, const nlohmann::json& data)
         : m_url(url)
@@ -158,7 +158,7 @@ public:
     }
 
     /**
-     * @brief This method is used to perform the PUT request
+     * @brief This method is used to perform the PUT request.
      */
     void execute() override
     {
@@ -175,7 +175,7 @@ public:
 };
 
 /**
- * @brief This class is used to perform a DELETE action
+ * @brief This class is used to perform a DELETE action.
  */
 class DeleteAction final : public IAction
 {
@@ -184,8 +184,8 @@ private:
 
 public:
     /**
-     * @brief Constructor of DeleteAction class
-     * @param url URL to perform the DELETE request
+     * @brief Constructor of DeleteAction class.
+     * @param url URL to perform the DELETE request.
      */
     explicit DeleteAction(const std::string& url)
         : m_url(url)
@@ -193,7 +193,7 @@ public:
     }
 
     /**
-     * @brief This method is used to perform the DELETE request
+     * @brief This method is used to perform the DELETE request.
      */
     void execute() override
     {

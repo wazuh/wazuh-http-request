@@ -30,20 +30,20 @@ class HTTPRequest final
 public:
     /**
      * @brief Performs a HTTP DOWNLOAD request.
-     * @param url URL to send the request
-     * @param fileName Output file
-     * @param onError Callback to be called in case of error
+     * @param url URL to send the request.
+     * @param fileName Output file.
+     * @param onError Callback to be called in case of error.
      */
     void download(
         const URL& url, const std::string& fileName, std::function<void(const std::string&)> onError = [](auto) {});
 
     /**
      * @brief Performs a HTTP POST request.
-     * @param url URL to send the request
-     * @param data Data to send
-     * @param onSuccess Callback to be called in case of success
-     * @param onError Callback to be called in case of error
-     * @param fileName File name of output file
+     * @param url URL to send the request.
+     * @param data Data to send.
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
      */
     void post(
         const URL& url,
@@ -54,10 +54,10 @@ public:
 
     /**
      * @brief Performs a HTTP GET request.
-     * @param url URL to send the request
-     * @param onSuccess Callback to be called in case of success
-     * @param onError Callback to be called in case of error
-     * @param fileName File name of output file
+     * @param url URL to send the request.
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
      */
     void get(
         const URL& url,
@@ -67,11 +67,11 @@ public:
 
     /**
      * @brief Performs a HTTP UPDATE request.
-     * @param url URL to send the request
-     * @param data Data to send
-     * @param onSuccess Callback to be called in case of success
-     * @param onError Callback to be called in case of error
-     * @param fileName File name of output file
+     * @param url URL to send the request.
+     * @param data Data to send.
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
      */
     void update(
         const URL& url,
@@ -82,10 +82,10 @@ public:
 
     /**
      * @brief Performs a HTTP DELETE request.
-     * @param url URL to send the request
-     * @param onSuccess Callback to be called in case of success
-     * @param onError Callback to be called in case of error
-     * @param fileName File name of output file
+     * @param url URL to send the request.
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
      */
     void delete_(
         const URL& url,

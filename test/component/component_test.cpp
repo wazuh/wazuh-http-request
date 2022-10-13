@@ -65,7 +65,7 @@ public:
 };
 
 /**
- * @brief Test the get request
+ * @brief Test the get request.
  */
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
@@ -80,7 +80,7 @@ TEST_F(ComponentTestInterface, GetHelloWorld)
 }
 
 /**
- * @brief Test the post request
+ * @brief Test the post request.
  */
 TEST_F(ComponentTestInterface, PostHelloWorld)
 {
@@ -96,7 +96,7 @@ TEST_F(ComponentTestInterface, PostHelloWorld)
 }
 
 /**
- * @brief Test the update request
+ * @brief Test the update request.
  */
 TEST_F(ComponentTestInterface, PutHelloWorld)
 {
@@ -112,7 +112,7 @@ TEST_F(ComponentTestInterface, PutHelloWorld)
 }
 
 /**
- * @brief Test the delete request
+ * @brief Test the delete request.
  */
 TEST_F(ComponentTestInterface, DeleteRandomID)
 {
@@ -129,7 +129,7 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
 }
 
 /**
- * @brief Test the download request
+ * @brief Test the download request.
  */
 TEST_F(ComponentTestInterface, DownloadFile)
 {
@@ -144,7 +144,7 @@ TEST_F(ComponentTestInterface, DownloadFile)
 }
 
 /**
- * @brief Test the download request with a invalid URL
+ * @brief Test the download request with a invalid URL.
  */
 TEST_F(ComponentTestInterface, DownloadFileError)
 {
@@ -160,7 +160,7 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 }
 
 /**
- * @brief Test the get request and check the file content
+ * @brief Test the get request and check the file content.
  */
 TEST_F(ComponentTestInterface, GetHelloWorldFile)
 {
@@ -177,7 +177,7 @@ TEST_F(ComponentTestInterface, GetHelloWorldFile)
 }
 
 /**
- * @brief Test the post request and check the file content
+ * @brief Test the post request and check the file content.
  */
 TEST_F(ComponentTestInterface, PostHelloWorldFile)
 {
@@ -195,7 +195,7 @@ TEST_F(ComponentTestInterface, PostHelloWorldFile)
 }
 
 /**
- * @brief Test the update request and check the file content
+ * @brief Test the update request and check the file content.
  */
 TEST_F(ComponentTestInterface, PutHelloWorldFile)
 {
@@ -213,7 +213,7 @@ TEST_F(ComponentTestInterface, PutHelloWorldFile)
 }
 
 /**
- * @brief Test the delete request and check the file content
+ * @brief Test the delete request and check the file content.
  */
 TEST_F(ComponentTestInterface, DeleteRandomIDFile)
 {
@@ -234,7 +234,7 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFile)
 using wrapperType = cURLWrapper;
 
 /**
- * @brief Test the download request with a empty URL
+ * @brief Test the download request with a empty URL.
  */
 TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
 {
@@ -251,7 +251,7 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
 }
 
 /**
- * @brief Test the download request with a invalid URL
+ * @brief Test the download request with a invalid URL.
  */
 TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl2)
 {
@@ -271,7 +271,7 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl2)
 }
 
 /**
- * @brief Test the get request with a invalid file
+ * @brief Test the get request with a invalid file.
  */
 TEST_F(ComponentTestInternalParameters, GetError)
 {
@@ -290,7 +290,7 @@ TEST_F(ComponentTestInternalParameters, GetError)
 }
 
 /**
- * @brief Test the post request with a invalid file
+ * @brief Test the post request with a invalid file.
  */
 TEST_F(ComponentTestInternalParameters, PostError)
 {
@@ -310,7 +310,7 @@ TEST_F(ComponentTestInternalParameters, PostError)
 }
 
 /**
- * @brief Test the put request with a invalid file
+ * @brief Test the put request with a invalid file.
  */
 TEST_F(ComponentTestInternalParameters, PutError)
 {
@@ -330,7 +330,7 @@ TEST_F(ComponentTestInternalParameters, PutError)
 }
 
 /**
- * @brief Test the delete request with a invalid file
+ * @brief Test the delete request with a invalid file.
  */
 TEST_F(ComponentTestInternalParameters, DeleteError)
 {
@@ -349,7 +349,7 @@ TEST_F(ComponentTestInternalParameters, DeleteError)
 }
 
 /**
- * @brief Test the get request with no url
+ * @brief Test the get request with no url.
  */
 TEST_F(ComponentTestInternalParameters, ExecuteGetNoUrl)
 {
@@ -366,7 +366,7 @@ TEST_F(ComponentTestInternalParameters, ExecuteGetNoUrl)
 }
 
 /**
- * @brief Test the post request with no url
+ * @brief Test the post request with no url.
  */
 TEST_F(ComponentTestInternalParameters, ExecutePostNoUrl)
 {
@@ -383,7 +383,7 @@ TEST_F(ComponentTestInternalParameters, ExecutePostNoUrl)
 }
 
 /**
- * @brief Test the put request with no url
+ * @brief Test the put request with no url.
  */
 TEST_F(ComponentTestInternalParameters, ExecutePutNoUrl)
 {
@@ -400,7 +400,7 @@ TEST_F(ComponentTestInternalParameters, ExecutePutNoUrl)
 }
 
 /**
- * @brief Test the delete request with no url
+ * @brief Test the delete request with no url.
  */
 TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
 {

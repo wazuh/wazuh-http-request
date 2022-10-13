@@ -193,7 +193,7 @@ public:
 };
 
 /**
- * @brief This class defines generic methods for HTTP POST requests
+ * @brief This class defines generic methods for HTTP POST requests.
  *
  * @tparam T Type of the response body.
  */

@@ -19,15 +19,15 @@
 #include <vector>
 
 /**
- * @brief Class to parse command line arguments
+ * @brief Class to parse command line arguments.
  */
 class CmdLineArgs
 {
 public:
     /**
      * @brief Constructor for CmdLineArgs.
-     * @param argc Number of arguments
-     * @param argv Arguments
+     * @param argc Number of arguments.
+     * @param argv Arguments.
      */
     CmdLineArgs(const int argc, const char* argv[])
         : m_url {paramValueOf(argc, argv, "-u")}

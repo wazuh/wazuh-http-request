@@ -26,7 +26,7 @@
 class FakeServer;
 
 /**
- * @brief Class to test HTTPRequest class
+ * @brief Class to test HTTPRequest class.
  */
 class ComponentTest : public ::testing::Test
 {
@@ -70,7 +70,7 @@ protected:
 };
 
 /**
- * @brief Class to test HTTPRequest class
+ * @brief Class to test HTTPRequest class.
  */
 class ComponentTestInterface : public ComponentTest
 {
@@ -80,7 +80,7 @@ protected:
 };
 
 /**
- * @brief Class to test HTTPRequest class
+ * @brief Class to test HTTPRequest class.
  */
 class ComponentTestInternalParameters : public ComponentTest
 {
