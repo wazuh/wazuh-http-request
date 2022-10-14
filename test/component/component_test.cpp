@@ -433,6 +433,8 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
                                     .url("http://localhost:44441/")
                                     .execute());
             });
+
+        EXPECT_LE(HANDLER_QUEUE.size(), QUEUE_SIZE);
     }
 
     for (auto& thread : threads)

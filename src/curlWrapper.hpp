@@ -52,6 +52,8 @@ class cURLWrapper final : public IRequestImplementator
 private:
     using deleterCurlStringList = CustomDeleter<decltype(&curl_slist_free_all), curl_slist_free_all>;
     std::unique_ptr<curl_slist, deleterCurlStringList> m_curlHeaders;
+    std::string m_returnValue;
+    std::shared_ptr<CURL> m_curlHandle;
 
     static size_t writeData(char* data, size_t size, size_t nmemb, void* userdata)
     {
@@ -59,22 +61,19 @@ private:
         str->append(data, size * nmemb);
         return size * nmemb;
     }
-    std::string m_returnValue;
-
-    std::shared_ptr<CURL> m_curlHandle;
 
     /**
-     * @brief Get the cURL Handle object
-     * This method create a cURL handle and return it, but ensures that only one cURL handle is used per thread and
+     * @brief Get the cURL Handler object
+     * This method creates a cURL handler and returns it, but ensures that only one cURL handler is used per thread and
      * keeps the queue size to a maximum of QUEUE_SIZE.
      *
      * @return std::shared_ptr<CURL>
      */
-    std::shared_ptr<CURL> curlHandleInit()
+    std::shared_ptr<CURL> curlHandlerInit()
     {
         std::lock_guard<std::mutex> lock(CURL_WRAPPER_MUTEX);
-        const auto it {std::find_if(HANDLER_QUEUE.begin(),
-                                    HANDLER_QUEUE.end(),
+        const auto it {std::find_if(HANDLER_QUEUE.cbegin(),
+                                    HANDLER_QUEUE.cend(),
                                     [](const std::pair<std::thread::id, std::shared_ptr<CURL>>& pair)
                                     { return std::this_thread::get_id() == pair.first; })};
 
@@ -84,13 +83,13 @@ private:
         }
         else
         {
-            HANDLER_QUEUE.emplace_back(std::this_thread::get_id(),
-                                       std::shared_ptr<CURL>(curl_easy_init(), deleterCurl()));
-
             if (QUEUE_SIZE <= HANDLER_QUEUE.size())
             {
                 HANDLER_QUEUE.pop_front();
             }
+
+            HANDLER_QUEUE.emplace_back(std::this_thread::get_id(),
+                                       std::shared_ptr<CURL>(curl_easy_init(), deleterCurl()));
 
             return HANDLER_QUEUE.back().second;
         }
@@ -99,7 +98,7 @@ private:
 public:
     cURLWrapper()
     {
-        m_curlHandle = curlHandleInit();
+        m_curlHandle = curlHandlerInit();
 
         if (!m_curlHandle)
         {
