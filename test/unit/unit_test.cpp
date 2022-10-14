@@ -13,17 +13,38 @@
 
 using namespace testing;
 
+/**
+ * @brief This class is a wrapper to perform requests.
+ */
 class RequestWrapper final : public IRequestImplementator
 {
 public:
     RequestWrapper() = default;
     virtual ~RequestWrapper() = default;
 
+    /**
+     * @brief Mock method to set request options.
+     */
     MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, void* ptr), (override));
+    /**
+     * @brief Mock method to set request options.
+     */
     MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, const std::string& opt), (override));
+    /**
+     * @brief Mock method to set request options.
+     */
     MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, const long int opt), (override));
+    /**
+     * @brief Mock method to set execute the request.
+     */
     MOCK_METHOD(void, execute, (), (override));
+    /**
+     * @brief Mock method to get the response.
+     */
     MOCK_METHOD(const std::string, response, (), (override));
+    /**
+     * @brief Mock method to append a header.
+     */
     MOCK_METHOD(void, appendHeader, (const std::string& header), (override));
 };
 
@@ -39,6 +60,9 @@ constexpr OPTION_REQUEST_TYPE optWriteFunction {OPT_WRITEFUNCTION};
 constexpr OPTION_REQUEST_TYPE optPostFieldSize {OPT_POSTFIELDSIZE};
 constexpr long zero {0};
 
+/**
+ * @brief This test checks the HTTP request.
+ */
 TEST_F(UrlRequestUnitTest, GetFileHttp)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -53,6 +77,9 @@ TEST_F(UrlRequestUnitTest, GetFileHttp)
     GetRequest::builder(request).url("http://www.wazuh.com/").outputFile("/tmp/hello_world.html").execute();
 }
 
+/**
+ * @brief This test checks the request with UnixSocket.
+ */
 TEST_F(UrlRequestUnitTest, GetFileWithUnixSocket)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -72,6 +99,9 @@ TEST_F(UrlRequestUnitTest, GetFileWithUnixSocket)
         .execute();
 }
 
+/**
+ * @brief This test checks the API GET request.
+ */
 TEST_F(UrlRequestUnitTest, GetApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -93,6 +123,9 @@ TEST_F(UrlRequestUnitTest, GetApiRequest)
         .execute();
 }
 
+/**
+ * @brief This test checks the API POST request.
+ */
 TEST_F(UrlRequestUnitTest, PostApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -114,6 +147,9 @@ TEST_F(UrlRequestUnitTest, PostApiRequest)
         .execute();
 }
 
+/**
+ * @brief This test checks the API POST request with post field.
+ */
 TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -138,6 +174,9 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
         .execute();
 }
 
+/**
+ * @brief This test checks the API POST request with post field and unix socket.
+ */
 TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -164,6 +203,9 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
         .execute();
 }
 
+/**
+ * @brief This test checks the API PUT request.
+ */
 TEST_F(UrlRequestUnitTest, PutApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -185,6 +227,9 @@ TEST_F(UrlRequestUnitTest, PutApiRequest)
         .execute();
 }
 
+/**
+ * @brief This test checks the API DELETE request.
+ */
 TEST_F(UrlRequestUnitTest, DeleteApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
@@ -206,6 +251,9 @@ TEST_F(UrlRequestUnitTest, DeleteApiRequest)
         .execute();
 }
 
+/**
+ * @brief This test checks the malformed API DELETE request.
+ */
 TEST_F(UrlRequestUnitTest, BadConstructorDelete)
 {
     EXPECT_ANY_THROW({
@@ -219,6 +267,9 @@ TEST_F(UrlRequestUnitTest, BadConstructorDelete)
     });
 }
 
+/**
+ * @brief This test checks the malformed API GET request.
+ */
 TEST_F(UrlRequestUnitTest, BadConstructorGet)
 {
     EXPECT_ANY_THROW({
@@ -232,6 +283,9 @@ TEST_F(UrlRequestUnitTest, BadConstructorGet)
     });
 }
 
+/**
+ * @brief This test checks the malformed API POST request.
+ */
 TEST_F(UrlRequestUnitTest, BadConstructorPost)
 {
     EXPECT_ANY_THROW({
@@ -245,6 +299,9 @@ TEST_F(UrlRequestUnitTest, BadConstructorPost)
     });
 }
 
+/**
+ * @brief This test checks the malformed API PUT request.
+ */
 TEST_F(UrlRequestUnitTest, BadConstructorPut)
 {
     EXPECT_ANY_THROW({

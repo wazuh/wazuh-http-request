@@ -35,6 +35,9 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_UNIX_SOCKET_PATH, CURLOPT_UNIX_SOCKET_PATH},
     {OPT_FAILONERROR, CURLOPT_FAILONERROR}};
 
+/**
+ * @brief This class is a wrapper of the curl library.
+ */
 class cURLWrapper final : public IRequestImplementator
 {
 private:
@@ -69,11 +72,20 @@ public:
 
     virtual ~cURLWrapper() = default;
 
+    /**
+     * @brief This method returns the value of the last request.
+     * @return The value of the last request.
+     */
     inline const std::string response() override
     {
         return m_returnValue;
     }
 
+    /**
+     * @brief This method sets an option to the curl handler.
+     * @param optIndex The option index.
+     * @param ptr The option value.
+     */
     void setOption(const OPTION_REQUEST_TYPE optIndex, void* ptr) override
     {
         auto ret = curl_easy_setopt(m_curlHandle.get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), ptr);
@@ -84,6 +96,11 @@ public:
         }
     }
 
+    /**
+     * @brief This method sets an option to the curl handler.
+     * @param optIndex The option index.
+     * @param opt The option value.
+     */
     void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) override
     {
         auto ret = curl_easy_setopt(m_curlHandle.get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt.c_str());
@@ -94,6 +111,11 @@ public:
         }
     }
 
+    /**
+     * @brief This method sets an option to the curl handler.
+     * @param optIndex The option index.
+     * @param opt The option value.
+     */
     void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) override
     {
         auto ret = curl_easy_setopt(m_curlHandle.get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt);
@@ -104,6 +126,10 @@ public:
         }
     }
 
+    /**
+     * @brief This method adds an header to the curl handler.
+     * @param header The header to be added.
+     */
     void appendHeader(const std::string& header) override
     {
         if (!m_curlHeaders)
@@ -116,6 +142,9 @@ public:
         }
     }
 
+    /**
+     * @brief This method performs the request.
+     */
     void execute() override
     {
         curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());

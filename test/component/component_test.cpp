@@ -14,6 +14,9 @@
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
 
+/**
+ * @brief This class is a simple HTTP server that provides a simple interface to perform HTTP requests.
+ */
 class FakeServer final
 {
 private:
@@ -37,6 +40,9 @@ public:
         m_thread.join();
     }
 
+    /**
+     * @brief This method is used to start the server.
+     */
     void run()
     {
         m_server.Get("/",
@@ -58,6 +64,9 @@ public:
     }
 };
 
+/**
+ * @brief Test the get request.
+ */
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
     HTTPRequest::instance().get(HttpURL("http://localhost:44441/"),
@@ -70,6 +79,9 @@ TEST_F(ComponentTestInterface, GetHelloWorld)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the post request.
+ */
 TEST_F(ComponentTestInterface, PostHelloWorld)
 {
     HTTPRequest::instance().post(HttpURL("http://localhost:44441/"),
@@ -83,6 +95,9 @@ TEST_F(ComponentTestInterface, PostHelloWorld)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the update request.
+ */
 TEST_F(ComponentTestInterface, PutHelloWorld)
 {
     HTTPRequest::instance().update(HttpURL("http://localhost:44441/"),
@@ -96,6 +111,9 @@ TEST_F(ComponentTestInterface, PutHelloWorld)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the delete request.
+ */
 TEST_F(ComponentTestInterface, DeleteRandomID)
 {
     auto random {std::to_string(std::rand())};
@@ -110,6 +128,9 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the download request.
+ */
 TEST_F(ComponentTestInterface, DownloadFile)
 {
     HTTPRequest::instance().download(HttpURL("http://localhost:44441/"),
@@ -122,6 +143,9 @@ TEST_F(ComponentTestInterface, DownloadFile)
     EXPECT_EQ(line, "Hello World!");
 }
 
+/**
+ * @brief Test the download request with a invalid URL.
+ */
 TEST_F(ComponentTestInterface, DownloadFileError)
 {
     HTTPRequest::instance().download(HttpURL("http://localhost:44441/invalid_file"),
@@ -135,6 +159,9 @@ TEST_F(ComponentTestInterface, DownloadFileError)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the get request and check the file content.
+ */
 TEST_F(ComponentTestInterface, GetHelloWorldFile)
 {
     HTTPRequest::instance().get(
@@ -149,6 +176,9 @@ TEST_F(ComponentTestInterface, GetHelloWorldFile)
     EXPECT_EQ(line, "Hello World!");
 }
 
+/**
+ * @brief Test the post request and check the file content.
+ */
 TEST_F(ComponentTestInterface, PostHelloWorldFile)
 {
     HTTPRequest::instance().post(
@@ -164,6 +194,9 @@ TEST_F(ComponentTestInterface, PostHelloWorldFile)
     EXPECT_EQ(line, R"({"hello":"world"})");
 }
 
+/**
+ * @brief Test the update request and check the file content.
+ */
 TEST_F(ComponentTestInterface, PutHelloWorldFile)
 {
     HTTPRequest::instance().update(
@@ -179,6 +212,9 @@ TEST_F(ComponentTestInterface, PutHelloWorldFile)
     EXPECT_EQ(line, R"({"hello":"world"})");
 }
 
+/**
+ * @brief Test the delete request and check the file content.
+ */
 TEST_F(ComponentTestInterface, DeleteRandomIDFile)
 {
     auto random {std::to_string(std::rand())};
@@ -197,6 +233,9 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFile)
 
 using wrapperType = cURLWrapper;
 
+/**
+ * @brief Test the download request with a empty URL.
+ */
 TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
 {
     try
@@ -211,6 +250,9 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the download request with a invalid URL.
+ */
 TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl2)
 {
     try
@@ -228,6 +270,9 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl2)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the get request with a invalid file.
+ */
 TEST_F(ComponentTestInternalParameters, GetError)
 {
     try
@@ -244,6 +289,9 @@ TEST_F(ComponentTestInternalParameters, GetError)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the post request with a invalid file.
+ */
 TEST_F(ComponentTestInternalParameters, PostError)
 {
     try
@@ -261,6 +309,9 @@ TEST_F(ComponentTestInternalParameters, PostError)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the put request with a invalid file.
+ */
 TEST_F(ComponentTestInternalParameters, PutError)
 {
     try
@@ -278,6 +329,9 @@ TEST_F(ComponentTestInternalParameters, PutError)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the delete request with a invalid file.
+ */
 TEST_F(ComponentTestInternalParameters, DeleteError)
 {
     try
@@ -294,6 +348,9 @@ TEST_F(ComponentTestInternalParameters, DeleteError)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the get request with no url.
+ */
 TEST_F(ComponentTestInternalParameters, ExecuteGetNoUrl)
 {
     try
@@ -308,6 +365,9 @@ TEST_F(ComponentTestInternalParameters, ExecuteGetNoUrl)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the post request with no url.
+ */
 TEST_F(ComponentTestInternalParameters, ExecutePostNoUrl)
 {
     try
@@ -322,6 +382,9 @@ TEST_F(ComponentTestInternalParameters, ExecutePostNoUrl)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the put request with no url.
+ */
 TEST_F(ComponentTestInternalParameters, ExecutePutNoUrl)
 {
     try
@@ -336,6 +399,9 @@ TEST_F(ComponentTestInternalParameters, ExecutePutNoUrl)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+/**
+ * @brief Test the delete request with no url.
+ */
 TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
 {
     try

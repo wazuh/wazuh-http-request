@@ -25,18 +25,33 @@
 
 class FakeServer;
 
+/**
+ * @brief Class to test HTTPRequest class.
+ */
 class ComponentTest : public ::testing::Test
 {
 protected:
+    /**
+     * @brief This variable is used as a flag to indicate if all the callbacks have been called.
+     */
     bool m_callbackComplete = false;
     virtual ~ComponentTest() = default;
+    /**
+     * @brief This method is called before each test to initialize the test environment.
+     */
     void SetUp() override
     {
         m_callbackComplete = false;
     }
 
+    /**
+     * @brief This variable is used to store the server instance.
+     */
     inline static std::unique_ptr<FakeServer> fakeFileServer;
 
+    /**
+     * @brief This method is called before each test to initialize the test environment.
+     */
     static void SetUpTestSuite()
     {
         if (!fakeFileServer)
@@ -45,12 +60,18 @@ protected:
         }
     }
 
+    /**
+     * @brief This method is called after each test to cleanup the test environment.
+     */
     static void TearDownTestSuite()
     {
         fakeFileServer.reset();
     }
 };
 
+/**
+ * @brief Class to test HTTPRequest class.
+ */
 class ComponentTestInterface : public ComponentTest
 {
 protected:
@@ -58,6 +79,9 @@ protected:
     virtual ~ComponentTestInterface() = default;
 };
 
+/**
+ * @brief Class to test HTTPRequest class.
+ */
 class ComponentTestInternalParameters : public ComponentTest
 {
 protected:

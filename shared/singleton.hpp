@@ -12,10 +12,19 @@
 #ifndef _SINGLETON_HPP
 #define _SINGLETON_HPP
 
+/**
+ * @brief This class is a template for singleton classes.
+ *
+ * @tparam T Type of the singleton class.
+ */
 template<typename T>
 class Singleton
 {
     public:
+        /**
+         * @brief Returns the instance of the singleton class.
+         * @return Instance of the singleton class.
+         */
         static T& instance()
         {
             static T s_instance;
