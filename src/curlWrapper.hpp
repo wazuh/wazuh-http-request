@@ -17,8 +17,11 @@
 #include "customDeleter.hpp"
 #include <map>
 #include <memory>
+#include <mutex>
 #include <ostream>
+#include <queue>
 #include <stdexcept>
+#include <thread>
 
 using deleterCurl = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 
@@ -35,6 +38,12 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_UNIX_SOCKET_PATH, CURLOPT_UNIX_SOCKET_PATH},
     {OPT_FAILONERROR, CURLOPT_FAILONERROR}};
 
+static std::deque<std::pair<std::thread::id, std::shared_ptr<CURL>>> HANDLER_QUEUE;
+
+static std::mutex CURL_WRAPPER_MUTEX;
+
+static const int QUEUE_SIZE = 5;
+
 /**
  * @brief This class is a wrapper of the curl library.
  */
@@ -43,6 +52,8 @@ class cURLWrapper final : public IRequestImplementator
 private:
     using deleterCurlStringList = CustomDeleter<decltype(&curl_slist_free_all), curl_slist_free_all>;
     std::unique_ptr<curl_slist, deleterCurlStringList> m_curlHeaders;
+    std::string m_returnValue;
+    std::shared_ptr<CURL> m_curlHandle;
 
     static size_t writeData(char* data, size_t size, size_t nmemb, void* userdata)
     {
@@ -50,14 +61,45 @@ private:
         str->append(data, size * nmemb);
         return size * nmemb;
     }
-    std::string m_returnValue;
 
-    const std::unique_ptr<CURL, deleterCurl> m_curlHandle;
+    /**
+     * @brief Get the cURL Handler object
+     * This method creates a cURL handler and returns it, but ensures that only one cURL handler is used per thread and
+     * keeps the queue size to a maximum of QUEUE_SIZE.
+     *
+     * @return std::shared_ptr<CURL>
+     */
+    std::shared_ptr<CURL> curlHandlerInit()
+    {
+        std::lock_guard<std::mutex> lock(CURL_WRAPPER_MUTEX);
+        const auto it {std::find_if(HANDLER_QUEUE.cbegin(),
+                                    HANDLER_QUEUE.cend(),
+                                    [](const std::pair<std::thread::id, std::shared_ptr<CURL>>& pair)
+                                    { return std::this_thread::get_id() == pair.first; })};
+
+        if (HANDLER_QUEUE.end() != it)
+        {
+            return it->second;
+        }
+        else
+        {
+            if (QUEUE_SIZE <= HANDLER_QUEUE.size())
+            {
+                HANDLER_QUEUE.pop_front();
+            }
+
+            HANDLER_QUEUE.emplace_back(std::this_thread::get_id(),
+                                       std::shared_ptr<CURL>(curl_easy_init(), deleterCurl()));
+
+            return HANDLER_QUEUE.back().second;
+        }
+    }
 
 public:
     cURLWrapper()
-        : m_curlHandle {curl_easy_init()}
     {
+        m_curlHandle = curlHandlerInit();
+
         if (!m_curlHandle)
         {
             throw std::runtime_error("cURL initialization failed");
@@ -150,6 +192,7 @@ public:
         curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
 
         const auto result {curl_easy_perform(m_curlHandle.get())};
+        curl_easy_reset(m_curlHandle.get());
         if (result != CURLE_OK)
         {
             throw std::runtime_error(curl_easy_strerror(result));
