@@ -30,7 +30,7 @@ Please see the CMake documentation and CMakeLists.txt for more advanced usage.
 
 ### Documentation
 
-Apart from the markdown that we can find in the readme of the project subfolders, the code has doxygen headers, which generates a technical documentation which gives some context of what the call tree is like, and what parameters and returns they have.
+Apart from the markdown that we can find in the readme of the project subfolders, the code has doxygen headers, which generate technical documentation that gives some context of what the call tree is like, and what parameters and returns they have.
 
 ```bash
 root@wazuh-dev:~/repos/wazuh-http-request# doxygen doxygen.cfg
