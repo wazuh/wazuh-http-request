@@ -28,4 +28,13 @@ Please see the CMake documentation and CMakeLists.txt for more advanced usage.
 
 4. **Diagrams** All changes must be accompanied by a new (or changed) architectural diagrams.
 
+### Documentation
+
+Apart from the markdown that we can find in the readme of the project subfolders, the code has doxygen headers, which generate technical documentation that gives some context of what the call tree is like, and what parameters and returns they have.
+
+```bash
+root@wazuh-dev:~/repos/wazuh-http-request# doxygen doxygen.cfg
+```
+
+After executing this command, open the index.html file that is generated in the `doc/html` folder, to view this technical and implementation documentation.
 
