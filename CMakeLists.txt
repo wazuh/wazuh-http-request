@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.16.3)
 project(urlrequest)
 
-enable_testing()
-
 get_filename_component(SRC_FOLDER     ${CMAKE_SOURCE_DIR}/ ABSOLUTE)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -69,10 +67,12 @@ add_library(urlrequest ${URL_REQUEST_SRC})
 target_link_libraries(urlrequest curl)
 
 if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
-add_subdirectory(external/googletest)
-add_subdirectory(external/benchmark)
+    add_subdirectory(external/googletest)
+    add_subdirectory(external/benchmark)
+
+    add_subdirectory(test_tool)
+    add_subdirectory(test)    
+
+    # Enable testing only if compiling this repository
+    enable_testing()    
 endif (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
-
-add_subdirectory(test_tool)
-add_subdirectory(test)
-
