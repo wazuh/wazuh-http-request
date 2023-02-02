@@ -17,7 +17,7 @@
 /**
  * @brief This class is a simple HTTP server that provides a simple interface to perform HTTP requests.
  */
-class FakeServer final
+class ComponentTestFakeServer final
 {
 private:
     httplib::Server m_server;
@@ -25,8 +25,9 @@ private:
     bool m_forceError;
 
 public:
-    FakeServer()
-        : m_thread(&FakeServer::run, this), m_forceError(true)
+    ComponentTestFakeServer()
+        : m_thread(&ComponentTestFakeServer::run, this)
+        , m_forceError(true)
     {
         // Wait until server is ready
         while (!m_server.is_running())
@@ -35,7 +36,7 @@ public:
         }
     }
 
-    ~FakeServer()
+    ~ComponentTestFakeServer()
     {
         m_server.stop();
         m_thread.join();
@@ -53,16 +54,16 @@ public:
         m_server.Get("/testRetry/",
                      [&](const httplib::Request& /*req*/, httplib::Response& res)
                      {
-                        if (m_forceError)
-                        {
-                            m_forceError = false;
-                            throw std::runtime_error {"Something went wrong"};
-                        }
-                        else
-                        {
-                            res.set_content("Hello World!", "text/json");
-                        }
-                    });
+                         if (m_forceError)
+                         {
+                             m_forceError = false;
+                             throw std::runtime_error {"Something went wrong"};
+                         }
+                         else
+                         {
+                             res.set_content("Hello World!", "text/json");
+                         }
+                     });
 
         m_server.Post(
             "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
@@ -99,13 +100,14 @@ TEST_F(ComponentTestInterface, GetHelloWorld)
  */
 TEST_F(ComponentTestInterface, GetIncorrectPort)
 {
-    HTTPRequest::instance().get(HttpURL("http://localhost:44442/"),
-                                [](auto) {},
-                                [&](const std::string& result)
-                                {
-                                    EXPECT_EQ(result, "Couldn't connect to server");
-                                    m_callbackComplete = true;
-                                });
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44442/"),
+        [](auto) {},
+        [&](const std::string& result)
+        {
+            EXPECT_EQ(result, "Couldn't connect to server");
+            m_callbackComplete = true;
+        });
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -119,17 +121,18 @@ TEST_F(ComponentTestInterface, GetWithRetry)
 {
     auto onErrorCallback {false};
 
-    HTTPRequest::instance().get(HttpURL("http://localhost:44441/testRetry/"),
-                                [&](const std::string& result)
-                                {
-                                    EXPECT_EQ(result, "Hello World!");
-                                    m_callbackComplete = true;
-                                },
-                                [&](const std::string& result)
-                                {
-                                    // This should not be executed
-                                    onErrorCallback = true;
-                                });
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44441/testRetry/"),
+        [&](const std::string& result)
+        {
+            EXPECT_EQ(result, "Hello World!");
+            m_callbackComplete = true;
+        },
+        [&](const std::string& result)
+        {
+            // This should not be executed
+            onErrorCallback = true;
+        });
 
     EXPECT_TRUE(m_callbackComplete);
     EXPECT_FALSE(onErrorCallback);

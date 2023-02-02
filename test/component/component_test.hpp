@@ -23,7 +23,7 @@
 
 #include "HTTPRequest.hpp"
 
-class FakeServer;
+class ComponentTestFakeServer;
 
 /**
  * @brief Class to test HTTPRequest class.
@@ -47,7 +47,7 @@ protected:
     /**
      * @brief This variable is used to store the server instance.
      */
-    inline static std::unique_ptr<FakeServer> fakeFileServer;
+    inline static std::unique_ptr<ComponentTestFakeServer> fakeFileServer;
 
     /**
      * @brief This method is called before each test to initialize the test environment.
@@ -56,7 +56,7 @@ protected:
     {
         if (!fakeFileServer)
         {
-            fakeFileServer = std::make_unique<FakeServer>();
+            fakeFileServer = std::make_unique<ComponentTestFakeServer>();
         }
     }
 

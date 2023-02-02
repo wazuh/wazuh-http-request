@@ -16,20 +16,19 @@
 
 #include "HTTPRequest.hpp"
 #include "benchmark.h"
-#include <iostream>
 
 /**
  * @brief This class is a simple HTTP server that provides a simple interface to perform HTTP requests.
  */
-class FakeServer final
+class BenchmarkFakeServer final
 {
 private:
     httplib::Server m_server;
     std::thread m_thread;
 
 public:
-    FakeServer()
-        : m_thread(&FakeServer::run, this)
+    BenchmarkFakeServer()
+        : m_thread(&BenchmarkFakeServer::run, this)
     {
         // Wait until server is ready
         while (!m_server.is_running())
@@ -38,7 +37,7 @@ public:
         }
     }
 
-    ~FakeServer()
+    ~BenchmarkFakeServer()
     {
         m_server.stop();
         m_thread.join();
@@ -68,7 +67,7 @@ public:
     }
 };
 
-FakeServer g_server;
+BenchmarkFakeServer g_server;
 
 /**
  * @brief This function is a benchmark test for the HTTP GET request.
