@@ -12,6 +12,7 @@
 #include "HTTPRequest.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
+#include <string>
 
 using wrapperType = cURLWrapper;
 
@@ -62,21 +63,36 @@ void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&)> onError,
                       const std::string& fileName)
 {
-    try
-    {
-        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url())
-            .appendHeader("Content-Type: application/json")
-            .appendHeader("Accept: application/json")
-            .appendHeader("Accept-Charset: utf-8")
-            .outputFile(fileName)
-            .execute();
+    auto fetchAttempts {2};
+    std::string exceptionMessage;
 
-        onSuccess(req.response());
-    }
-    catch (const std::exception& ex)
+    // Do fetchAttempts attempts to fetch the description
+    while (0 < fetchAttempts)
     {
-        onError(ex.what());
+        try
+        {
+            auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+            req.url(url.url())
+                .appendHeader("Content-Type: application/json")
+                .appendHeader("Accept: application/json")
+                .appendHeader("Accept-Charset: utf-8")
+                .outputFile(fileName)
+                .execute();
+
+            onSuccess(req.response());
+            break;
+        }
+        catch (const std::exception& ex)
+        {
+            fetchAttempts--;
+            exceptionMessage = ex.what();
+        }
+    }
+
+    // If all attempts fail, the error callback is called
+    if (0 == fetchAttempts)
+    {
+        onError(std::move(exceptionMessage));
     }
 }
 
