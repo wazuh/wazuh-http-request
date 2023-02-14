@@ -66,7 +66,7 @@ void HTTPRequest::get(const URL& url,
     auto getAttempts {2};
     std::string exceptionMessage;
 
-    // Do getAttempts attempts to get the description
+    // Try the request 'getAttempts' times
     while (0 < getAttempts)
     {
         try
