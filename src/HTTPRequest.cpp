@@ -63,11 +63,11 @@ void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&)> onError,
                       const std::string& fileName)
 {
-    auto fetchAttempts {2};
+    auto getAttempts {2};
     std::string exceptionMessage;
 
-    // Do fetchAttempts attempts to fetch the description
-    while (0 < fetchAttempts)
+    // Do getAttempts attempts to get the description
+    while (0 < getAttempts)
     {
         try
         {
@@ -84,15 +84,15 @@ void HTTPRequest::get(const URL& url,
         }
         catch (const std::exception& ex)
         {
-            fetchAttempts--;
+            getAttempts--;
             exceptionMessage = ex.what();
         }
     }
 
     // If all attempts fail, the error callback is called
-    if (0 == fetchAttempts)
+    if (0 == getAttempts)
     {
-        onError(std::move(exceptionMessage));
+        onError(exceptionMessage);
     }
 }
 
