@@ -119,7 +119,7 @@ TEST_F(ComponentTestInterface, GetIncorrectPort)
  */
 TEST_F(ComponentTestInterface, GetWithRetry)
 {
-    auto onErrorCallback {false};
+    auto errorCallbackComplete {false};
 
     HTTPRequest::instance().get(
         HttpURL("http://localhost:44441/testRetry/"),
@@ -131,11 +131,11 @@ TEST_F(ComponentTestInterface, GetWithRetry)
         [&](const std::string& result)
         {
             // This should not be executed
-            onErrorCallback = true;
+            errorCallbackComplete = true;
         });
 
     EXPECT_TRUE(m_callbackComplete);
-    EXPECT_FALSE(onErrorCallback);
+    EXPECT_FALSE(errorCallbackComplete);
 }
 
 /**
