@@ -65,6 +65,7 @@ void HTTPRequest::get(const URL& url,
                       unsigned int attempts)
 {
     std::string exceptionMessage;
+    std::string response;
 
     // Try the request 'getAttempts' times
     while (0 < attempts)
@@ -79,7 +80,7 @@ void HTTPRequest::get(const URL& url,
                 .outputFile(fileName)
                 .execute();
 
-            onSuccess(req.response());
+            response = req.response();
             break;
         }
         catch (const std::exception& ex)
@@ -89,10 +90,14 @@ void HTTPRequest::get(const URL& url,
         }
     }
 
-    // If all attempts fail, the error callback is called
     if (0 == attempts)
     {
+        // If all attempts fail, the error callback is called
         onError(exceptionMessage);
+    }
+    else
+    {
+        onSuccess(response);
     }
 }
 
