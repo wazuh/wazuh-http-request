@@ -58,6 +58,9 @@ void UNIXSocketRequest::get(const URL& url,
                             const std::string& fileName,
                             unsigned int attempts)
 {
+    // TODO: Implement attempts logic
+    (void)attempts;
+
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
