@@ -86,14 +86,15 @@ void HTTPRequest::get(const URL& url,
         catch (const std::exception& ex)
         {
             attempts--;
-            exceptionMessage = ex.what();
+            exceptionMessage += std::string("'") + ex.what() + "' - ";
         }
     }
 
     if (0 == attempts)
     {
         // If all attempts fail, the error callback is called
-        onError(exceptionMessage);
+        // Last three chars of the message (" - ") are removed
+        onError(exceptionMessage.substr(0, exceptionMessage.size() - 3));
     }
     else
     {

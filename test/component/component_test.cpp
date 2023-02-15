@@ -105,7 +105,7 @@ TEST_F(ComponentTestInterface, GetIncorrectPort)
         [](auto) {},
         [&](const std::string& result)
         {
-            EXPECT_EQ(result, "Couldn't connect to server");
+            EXPECT_EQ(result, "'Couldn't connect to server' - 'Couldn't connect to server'");
             m_callbackComplete = true;
         });
 
