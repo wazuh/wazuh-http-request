@@ -55,7 +55,8 @@ void UNIXSocketRequest::post(const URL& url,
 void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&)> onError,
-                            const std::string& fileName)
+                            const std::string& fileName,
+                            unsigned int attempts)
 {
     try
     {

@@ -61,13 +61,13 @@ void HTTPRequest::post(const URL& url,
 void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&)> onSuccess,
                       std::function<void(const std::string&)> onError,
-                      const std::string& fileName)
+                      const std::string& fileName,
+                      unsigned int attempts)
 {
-    auto getAttempts {2};
     std::string exceptionMessage;
 
     // Try the request 'getAttempts' times
-    while (0 < getAttempts)
+    while (0 < attempts)
     {
         try
         {
@@ -84,13 +84,13 @@ void HTTPRequest::get(const URL& url,
         }
         catch (const std::exception& ex)
         {
-            getAttempts--;
+            attempts--;
             exceptionMessage = ex.what();
         }
     }
 
     // If all attempts fail, the error callback is called
-    if (0 == getAttempts)
+    if (0 == attempts)
     {
         onError(exceptionMessage);
     }

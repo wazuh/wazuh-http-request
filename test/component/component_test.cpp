@@ -132,7 +132,9 @@ TEST_F(ComponentTestInterface, GetWithRetry)
         {
             // This should not be executed
             errorCallbackComplete = true;
-        });
+        },
+        "",
+        2);
 
     EXPECT_TRUE(m_callbackComplete);
     EXPECT_FALSE(errorCallbackComplete);

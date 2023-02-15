@@ -147,12 +147,14 @@ public:
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
+     * @param attempts Number of attempts (in total) if the query fails.
      */
     virtual void get(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&)> onError = [](auto) {},
-        const std::string& fileName = "") = 0;
+        const std::string& fileName = "",
+        unsigned int attempts = 2) = 0;
 
     /**
      * @brief Virtual method to send a UPDATE request to a URL.
