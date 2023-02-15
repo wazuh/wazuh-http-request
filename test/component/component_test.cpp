@@ -134,7 +134,7 @@ TEST_F(ComponentTestInterface, GetWithRetry)
             errorCallbackComplete = true;
         },
         "",
-        2);
+        2); // This should be greater than one in order to success
 
     EXPECT_TRUE(m_callbackComplete);
     EXPECT_FALSE(errorCallbackComplete);
