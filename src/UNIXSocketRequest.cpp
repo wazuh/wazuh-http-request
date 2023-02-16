@@ -56,7 +56,7 @@ void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&)> onError,
                             const std::string& fileName,
-                            unsigned int retryAttempts)
+                            const unsigned int retryAttempts)
 {
     // TODO: Implement retry attempts logic
     (void)retryAttempts;

@@ -41,7 +41,7 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&)> onError = [](auto) {},
         const std::string& fileName = "",
-        unsigned int retryAttempts = 1);
+        const unsigned int retryAttempts = 1);
     void update(
         const URL& url,
         const nlohmann::json& data,
