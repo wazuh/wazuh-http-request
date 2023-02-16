@@ -56,10 +56,10 @@ void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&)> onError,
                             const std::string& fileName,
-                            unsigned int attempts)
+                            unsigned int retryAttempts)
 {
-    // TODO: Implement attempts logic
-    (void)attempts;
+    // TODO: Implement retry attempts logic
+    (void)retryAttempts;
 
     try
     {

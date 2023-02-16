@@ -62,6 +62,7 @@ public:
                          else
                          {
                              res.set_content("Hello World!", "text/json");
+                             m_forceError = true;
                          }
                      });
 
@@ -134,10 +135,34 @@ TEST_F(ComponentTestInterface, GetWithRetry)
             errorCallbackComplete = true;
         },
         "",
-        2); // This should be greater than one in order to success
+        1); // This should be greater than zero in order to success
 
     EXPECT_TRUE(m_callbackComplete);
     EXPECT_FALSE(errorCallbackComplete);
+}
+
+/**
+ * @brief Test the get request without any retry.
+ *
+ * @details The first (and only) attempt to get() should fail.
+ */
+TEST_F(ComponentTestInterface, GetWithoutRetry)
+{
+    auto errorCallbackComplete {false};
+
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44441/testRetry/"),
+        [&](const std::string& result)
+        {
+            // This should not be executed
+            m_callbackComplete = true;
+        },
+        [&](const std::string& result) { errorCallbackComplete = true; },
+        "",
+        0);
+
+    EXPECT_FALSE(m_callbackComplete);
+    EXPECT_TRUE(errorCallbackComplete);
 }
 
 /**

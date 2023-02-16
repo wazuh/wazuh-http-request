@@ -62,12 +62,13 @@ void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&)> onSuccess,
                       std::function<void(const std::string&)> onError,
                       const std::string& fileName,
-                      unsigned int attempts)
+                      unsigned int retryAttempts)
 {
     std::string exceptionMessage;
+    bool firstGet {true};
 
-    // Try the request 'attempts' times
-    while (0 < attempts)
+    // Try the request 'retryAttempts' + 1 times
+    while (firstGet || 0 < retryAttempts)
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
 
@@ -82,8 +83,12 @@ void HTTPRequest::get(const URL& url,
         }
         catch (const std::exception& ex)
         {
-            attempts--;
+            if (!firstGet)
+            {
+                retryAttempts--;
+            }
             exceptionMessage += std::string("'") + ex.what() + "' - ";
+            firstGet = false;
             continue;
         }
 
@@ -91,7 +96,7 @@ void HTTPRequest::get(const URL& url,
         break;
     }
 
-    if (0 == attempts)
+    if (!firstGet && 0 == retryAttempts)
     {
         // If all attempts fail, the error callback is called
         // Last three chars of the message (" - ") are removed
