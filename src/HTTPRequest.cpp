@@ -65,29 +65,30 @@ void HTTPRequest::get(const URL& url,
                       unsigned int attempts)
 {
     std::string exceptionMessage;
-    std::string response;
 
-    // Try the request 'getAttempts' times
+    // Try the request 'attempts' times
     while (0 < attempts)
     {
+        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+
         try
         {
-            auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
             req.url(url.url())
                 .appendHeader("Content-Type: application/json")
                 .appendHeader("Accept: application/json")
                 .appendHeader("Accept-Charset: utf-8")
                 .outputFile(fileName)
                 .execute();
-
-            response = req.response();
-            break;
         }
         catch (const std::exception& ex)
         {
             attempts--;
             exceptionMessage += std::string("'") + ex.what() + "' - ";
+            continue;
         }
+
+        onSuccess(req.response());
+        break;
     }
 
     if (0 == attempts)
@@ -95,10 +96,6 @@ void HTTPRequest::get(const URL& url,
         // If all attempts fail, the error callback is called
         // Last three chars of the message (" - ") are removed
         onError(exceptionMessage.substr(0, exceptionMessage.size() - 3));
-    }
-    else
-    {
-        onSuccess(response);
     }
 }
 
