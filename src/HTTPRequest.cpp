@@ -67,7 +67,7 @@ void HTTPRequest::get(const URL& url,
     std::string exceptionMessage;
     unsigned int attempts {1 + retryAttempts};
 
-    // Try the request 'attempts'
+    // Try the request 'attempts' times
     while (0 < attempts)
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
