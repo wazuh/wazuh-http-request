@@ -58,19 +58,34 @@ void UNIXSocketRequest::get(const URL& url,
                             const std::string& fileName,
                             const unsigned int retryAttempts)
 {
-    // TODO: Implement retry attempts logic
-    (void)retryAttempts;
+    std::string exceptionMessage;
+    unsigned int attempts {1 + retryAttempts};
 
-    try
+    // Try the request 'attempts' times
+    while (0 < attempts)
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url()).unixSocketPath(url.unixSocketPath()).outputFile(fileName).execute();
+
+        try
+        {
+            req.url(url.url()).unixSocketPath(url.unixSocketPath()).outputFile(fileName).execute();
+        }
+        catch (const std::exception& ex)
+        {
+            attempts--;
+            exceptionMessage += std::string("'") + ex.what() + "' - ";
+            continue;
+        }
 
         onSuccess(req.response());
+        break;
     }
-    catch (const std::exception& ex)
+
+    if (0 == attempts)
     {
-        onError(ex.what());
+        // If all attempts fail, the error callback is called
+        // Last three chars of the message (" - ") are removed
+        onError(exceptionMessage.substr(0, exceptionMessage.size() - 3));
     }
 }
 
