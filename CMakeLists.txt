@@ -5,6 +5,8 @@ get_filename_component(SRC_FOLDER     ${CMAKE_SOURCE_DIR}/ ABSOLUTE)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_FLAGS "-fPIC")
+
 if(NOT EXTERNAL_DEPS_VERSION)
     set(EXTERNAL_DEPS_VERSION "19")
 endif(NOT EXTERNAL_DEPS_VERSION)
@@ -56,7 +58,7 @@ include_directories(src/)
 include_directories(include/)
 include_directories(${SRC_FOLDER}/external/curl/include/curl/)
 include_directories(${SRC_FOLDER}/external/nlohmann/)
-include_directories(shared/)
+include_directories(BEFORE shared/)
 
 link_directories(${SRC_FOLDER}/external/curl/lib/.libs/)
 
