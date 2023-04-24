@@ -97,7 +97,7 @@ TEST_F(ComponentTestInterface, GetHelloWorld)
 }
 
 /**
- * @brief Test the get request from an incorrect port.
+ * @brief Test the get request from an incorrect port. One retry is enabled.
  */
 TEST_F(ComponentTestInterface, GetIncorrectPort)
 {
@@ -108,7 +108,9 @@ TEST_F(ComponentTestInterface, GetIncorrectPort)
         {
             EXPECT_EQ(result, "'Couldn't connect to server' - 'Couldn't connect to server'");
             m_callbackComplete = true;
-        });
+        },
+        "",
+        1);
 
     EXPECT_TRUE(m_callbackComplete);
 }

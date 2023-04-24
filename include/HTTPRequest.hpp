@@ -58,14 +58,15 @@ public:
      * @param onSuccess Callback to be called in case of success.
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
-     * @param retryAttempts Number of retry attempts if the query fails.
+     * @param retryAttempts Number of retry attempts if the query fails. By default is zero, meaning no retry will be
+     * made.
      */
     void get(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&)> onError = [](auto) {},
         const std::string& fileName = "",
-        const unsigned int retryAttempts = 1);
+        const unsigned int retryAttempts = 0);
 
     /**
      * @brief Performs a HTTP UPDATE request.

@@ -65,10 +65,10 @@ void HTTPRequest::get(const URL& url,
                       const unsigned int retryAttempts)
 {
     std::string exceptionMessage;
-    unsigned int attempts {1 + retryAttempts};
+    unsigned int attempts {1u + retryAttempts};
 
     // Try the request 'attempts' times
-    while (0 < attempts)
+    while (0u < attempts)
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
 
@@ -83,7 +83,7 @@ void HTTPRequest::get(const URL& url,
         }
         catch (const std::exception& ex)
         {
-            attempts--;
+            --attempts;
             exceptionMessage += std::string("'") + ex.what() + "' - ";
             continue;
         }
@@ -92,7 +92,7 @@ void HTTPRequest::get(const URL& url,
         break;
     }
 
-    if (0 == attempts)
+    if (0u == attempts)
     {
         // If all attempts fail, the error callback is called
         // Last three chars of the message (" - ") are removed
