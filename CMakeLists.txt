@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.12.4)
 project(urlrequest)
 
 get_filename_component(SRC_FOLDER     ${CMAKE_SOURCE_DIR}/ ABSOLUTE)
@@ -41,8 +41,13 @@ function(check_and_download_dep libname url)
     endif()
 endfunction(check_and_download_dep)
 
-set(EXTERNAL_RES nlohmann googletest benchmark cpp-httplib)
-set(PRECOMPILED_EXTERNAL_RES curl)
+if(NOT DEFINED EXTERNAL_RES)
+    set(EXTERNAL_RES nlohmann googletest benchmark cpp-httplib)
+endif(NOT DEFINED EXTERNAL_RES)
+
+if(NOT DEFINED PRECOMPILED_EXTERNAL_RES)
+    set(PRECOMPILED_EXTERNAL_RES curl)
+endif(NOT DEFINED PRECOMPILED_EXTERNAL_RES)
 
 foreach(loop_var ${EXTERNAL_RES})
     check_and_download_dep(${loop_var} ${RESOURCES_URL})
@@ -58,7 +63,7 @@ include_directories(src/)
 include_directories(include/)
 include_directories(${SRC_FOLDER}/external/curl/include/curl/)
 include_directories(${SRC_FOLDER}/external/nlohmann/)
-include_directories(BEFORE shared/)
+include_directories(BEFORE PRIVATE shared/)
 
 link_directories(${SRC_FOLDER}/external/curl/lib/.libs/)
 
