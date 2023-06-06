@@ -71,7 +71,11 @@ file(GLOB URL_REQUEST_SRC src/*.cpp)
 
 add_library(urlrequest ${URL_REQUEST_SRC})
 
-target_link_libraries(urlrequest curl)
+if(NOT DEFINED CURL_DEP)
+    set(CURL_DEP curl)
+endif(NOT DEFINED CURL_DEP)
+
+target_link_libraries(urlrequest ${CURL_DEP})
 
 if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
     add_subdirectory(external/googletest)
