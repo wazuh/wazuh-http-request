@@ -41,13 +41,8 @@ function(check_and_download_dep libname url)
     endif()
 endfunction(check_and_download_dep)
 
-if(NOT DEFINED EXTERNAL_RES)
-    set(EXTERNAL_RES nlohmann googletest benchmark cpp-httplib)
-endif(NOT DEFINED EXTERNAL_RES)
-
-if(NOT DEFINED PRECOMPILED_EXTERNAL_RES)
-    set(PRECOMPILED_EXTERNAL_RES curl)
-endif(NOT DEFINED PRECOMPILED_EXTERNAL_RES)
+set(EXTERNAL_RES nlohmann googletest benchmark cpp-httplib)
+set(PRECOMPILED_EXTERNAL_RES curl)
 
 foreach(loop_var ${EXTERNAL_RES})
     check_and_download_dep(${loop_var} ${RESOURCES_URL})
@@ -82,8 +77,8 @@ if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
     add_subdirectory(external/benchmark)
 
     add_subdirectory(test_tool)
-    add_subdirectory(test)    
+    add_subdirectory(test)
 
     # Enable testing only if compiling this repository
-    enable_testing()    
+    enable_testing()
 endif (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
