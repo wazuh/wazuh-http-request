@@ -49,6 +49,10 @@ public:
                      [](const httplib::Request& /*req*/, httplib::Response& res)
                      { res.set_content("Hello World!", "text/json"); });
 
+        m_server.Get("/redirect",
+                     [](const httplib::Request& /*req*/, httplib::Response& res)
+                     { res.set_redirect("http://localhost:44441/", 301); });
+
         m_server.Post(
             "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
 
@@ -70,6 +74,21 @@ public:
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
     HTTPRequest::instance().get(HttpURL("http://localhost:44441/"),
+                                [&](const std::string& result)
+                                {
+                                    EXPECT_EQ(result, "Hello World!");
+                                    m_callbackComplete = true;
+                                });
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the get request with redirection.
+ */
+TEST_F(ComponentTestInterface, GetHelloWorldRedirection)
+{
+    HTTPRequest::instance().get(HttpURL("http://localhost:44441/redirect"),
                                 [&](const std::string& result)
                                 {
                                     EXPECT_EQ(result, "Hello World!");
