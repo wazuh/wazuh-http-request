@@ -21,6 +21,8 @@
 /**
  * @brief This class is a simple HTTP server that provides a simple interface to perform HTTP requests.
  */
+namespace
+{
 class FakeServer final
 {
 private:
@@ -67,6 +69,7 @@ public:
         m_server.listen("localhost", 44441);
     }
 };
+} // namespace
 
 FakeServer g_server;
 
