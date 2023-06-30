@@ -142,7 +142,7 @@ static void BM_Download(benchmark::State& state)
     for (auto _ : state)
     {
         HTTPRequest::instance().download(
-            HttpURL("http://localhost:44441/"), "out.txt", [&](const std::string& /*result*/) {});
+            HttpURL("http://localhost:44441/"), "out.txt", [&](const std::string& /*result*/, const long /*responseCode*/) {});
     }
 }
 BENCHMARK(BM_Download);

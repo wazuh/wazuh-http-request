@@ -100,7 +100,7 @@ TEST_F(ComponentTestInterface, DownloadFile)
 {
     HTTPRequest::instance().download(HttpURL("http://localhost:44441/"),
                                      "./test.txt",
-                                     [&](const std::string& result) { std::cout << result << std::endl; });
+                                     [&](const std::string& result, const long responseCode) { std::cout << result <<  std::endl; });
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -115,9 +115,11 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 {
     HTTPRequest::instance().download(HttpURL("http://localhost:44441/invalid_file"),
                                      "./test.txt",
-                                     [&](const std::string& result)
+                                     [&](const std::string& result, const long responseCode)
                                      {
                                          EXPECT_EQ(result, "HTTP response code said error");
+                                         EXPECT_EQ(responseCode, 0);
+
                                          m_callbackComplete = true;
                                      });
 
@@ -132,7 +134,7 @@ TEST_F(ComponentTestInterface, GetHelloWorldFile)
     HTTPRequest::instance().get(
         HttpURL("http://localhost:44441/"),
         [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto) {},
+        [](auto, auto) {},
         "./testGetHelloWorld.txt");
 
     std::ifstream file("./testGetHelloWorld.txt");
@@ -150,7 +152,7 @@ TEST_F(ComponentTestInterface, PostHelloWorldFile)
         HttpURL("http://localhost:44441/"),
         R"({"hello":"world"})"_json,
         [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto) {},
+        [](auto, auto) {},
         "./testPostHelloWorld.txt");
 
     std::ifstream file("./testPostHelloWorld.txt");
@@ -168,7 +170,7 @@ TEST_F(ComponentTestInterface, PutHelloWorldFile)
         HttpURL("http://localhost:44441/"),
         R"({"hello":"world"})"_json,
         [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto) {},
+        [](auto, auto) {},
         "./testPutHelloWorld.txt");
 
     std::ifstream file("./testPutHelloWorld.txt");
@@ -187,7 +189,7 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFile)
     HTTPRequest::instance().delete_(
         HttpURL("http://localhost:44441/" + random),
         [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto) {},
+        [](auto, auto) {},
         "./testDeleteRandomID.txt");
 
     std::ifstream file("./testDeleteRandomID.txt");
