@@ -23,6 +23,7 @@
 #include <queue>
 #include <stdexcept>
 #include <thread>
+#include "curlException.hpp"
 
 using deleterCurl = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 
@@ -202,11 +203,22 @@ public:
     {
         curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
 
-        const auto result {curl_easy_perform(m_curlHandle.get())};
+        const auto resPerform {curl_easy_perform(m_curlHandle.get())};
         curl_easy_reset(m_curlHandle.get());
-        if (result != CURLE_OK)
+
+        if (resPerform != CURLE_OK)
         {
-            throw std::runtime_error(curl_easy_strerror(result));
+            long responseCode;
+            const auto resGetInfo = curl_easy_getinfo(m_curlHandle.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+
+            if (CURLE_OK == resGetInfo)
+            {
+                throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
+            }
+            else
+            {
+                throw Curl::CurlException(curl_easy_strerror(resGetInfo));
+            }
         }
     }
 };
