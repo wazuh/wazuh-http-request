@@ -13,6 +13,7 @@
 #define _ACTION_HPP
 #include "HTTPRequest.hpp"
 #include <iostream>
+#include "curlException.hpp"
 
 /**
  * @brief Action interface.
@@ -56,10 +57,10 @@ public:
     {
         HTTPRequest::instance().download(HttpURL(m_url),
                                          m_outputFile,
-                                         [](const std::string& msg)
+                                         [](const std::string& msg, const long responseCode)
                                          {
-                                             std::cerr << msg << std::endl;
-                                             throw std::runtime_error(msg);
+                                            std::cerr << msg << std::endl;
+                                            throw std::runtime_error(msg);
                                          });
     }
 };
@@ -90,7 +91,7 @@ public:
         HTTPRequest::instance().get(
             HttpURL(m_url),
             [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg)
+            [](const std::string& msg, const long responseCode)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
@@ -128,7 +129,7 @@ public:
             HttpURL(m_url),
             m_data,
             [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg)
+            [](const std::string& msg, const long responseCode)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
@@ -166,7 +167,7 @@ public:
             HttpURL(m_url),
             m_data,
             [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg)
+            [](const std::string& msg, const long responseCode)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
@@ -200,7 +201,7 @@ public:
         HTTPRequest::instance().delete_(
             HttpURL(m_url),
             [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg)
+            [](const std::string& msg, const long responseCode)
             {
                 std::cerr << msg << std::endl;
                 throw std::runtime_error(msg);
