@@ -15,63 +15,6 @@
 #include "urlRequest.hpp"
 
 /**
- * @brief This class is a simple HTTP server that provides a simple interface to perform HTTP requests.
- */
-namespace
-{
-class FakeServer final
-{
-private:
-    httplib::Server m_server;
-    std::thread m_thread;
-
-public:
-    FakeServer()
-        : m_thread(&FakeServer::run, this)
-    {
-        // Wait until server is ready
-        while (!m_server.is_running())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-    }
-
-    ~FakeServer()
-    {
-        m_server.stop();
-        m_thread.join();
-    }
-
-    /**
-     * @brief This method is used to start the server.
-     */
-    void run()
-    {
-        m_server.Get("/",
-                     [](const httplib::Request& /*req*/, httplib::Response& res)
-                     { res.set_content("Hello World!", "text/json"); });
-
-        m_server.Get("/redirect",
-                     [](const httplib::Request& /*req*/, httplib::Response& res)
-                     { res.set_redirect("http://localhost:44441/", 301); });
-
-        m_server.Post(
-            "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
-
-        m_server.Put(
-            "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
-
-        m_server.Delete(R"(/(\d+))",
-                        [](const httplib::Request& req, httplib::Response& res)
-                        { res.set_content(req.matches[1], "text/json"); });
-
-        m_server.set_keep_alive_max_count(1);
-        m_server.listen("localhost", 44441);
-    }
-};
-} // namespace
-
-/**
  * @brief Test the get request.
  */
 TEST_F(ComponentTestInterface, GetHelloWorld)
