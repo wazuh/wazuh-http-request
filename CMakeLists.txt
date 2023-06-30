@@ -73,12 +73,13 @@ endif(NOT DEFINED CURL_DEP)
 target_link_libraries(urlrequest ${CURL_DEP})
 
 if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
+    # Enable testing only if compiling this repository.
+    # Always set enable_testing() before add_subdirectory.
+    enable_testing()
+
     add_subdirectory(external/googletest)
     add_subdirectory(external/benchmark)
 
     add_subdirectory(test_tool)
     add_subdirectory(test)
-
-    # Enable testing only if compiling this repository
-    enable_testing()
 endif (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
