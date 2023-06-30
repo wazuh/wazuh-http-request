@@ -29,7 +29,9 @@ class UNIXSocketRequest final
 {
 public:
     void download(
-        const URL& url, const std::string& fileName, std::function<void(const std::string&, const long)> onError = [](auto, auto) {});
+        const URL& url,
+        const std::string& fileName,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {});
     void post(
         const URL& url,
         const nlohmann::json& data,

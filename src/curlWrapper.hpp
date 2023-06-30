@@ -14,6 +14,7 @@
 
 #include "IRequestImplementator.hpp"
 #include "curl.h"
+#include "curlException.hpp"
 #include "customDeleter.hpp"
 #include <algorithm>
 #include <map>
@@ -23,7 +24,6 @@
 #include <queue>
 #include <stdexcept>
 #include <thread>
-#include "curlException.hpp"
 
 using deleterCurl = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 

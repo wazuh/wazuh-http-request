@@ -100,7 +100,8 @@ TEST_F(ComponentTestInterface, DownloadFile)
 {
     HTTPRequest::instance().download(HttpURL("http://localhost:44441/"),
                                      "./test.txt",
-                                     [&](const std::string& result, const long responseCode) { std::cout << result <<  std::endl; });
+                                     [&](const std::string& result, const long responseCode)
+                                     { std::cout << result << std::endl; });
 
     std::ifstream file("./test.txt");
     std::string line;

@@ -35,7 +35,9 @@ public:
      * @param onError Callback to be called in case of error.
      */
     void download(
-        const URL& url, const std::string& fileName, std::function<void(const std::string&, const long)> onError = [](auto, auto) {});
+        const URL& url,
+        const std::string& fileName,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {});
 
     /**
      * @brief Performs a HTTP POST request.

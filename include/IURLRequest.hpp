@@ -124,7 +124,9 @@ public:
      * @param onError Callback to be called when an error occurs.
      */
     virtual void download(
-        const URL& url, const std::string& fileName, std::function<void(const std::string&, const long)> onError = [](auto, auto) {}) = 0;
+        const URL& url,
+        const std::string& fileName,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {}) = 0;
 
     /**
      * @brief Virtual method to send a POST request to a URL.

@@ -12,8 +12,8 @@
 #ifndef _ACTION_HPP
 #define _ACTION_HPP
 #include "HTTPRequest.hpp"
-#include <iostream>
 #include "curlException.hpp"
+#include <iostream>
 
 /**
  * @brief Action interface.
@@ -59,8 +59,8 @@ public:
                                          m_outputFile,
                                          [](const std::string& msg, const long responseCode)
                                          {
-                                            std::cerr << msg << std::endl;
-                                            throw std::runtime_error(msg);
+                                             std::cerr << msg << std::endl;
+                                             throw std::runtime_error(msg);
                                          });
     }
 };
