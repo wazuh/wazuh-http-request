@@ -36,13 +36,18 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_POSTFIELDSIZE, CURLOPT_POSTFIELDSIZE},
     {OPT_CUSTOMREQUEST, CURLOPT_CUSTOMREQUEST},
     {OPT_UNIX_SOCKET_PATH, CURLOPT_UNIX_SOCKET_PATH},
-    {OPT_FAILONERROR, CURLOPT_FAILONERROR}};
+    {OPT_FAILONERROR, CURLOPT_FAILONERROR},
+    {OPT_FOLLOW_REDIRECT, CURLOPT_FOLLOWLOCATION},
+    {OPT_MAX_REDIRECTIONS, CURLOPT_MAXREDIRS},
+    };
 
 static std::deque<std::pair<std::thread::id, std::shared_ptr<CURL>>> HANDLER_QUEUE;
 
 static std::mutex CURL_WRAPPER_MUTEX;
 
 static const int QUEUE_SIZE = 5;
+
+auto constexpr MAX_REDIRECTIONS {20l};
 
 /**
  * @brief This class is a wrapper of the curl library.
@@ -110,6 +115,11 @@ public:
         this->setOption(OPT_WRITEDATA, &m_returnValue);
 
         this->setOption(OPT_FAILONERROR, 1l);
+
+        this->setOption(OPT_FOLLOW_REDIRECT, 1l);
+
+        this->setOption(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
+
     }
 
     virtual ~cURLWrapper() = default;
