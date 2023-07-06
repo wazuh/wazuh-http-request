@@ -98,9 +98,7 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
  */
 TEST_F(ComponentTestInterface, DownloadFile)
 {
-    HTTPRequest::instance().download(HttpURL("http://localhost:44441/"),
-                                     "./test.txt",
-                                      [](auto, auto) {});
+    HTTPRequest::instance().download(HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -115,7 +113,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURL)
 {
     HTTPRequest::instance().download(HttpURL(""),
                                      "./test.txt",
-                                    [&](const std::string& result, const long responseCode)
+                                     [&](const std::string& result, const long responseCode)
                                      {
                                          EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
                                          EXPECT_EQ(responseCode, -1);
@@ -173,12 +171,12 @@ TEST_F(ComponentTestInterface, GetHelloWorldFileEmptyURL)
         HttpURL(""),
         [&](const std::string& result) { std::cout << result << std::endl; },
         [&](const std::string& result, const long responseCode)
-                                     {
-                                         EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                         EXPECT_EQ(responseCode, -1);
+        {
+            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+            EXPECT_EQ(responseCode, -1);
 
-                                         m_callbackComplete = true;
-                                     },
+            m_callbackComplete = true;
+        },
         "./testGetHelloWorld.txt");
 
     std::ifstream file("./testGetHelloWorld.txt");
@@ -215,12 +213,12 @@ TEST_F(ComponentTestInterface, PostHelloWorldFileEmptyURL)
         R"({"hello":"world"})"_json,
         [&](const std::string& result) { std::cout << result << std::endl; },
         [&](const std::string& result, const long responseCode)
-                                     {
-                                         EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                         EXPECT_EQ(responseCode, -1);
+        {
+            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+            EXPECT_EQ(responseCode, -1);
 
-                                         m_callbackComplete = true;
-                                     },
+            m_callbackComplete = true;
+        },
         "./testPostHelloWorld.txt");
 
     std::ifstream file("./testPostHelloWorld.txt");
@@ -257,12 +255,12 @@ TEST_F(ComponentTestInterface, PutHelloWorldFileEmptyURL)
         R"({"hello":"world"})"_json,
         [&](const std::string& result) { std::cout << result << std::endl; },
         [&](const std::string& result, const long responseCode)
-                                     {
-                                         EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                         EXPECT_EQ(responseCode, -1);
+        {
+            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+            EXPECT_EQ(responseCode, -1);
 
-                                         m_callbackComplete = true;
-                                     },
+            m_callbackComplete = true;
+        },
         "./testPutHelloWorld.txt");
 
     std::ifstream file("./testPutHelloWorld.txt");
@@ -301,12 +299,12 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFileEmptyURL)
         HttpURL(""),
         [&](const std::string& result) { std::cout << result << std::endl; },
         [&](const std::string& result, const long responseCode)
-                                     {
-                                         EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                         EXPECT_EQ(responseCode, -1);
+        {
+            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+            EXPECT_EQ(responseCode, -1);
 
-                                         m_callbackComplete = true;
-                                     },
+            m_callbackComplete = true;
+        },
         "./testDeleteRandomID.txt");
 
     std::ifstream file("./testDeleteRandomID.txt");
