@@ -59,7 +59,7 @@ public:
                                          m_outputFile,
                                          [](const std::string& msg, const long responseCode)
                                          {
-                                             std::cerr << msg << std::endl;
+                                             std::cerr << msg << ": " << responseCode << std::endl;
                                              throw std::runtime_error(msg);
                                          });
     }
@@ -93,7 +93,7 @@ public:
             [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg, const long responseCode)
             {
-                std::cerr << msg << std::endl;
+                std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
             });
     }
@@ -131,7 +131,7 @@ public:
             [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg, const long responseCode)
             {
-                std::cerr << msg << std::endl;
+                std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
             });
     }
@@ -169,7 +169,7 @@ public:
             [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg, const long responseCode)
             {
-                std::cerr << msg << std::endl;
+                std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
             });
     }
@@ -203,7 +203,7 @@ public:
             [](const std::string& msg) { std::cout << msg << std::endl; },
             [](const std::string& msg, const long responseCode)
             {
-                std::cerr << msg << std::endl;
+                std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
             });
     }
