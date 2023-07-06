@@ -15,11 +15,13 @@
 #include "IRequestImplementator.hpp"
 #include "builder.hpp"
 #include "customDeleter.hpp"
+#include "fsWrapper.hpp"
 #include "json.hpp"
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 enum METHOD_TYPE
 {
@@ -32,14 +34,24 @@ enum METHOD_TYPE
 static const std::map<METHOD_TYPE, std::string> METHOD_TYPE_MAP = {
     {METHOD_GET, "GET"}, {METHOD_POST, "POST"}, {METHOD_PUT, "PUT"}, {METHOD_DELETE, "DELETE"}};
 
+static const std::vector<std::string> DEFAULT_CAINFO_PATHS = {
+    "/etc/ssl/certs/ca-certificates.crt",     // Debian systems
+    "/etc/pki/tls/certs/ca-bundle.crt",       // Redhat and Mandriva
+    "/usr/share/ssl/certs/ca-bundle.crt",     // RedHat
+    "/usr/local/share/certs/ca-root-nss.crt", // FreeBSD
+    "/etc/ssl/cert.pem",                      // OpenBSD, FreeBSD, MacOS
+};
+
 /**
  * @brief This class is a wrapper for curl library.
  * It provides a simple interface to perform HTTP requests.
  *
  * @tparam T Type of the response body.
  */
-template<typename T>
-class cURLRequest : public Utils::Builder<T, std::shared_ptr<IRequestImplementator>>
+template<typename T, typename TFileSystem = FsWrapper>
+class cURLRequest
+    : public Utils::Builder<T, std::shared_ptr<IRequestImplementator>>
+    , public TFileSystem
 {
     using deleterFP = CustomDeleter<decltype(&fclose), fclose>;
 
@@ -115,6 +127,30 @@ public:
         m_url = url;
         m_requestImplementator->setOption(OPT_URL, m_url);
 
+        // If the URL starts with "https", we need set CAINFO option.
+        // Otherwise, we need to set the SSL_VERIFYPEER option to false.
+
+        if (m_url.find("https") == 0)
+        {
+            // If the certificate is not set, we try to find it in the default paths.
+            if (m_certificate.empty())
+            {
+                for (const auto& path : DEFAULT_CAINFO_PATHS)
+                {
+                    if (TFileSystem::exists(path))
+                    {
+                        certificate(path);
+                        break;
+                    }
+                }
+            }
+
+            if (m_certificate.empty())
+            {
+                m_requestImplementator->setOption(OPT_VERIFYPEER, 0L);
+            }
+        }
+
         return static_cast<T&>(*this);
     }
 
@@ -163,6 +199,7 @@ public:
     {
         m_certificate = cert;
         m_requestImplementator->setOption(OPT_CAINFO, m_certificate);
+        m_requestImplementator->setOption(OPT_VERIFYPEER, 1L);
 
         return static_cast<T&>(*this);
     }
@@ -291,7 +328,7 @@ public:
     explicit GetRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<GetRequest>(requestImplementator)
     {
-        m_requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_GET).c_str());
+        requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_GET).c_str());
     }
 
     // LCOV_EXCL_START
@@ -312,7 +349,7 @@ public:
     explicit DeleteRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<DeleteRequest>(requestImplementator)
     {
-        m_requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_DELETE).c_str());
+        requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_DELETE).c_str());
     }
 
     // LCOV_EXCL_START
