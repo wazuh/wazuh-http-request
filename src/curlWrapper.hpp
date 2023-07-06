@@ -222,7 +222,6 @@ public:
             }
             throw std::runtime_error(curl_easy_strerror(resPerform));
         }
-        curl_easy_reset(m_curlHandle.get());
     }
 };
 
