@@ -205,18 +205,23 @@ public:
 
         const auto resPerform {curl_easy_perform(m_curlHandle.get())};
 
-        if (CURLE_HTTP_RETURNED_ERROR == resPerform)
+        long responseCode;
+        const auto resGetInfo = curl_easy_getinfo(m_curlHandle.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+
+        curl_easy_reset(m_curlHandle.get());
+
+        if (CURLE_OK != resPerform)
         {
-            long responseCode;
-            const auto resGetInfo = curl_easy_getinfo(m_curlHandle.get(), CURLINFO_RESPONSE_CODE, &responseCode);
-
-            if (CURLE_OK != resGetInfo)
+            if (CURLE_HTTP_RETURNED_ERROR == resPerform)
             {
-                throw std::runtime_error("cURLWrapper::execute() failed: Couldn't get HTTP response code");
+                if (CURLE_OK != resGetInfo)
+                {
+                    throw std::runtime_error("cURLWrapper::execute() failed: Couldn't get HTTP response code");
+                }
+                throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
             }
-            throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
+            throw std::runtime_error(curl_easy_strerror(resPerform));
         }
-
         curl_easy_reset(m_curlHandle.get());
     }
 };

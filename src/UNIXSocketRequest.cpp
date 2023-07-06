@@ -31,6 +31,10 @@ void UNIXSocketRequest::download(const URL& url,
     {
         onError(ex.what(), ex.responseCode());
     }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
 }
 
 void UNIXSocketRequest::post(const URL& url,
@@ -50,6 +54,10 @@ void UNIXSocketRequest::post(const URL& url,
     {
         onError(ex.what(), ex.responseCode());
     }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
 }
 
 void UNIXSocketRequest::get(const URL& url,
@@ -67,6 +75,10 @@ void UNIXSocketRequest::get(const URL& url,
     catch (const Curl::CurlException& ex)
     {
         onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
     }
 }
 
@@ -87,6 +99,10 @@ void UNIXSocketRequest::update(const URL& url,
     {
         onError(ex.what(), ex.responseCode());
     }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
 }
 
 void UNIXSocketRequest::delete_(const URL& url,
@@ -104,5 +120,9 @@ void UNIXSocketRequest::delete_(const URL& url,
     catch (const Curl::CurlException& ex)
     {
         onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
     }
 }

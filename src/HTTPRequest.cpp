@@ -30,6 +30,10 @@ void HTTPRequest::download(const URL& url,
     {
         onError(ex.what(), ex.responseCode());
     }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
 }
 
 void HTTPRequest::post(const URL& url,
@@ -55,6 +59,10 @@ void HTTPRequest::post(const URL& url,
     {
         onError(ex.what(), ex.responseCode());
     }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
 }
 
 void HTTPRequest::get(const URL& url,
@@ -77,6 +85,10 @@ void HTTPRequest::get(const URL& url,
     catch (const Curl::CurlException& ex)
     {
         onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
     }
 }
 
@@ -103,6 +115,10 @@ void HTTPRequest::update(const URL& url,
     {
         onError(ex.what(), ex.responseCode());
     }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
 }
 
 void HTTPRequest::delete_(const URL& url,
@@ -125,5 +141,9 @@ void HTTPRequest::delete_(const URL& url,
     catch (const Curl::CurlException& ex)
     {
         onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
     }
 }
