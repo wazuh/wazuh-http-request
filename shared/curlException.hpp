@@ -1,6 +1,6 @@
 /*
  * Wazuh shared modules utils
- * Copyright (C) 2015-2021, Wazuh Inc.
+ * Copyright (C) 2015, Wazuh Inc.
  * June 30, 2023.
  *
  * This program is free software; you can redistribute it
@@ -47,7 +47,7 @@ namespace Curl
              * @param errorMessage Error message to show.
              * @param responseCode HTTP response code ID.
              */
-            CurlException(const std::string& errorMessage, const long responseCode = 0)
+            CurlException(const std::string& errorMessage, const long responseCode)
                 : m_error {errorMessage}
                 , m_responseCode {responseCode}
             {}
