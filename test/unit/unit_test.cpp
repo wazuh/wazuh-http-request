@@ -10,43 +10,11 @@
  */
 
 #include "unit_test.hpp"
+#include "mocks/MockRequest.hpp"
+#include "mocks/MockRequestImplementator.hpp"
+#include "tests/mocks/mockFsWrapper.hpp"
 
 using namespace testing;
-
-/**
- * @brief This class is a wrapper to perform requests.
- */
-class RequestWrapper final : public IRequestImplementator
-{
-public:
-    RequestWrapper() = default;
-    virtual ~RequestWrapper() = default;
-
-    /**
-     * @brief Mock method to set request options.
-     */
-    MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, void* ptr), (override));
-    /**
-     * @brief Mock method to set request options.
-     */
-    MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, const std::string& opt), (override));
-    /**
-     * @brief Mock method to set request options.
-     */
-    MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, const long int opt), (override));
-    /**
-     * @brief Mock method to set execute the request.
-     */
-    MOCK_METHOD(void, execute, (), (override));
-    /**
-     * @brief Mock method to get the response.
-     */
-    MOCK_METHOD(const std::string, response, (), (override));
-    /**
-     * @brief Mock method to append a header.
-     */
-    MOCK_METHOD(void, appendHeader, (const std::string& header), (override));
-};
 
 constexpr OPTION_REQUEST_TYPE optCustomRequest {OPT_CUSTOMREQUEST};
 constexpr OPTION_REQUEST_TYPE optUnixSocketPath {OPT_UNIX_SOCKET_PATH};
@@ -58,6 +26,7 @@ constexpr OPTION_REQUEST_TYPE optUserAgent {OPT_USERAGENT};
 constexpr OPTION_REQUEST_TYPE optPostFields {OPT_POSTFIELDS};
 constexpr OPTION_REQUEST_TYPE optWriteFunction {OPT_WRITEFUNCTION};
 constexpr OPTION_REQUEST_TYPE optPostFieldSize {OPT_POSTFIELDSIZE};
+constexpr OPTION_REQUEST_TYPE optVerifyPeer {OPT_VERIFYPEER};
 constexpr long zero {0};
 
 /**
@@ -112,6 +81,7 @@ TEST_F(UrlRequestUnitTest, GetApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request)
@@ -136,6 +106,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -162,6 +133,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
     EXPECT_CALL(*request, setOption(optPostFields, R"({"name":"wazuh"})")).Times(1);
     EXPECT_CALL(*request, setOption(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -190,6 +162,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
     EXPECT_CALL(*request, setOption(optPostFields, R"({"name":"wazuh"})")).Times(1);
     EXPECT_CALL(*request, setOption(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -216,6 +189,7 @@ TEST_F(UrlRequestUnitTest, PutApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PutRequest::builder(request)
@@ -240,6 +214,7 @@ TEST_F(UrlRequestUnitTest, DeleteApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     DeleteRequest::builder(request)
@@ -314,3 +289,41 @@ TEST_F(UrlRequestUnitTest, BadConstructorPut)
             .execute();
     });
 }
+
+/**
+ * @brief This test checks the HTTPS GET request.
+ */
+TEST_F(UrlRequestUnitTest, HttpsCertExists)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "/etc/ssl/certs/ca-certificates.crt")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+    EXPECT_CALL(*request, appendHeader(_)).Times(0);
+
+    auto getRequest {cURLRequest<MockRequest<MockFsWrapper>, MockFsWrapper>::builder(request)};
+
+    EXPECT_CALL(getRequest, exists("/etc/ssl/certs/ca-certificates.crt")).Times(1).WillOnce(Return(true));
+    EXPECT_NO_THROW(getRequest.url("https://www.wazuh.com/").execute());
+}
+
+/**
+ * @brief This test checks the HTTPS GET request not using a certificate.
+ */
+TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, false)).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+    EXPECT_CALL(*request, appendHeader(_)).Times(0);
+
+    auto getRequestNoCert {cURLRequest<MockRequest<MockFsWrapper>, MockFsWrapper>::builder(request)};
+
+    EXPECT_CALL(getRequestNoCert, exists(_)).Times(5).WillRepeatedly(Return(false));
+    EXPECT_NO_THROW(getRequestNoCert.url("https://www.wazuh.com/").execute());
+}
+

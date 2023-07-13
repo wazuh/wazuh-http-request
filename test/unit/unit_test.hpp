@@ -12,8 +12,6 @@
 #ifndef _UNIT_TEST_H
 #define _UNIT_TEST_H
 
-#include "urlRequest.hpp"
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <memory>
 

@@ -15,6 +15,7 @@
 #include "IRequestImplementator.hpp"
 #include "curl.h"
 #include "customDeleter.hpp"
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -39,7 +40,8 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_FAILONERROR, CURLOPT_FAILONERROR},
     {OPT_FOLLOW_REDIRECT, CURLOPT_FOLLOWLOCATION},
     {OPT_MAX_REDIRECTIONS, CURLOPT_MAXREDIRS},
-    };
+    {OPT_VERIFYPEER, CURLOPT_SSL_VERIFYPEER},
+};
 
 static std::deque<std::pair<std::thread::id, std::shared_ptr<CURL>>> HANDLER_QUEUE;
 
@@ -119,7 +121,6 @@ public:
         this->setOption(OPT_FOLLOW_REDIRECT, 1l);
 
         this->setOption(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
-
     }
 
     virtual ~cURLWrapper() = default;
