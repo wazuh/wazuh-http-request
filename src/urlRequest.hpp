@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#define NOT_USED -1
+
 enum METHOD_TYPE
 {
     METHOD_GET,

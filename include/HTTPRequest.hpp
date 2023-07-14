@@ -35,7 +35,9 @@ public:
      * @param onError Callback to be called in case of error.
      */
     void download(
-        const URL& url, const std::string& fileName, std::function<void(const std::string&)> onError = [](auto) {});
+        const URL& url,
+        const std::string& fileName,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {});
 
     /**
      * @brief Performs a HTTP POST request.
@@ -49,7 +51,7 @@ public:
         const URL& url,
         const nlohmann::json& data,
         std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&)> onError = [](auto) {},
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "");
 
     /**
@@ -62,7 +64,7 @@ public:
     void get(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&)> onError = [](auto) {},
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "");
 
     /**
@@ -77,7 +79,7 @@ public:
         const URL& url,
         const nlohmann::json& data,
         std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&)> onError = [](auto) {},
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "");
 
     /**
@@ -90,7 +92,7 @@ public:
     void delete_(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&)> onError = [](auto) {},
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "");
 };
 

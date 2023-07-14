@@ -17,7 +17,7 @@ using wrapperType = cURLWrapper;
 
 void HTTPRequest::download(const URL& url,
                            const std::string& outputFile,
-                           std::function<void(const std::string&)> onError)
+                           std::function<void(const std::string&, const long)> onError)
 {
     try
     {
@@ -26,16 +26,20 @@ void HTTPRequest::download(const URL& url,
             .outputFile(outputFile)
             .execute();
     }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
     catch (const std::exception& ex)
     {
-        onError(ex.what());
+        onError(ex.what(), NOT_USED);
     }
 }
 
 void HTTPRequest::post(const URL& url,
                        const nlohmann::json& data,
                        std::function<void(const std::string&)> onSuccess,
-                       std::function<void(const std::string&)> onError,
+                       std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName)
 {
     try
@@ -51,15 +55,19 @@ void HTTPRequest::post(const URL& url,
 
         onSuccess(req.response());
     }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
     catch (const std::exception& ex)
     {
-        onError(ex.what());
+        onError(ex.what(), NOT_USED);
     }
 }
 
 void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&)> onSuccess,
-                      std::function<void(const std::string&)> onError,
+                      std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName)
 {
     try
@@ -74,16 +82,20 @@ void HTTPRequest::get(const URL& url,
 
         onSuccess(req.response());
     }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
     catch (const std::exception& ex)
     {
-        onError(ex.what());
+        onError(ex.what(), NOT_USED);
     }
 }
 
 void HTTPRequest::update(const URL& url,
                          const nlohmann::json& data,
                          std::function<void(const std::string&)> onSuccess,
-                         std::function<void(const std::string&)> onError,
+                         std::function<void(const std::string&, const long)> onError,
                          const std::string& fileName)
 {
     try
@@ -99,15 +111,19 @@ void HTTPRequest::update(const URL& url,
 
         onSuccess(req.response());
     }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
     catch (const std::exception& ex)
     {
-        onError(ex.what());
+        onError(ex.what(), NOT_USED);
     }
 }
 
 void HTTPRequest::delete_(const URL& url,
                           std::function<void(const std::string&)> onSuccess,
-                          std::function<void(const std::string&)> onError,
+                          std::function<void(const std::string&, const long)> onError,
                           const std::string& fileName)
 {
     try
@@ -122,8 +138,12 @@ void HTTPRequest::delete_(const URL& url,
 
         onSuccess(req.response());
     }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
     catch (const std::exception& ex)
     {
-        onError(ex.what());
+        onError(ex.what(), NOT_USED);
     }
 }

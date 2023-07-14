@@ -14,6 +14,7 @@
 
 #include "IRequestImplementator.hpp"
 #include "curl.h"
+#include "curlException.hpp"
 #include "customDeleter.hpp"
 #include <algorithm>
 #include <map>
@@ -202,11 +203,24 @@ public:
     {
         curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
 
-        const auto result {curl_easy_perform(m_curlHandle.get())};
+        const auto resPerform {curl_easy_perform(m_curlHandle.get())};
+
+        long responseCode;
+        const auto resGetInfo = curl_easy_getinfo(m_curlHandle.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+
         curl_easy_reset(m_curlHandle.get());
-        if (result != CURLE_OK)
+
+        if (CURLE_OK != resPerform)
         {
-            throw std::runtime_error(curl_easy_strerror(result));
+            if (CURLE_HTTP_RETURNED_ERROR == resPerform)
+            {
+                if (CURLE_OK != resGetInfo)
+                {
+                    throw std::runtime_error("cURLWrapper::execute() failed: Couldn't get HTTP response code");
+                }
+                throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
+            }
+            throw std::runtime_error(curl_easy_strerror(resPerform));
         }
     }
 };
