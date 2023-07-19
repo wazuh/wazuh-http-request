@@ -21,6 +21,11 @@ if(NOT PRECOMPILED_RESOURCES_URL)
     set(PRECOMPILED_RESOURCES_URL "https://packages.wazuh.com/deps/${EXTERNAL_DEPS_VERSION}/libraries/linux/amd64")
 endif(NOT PRECOMPILED_RESOURCES_URL)
 
+if(USE_HTTP)
+    string(REPLACE "https://" "http://" RESOURCES_URL ${RESOURCES_URL})
+    string(REPLACE "https://" "http://" PRECOMPILED_RESOURCES_URL ${PRECOMPILED_RESOURCES_URL})
+endif()
+
 function(check_and_download_dep libname url)
     if(NOT EXISTS ${SRC_FOLDER}/external/${libname})
         message("==============================================")
