@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.12.4)
 project(urlrequest)
 
-get_filename_component(SRC_FOLDER     ${CMAKE_SOURCE_DIR}/ ABSOLUTE)
+if(NOT SRC_FOLDER)
+    get_filename_component(SRC_FOLDER     ${CMAKE_SOURCE_DIR}/ ABSOLUTE)
+endif(NOT SRC_FOLDER)
 
 set(CMAKE_CXX_STANDARD 17)
 
