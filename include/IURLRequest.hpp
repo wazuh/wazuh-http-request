@@ -23,6 +23,10 @@ enum SOCKET_TYPE
     SOCKET_TCP
 };
 
+// HTTP headers used by default in queries.
+const std::unordered_set<std::string> DEFAULT_HEADERS {
+    "Content-Type: application/json", "Accept: application/json", "Accept-Charset: utf-8"};
+
 /**
  * @brief This class is an abstraction of URL.
  * It is a base class to store the type/configuration of the request to made.
@@ -129,7 +133,7 @@ public:
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
 
     /**
      * @brief Virtual method to send a POST request to a URL.
@@ -146,7 +150,7 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
 
     /**
      * @brief Virtual method to send a GET request to a URL.
@@ -161,7 +165,7 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
 
     /**
      * @brief Virtual method to send a UPDATE request to a URL.
@@ -178,7 +182,7 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
 
     /**
      * @brief Virtual method to send a DELETE request to a URL.
@@ -193,7 +197,7 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
 };
 
 #endif // _URL_REQUEST_HPP

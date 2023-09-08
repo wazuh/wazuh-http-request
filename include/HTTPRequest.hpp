@@ -19,10 +19,6 @@
 #include <string>
 #include <unordered_set>
 
-// HTTP headers used by default in queries.
-const std::unordered_set<std::string> DEFAULT_HEADERS {
-    "Content-Type: application/json", "Accept: application/json", "Accept-Charset: utf-8"};
-
 /**
  * @brief This class is an implementation of IURLRequest.
  * It provides a simple interface to perform HTTP requests.
