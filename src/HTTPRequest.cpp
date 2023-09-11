@@ -13,7 +13,6 @@
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"
 #include "urlRequest.hpp"
-#include <algorithm>
 #include <string>
 #include <unordered_set>
 
@@ -26,12 +25,12 @@ void HTTPRequest::download(const URL& url,
 {
     try
     {
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+            .url(url.url())
+            .outputFile(outputFile)
+            .appendHeaders(httpHeaders)
+            .execute();
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-
-        std::for_each(
-            httpHeaders.begin(), httpHeaders.end(), [&req](const std::string& header) { req.appendHeader(header); });
-
-        req.url(url.url()).outputFile(outputFile).execute();
     }
     catch (const Curl::CurlException& ex)
     {
@@ -53,11 +52,7 @@ void HTTPRequest::post(const URL& url,
     try
     {
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-
-        std::for_each(
-            httpHeaders.begin(), httpHeaders.end(), [&req](const std::string& header) { req.appendHeader(header); });
-
-        req.url(url.url()).postData(data).outputFile(fileName).execute();
+        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }
@@ -80,11 +75,7 @@ void HTTPRequest::get(const URL& url,
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-
-        std::for_each(
-            httpHeaders.begin(), httpHeaders.end(), [&req](const std::string& header) { req.appendHeader(header); });
-
-        req.url(url.url()).outputFile(fileName).execute();
+        req.url(url.url()).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }
@@ -108,11 +99,7 @@ void HTTPRequest::update(const URL& url,
     try
     {
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-
-        std::for_each(
-            httpHeaders.begin(), httpHeaders.end(), [&req](const std::string& header) { req.appendHeader(header); });
-
-        req.url(url.url()).postData(data).outputFile(fileName).execute();
+        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }
@@ -135,11 +122,7 @@ void HTTPRequest::delete_(const URL& url,
     try
     {
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
-
-        std::for_each(
-            httpHeaders.begin(), httpHeaders.end(), [&req](const std::string& header) { req.appendHeader(header); });
-
-        req.url(url.url()).outputFile(fileName).execute();
+        req.url(url.url()).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }

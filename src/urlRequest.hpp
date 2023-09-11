@@ -17,10 +17,12 @@
 #include "customDeleter.hpp"
 #include "fsWrapper.hpp"
 #include "json.hpp"
+#include <algorithm>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #define NOT_USED -1
@@ -177,6 +179,19 @@ public:
     T& appendHeader(const std::string& header)
     {
         m_requestImplementator->appendHeader(header);
+        return static_cast<T&>(*this);
+    }
+
+    /**
+     * @brief This method appends a set of headers and returns a reference to the object.
+     * @param headers Headers to append.
+     * @return A reference to the object.
+     */
+    T& appendHeaders(const std::unordered_set<std::string>& headers)
+    {
+        std::for_each(headers.begin(),
+                      headers.end(),
+                      [this](const std::string& header) { m_requestImplementator->appendHeader(header); });
         return static_cast<T&>(*this);
     }
 
