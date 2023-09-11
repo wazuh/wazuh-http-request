@@ -39,7 +39,7 @@ public:
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>());
 
     /**
      * @brief Performs a HTTP POST request.

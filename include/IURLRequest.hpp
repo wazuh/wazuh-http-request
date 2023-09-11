@@ -133,7 +133,7 @@ public:
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
 
     /**
      * @brief Virtual method to send a POST request to a URL.
