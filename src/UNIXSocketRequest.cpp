@@ -20,10 +20,8 @@ using wrapperType = cURLWrapper;
 void UNIXSocketRequest::download(const URL& url,
                                  const std::string& outputFile,
                                  std::function<void(const std::string&, const long)> onError,
-                                 const std::unordered_set<std::string>& httpHeaders)
+                                 [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
 {
-    std::ignore = httpHeaders;
-
     try
     {
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
@@ -47,10 +45,8 @@ void UNIXSocketRequest::post(const URL& url,
                              std::function<void(const std::string&)> onSuccess,
                              std::function<void(const std::string&, const long)> onError,
                              const std::string& fileName,
-                             const std::unordered_set<std::string>& httpHeaders)
+                             [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
 {
-    std::ignore = httpHeaders;
-
     try
     {
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
@@ -72,10 +68,8 @@ void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders)
+                            [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
 {
-    std::ignore = httpHeaders;
-
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
@@ -98,10 +92,8 @@ void UNIXSocketRequest::update(const URL& url,
                                std::function<void(const std::string&)> onSuccess,
                                std::function<void(const std::string&, const long)> onError,
                                const std::string& fileName,
-                               const std::unordered_set<std::string>& httpHeaders)
+                               [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
 {
-    std::ignore = httpHeaders;
-
     try
     {
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
@@ -123,10 +115,8 @@ void UNIXSocketRequest::delete_(const URL& url,
                                 std::function<void(const std::string&)> onSuccess,
                                 std::function<void(const std::string&, const long)> onError,
                                 const std::string& fileName,
-                                const std::unordered_set<std::string>& httpHeaders)
+                                [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
 {
-    std::ignore = httpHeaders;
-
     try
     {
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
