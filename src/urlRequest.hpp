@@ -32,11 +32,15 @@ enum METHOD_TYPE
     METHOD_GET,
     METHOD_POST,
     METHOD_PUT,
+    METHOD_PATCH,
     METHOD_DELETE
 };
 
-static const std::map<METHOD_TYPE, std::string> METHOD_TYPE_MAP = {
-    {METHOD_GET, "GET"}, {METHOD_POST, "POST"}, {METHOD_PUT, "PUT"}, {METHOD_DELETE, "DELETE"}};
+static const std::map<METHOD_TYPE, std::string> METHOD_TYPE_MAP = {{METHOD_GET, "GET"},
+                                                                   {METHOD_POST, "POST"},
+                                                                   {METHOD_PUT, "PUT"},
+                                                                   {METHOD_PATCH, "PATCH"},
+                                                                   {METHOD_DELETE, "DELETE"}};
 
 static const std::vector<std::string> DEFAULT_CAINFO_PATHS = {
     "/etc/ssl/certs/ca-certificates.crt",     // Debian systems
@@ -329,6 +333,32 @@ public:
 
     // LCOV_EXCL_START
     virtual ~PutRequest() = default;
+    // LCOV_EXCL_STOP
+};
+
+/**
+ * @brief This class is a wrapper for curl library. It provides a simple interface to perform HTTP PATCH requests.
+ *
+ */
+class PatchRequest final
+    : public cURLRequest<PatchRequest>
+    , public PostData<PatchRequest>
+{
+public:
+    /**
+     * @brief This constructor initializes the PatchRequest object.
+     * @param requestImplementator Shared pointer to the request implementator.
+     */
+    explicit PatchRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
+        : cURLRequest<PatchRequest>(requestImplementator)
+        , PostData<PatchRequest>(requestImplementator)
+    {
+        cURLRequest<PatchRequest>::m_requestImplementator->setOption(OPT_CUSTOMREQUEST,
+                                                                     METHOD_TYPE_MAP.at(METHOD_PATCH));
+    }
+
+    // LCOV_EXCL_START
+    virtual ~PatchRequest() = default;
     // LCOV_EXCL_STOP
 };
 

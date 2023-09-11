@@ -54,6 +54,13 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    void patch(
+        const URL& url,
+        const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
     void delete_(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,

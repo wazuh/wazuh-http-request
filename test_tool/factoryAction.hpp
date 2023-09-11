@@ -46,6 +46,10 @@ public:
         {
             return std::make_unique<PutAction>(args.url(), args.postArguments());
         }
+        else if (0 == args.type().compare("patch"))
+        {
+            return std::make_unique<PatchAction>(args.url(), args.postArguments());
+        }
         else if (0 == args.type().compare("delete"))
         {
             return std::make_unique<DeleteAction>(args.url());

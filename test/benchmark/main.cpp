@@ -61,6 +61,9 @@ public:
         m_server.Put(
             "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
 
+        m_server.Patch(
+            "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
+
         m_server.Delete(R"(/(\d+))",
                         [](const httplib::Request& req, httplib::Response& res)
                         { res.set_content(req.matches[1], "text/json"); });
@@ -116,6 +119,21 @@ static void BM_Update(benchmark::State& state)
     }
 }
 BENCHMARK(BM_Update);
+
+/**
+ * @brief This function is a benchmark test for the HTTP PATCH request.
+ *
+ * @param state Benchmark state.
+ */
+static void BM_Patch(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        HTTPRequest::instance().patch(
+            HttpURL("http://localhost:44441/"), R"({"foo": "bar"})", [&](const std::string& /*result*/) {});
+    }
+}
+BENCHMARK(BM_Patch);
 
 /**
  * @brief This function is a benchmark test for the HTTP DELETE request.

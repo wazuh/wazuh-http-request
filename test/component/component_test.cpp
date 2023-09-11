@@ -631,3 +631,29 @@ TEST_F(ComponentTestInterface, PutWithCustomHeaders)
 
     EXPECT_TRUE(m_callbackComplete);
 }
+
+/**
+ * @brief Test the basic functionality of a PATCH request.
+ *
+ */
+TEST_F(ComponentTestInterface, PatchSimpleFunctionality)
+{
+    const auto postData = R"({"hello":"world"})"_json;
+
+    auto expectedResponse = R"(
+        {
+            "query": "patch"
+        }
+    )"_json;
+    expectedResponse["payload"] = postData;
+
+    HTTPRequest::instance().patch(HttpURL("http://localhost:44441/"),
+                                  postData,
+                                  [&](const std::string& response)
+                                  {
+                                      EXPECT_EQ(nlohmann::json::parse(response), expectedResponse);
+                                      m_callbackComplete = true;
+                                  });
+
+    EXPECT_TRUE(m_callbackComplete);
+}

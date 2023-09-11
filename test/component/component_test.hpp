@@ -12,6 +12,7 @@
 #ifndef _COMPONENT_TEST_H
 #define _COMPONENT_TEST_H
 
+#include "json.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
@@ -95,6 +96,16 @@ public:
         m_server.Put("/check-headers",
                      [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
                      { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
+
+        m_server.Patch("/",
+                       [](const httplib::Request& req, httplib::Response& res)
+                       {
+                           nlohmann::json response;
+                           response["query"] = "patch";
+                           response["payload"] = nlohmann::json::parse(req.body);
+
+                           res.set_content(response.dump(), "text/json");
+                       });
 
         m_server.Delete(R"(/(\d+))",
                         [](const httplib::Request& req, httplib::Response& res)
