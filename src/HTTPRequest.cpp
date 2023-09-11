@@ -30,7 +30,6 @@ void HTTPRequest::download(const URL& url,
             .outputFile(outputFile)
             .appendHeaders(httpHeaders)
             .execute();
-        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
     }
     catch (const Curl::CurlException& ex)
     {
