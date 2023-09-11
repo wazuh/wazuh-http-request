@@ -89,6 +89,7 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+
     /**
      * @brief Performs a HTTP DELETE request.
      * @param url URL to send the request.

@@ -18,6 +18,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 
 /**
  * @brief This class is an abstraction of HTTP Unix socket request.
