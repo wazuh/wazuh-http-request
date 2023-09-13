@@ -91,6 +91,24 @@ public:
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
 
     /**
+     * @brief Performs an HTTP PATCH request.
+     *
+     * @param url URL to send the request.
+     * @param data Data to send.
+     * @param onSuccess Callback to be called when the request is successful.
+     * @param onError Callback to be called when an error occurs.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    void patch(
+        const URL& url,
+        const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+
+    /**
      * @brief Performs a HTTP DELETE request.
      * @param url URL to send the request.
      * @param onSuccess Callback to be called in case of success.

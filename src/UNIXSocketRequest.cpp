@@ -111,6 +111,30 @@ void UNIXSocketRequest::update(const URL& url,
     }
 }
 
+void UNIXSocketRequest::patch(const URL& url,
+                              const nlohmann::json& data,
+                              std::function<void(const std::string&)> onSuccess,
+                              std::function<void(const std::string&, const long)> onError,
+                              const std::string& fileName,
+                              [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        req.url(url.url()).unixSocketPath(url.unixSocketPath()).postData(data).outputFile(fileName).execute();
+
+        onSuccess(req.response());
+    }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
 void UNIXSocketRequest::delete_(const URL& url,
                                 std::function<void(const std::string&)> onSuccess,
                                 std::function<void(const std::string&, const long)> onError,

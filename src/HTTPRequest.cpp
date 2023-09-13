@@ -112,6 +112,30 @@ void HTTPRequest::update(const URL& url,
     }
 }
 
+void HTTPRequest::patch(const URL& url,
+                        const nlohmann::json& data,
+                        std::function<void(const std::string&)> onSuccess,
+                        std::function<void(const std::string&, const long)> onError,
+                        const std::string& fileName,
+                        const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
+
+        onSuccess(req.response());
+    }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
 void HTTPRequest::delete_(const URL& url,
                           std::function<void(const std::string&)> onSuccess,
                           std::function<void(const std::string&, const long)> onError,

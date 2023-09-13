@@ -176,6 +176,47 @@ public:
 };
 
 /**
+ * @brief This class is used to perform a PATCH action.
+ *
+ */
+class PatchAction final : public IAction
+{
+private:
+    std::string m_url;
+    nlohmann::json m_data;
+
+public:
+    /**
+     * @brief Constructor of PatchAction class.
+     *
+     * @param url URL to perform the PATCH request.
+     * @param data Data to send in the PATCH request.
+     */
+    explicit PatchAction(const std::string& url, const nlohmann::json& data)
+        : m_url(url)
+        , m_data(data)
+    {
+    }
+
+    /**
+     * @brief This method is used to perform the PATCH request.
+     *
+     */
+    void execute() override
+    {
+        HTTPRequest::instance().patch(
+            HttpURL(m_url),
+            m_data,
+            [](const std::string& msg) { std::cout << msg << std::endl; },
+            [](const std::string& msg, const long responseCode)
+            {
+                std::cerr << msg << ": " << responseCode << std::endl;
+                throw std::runtime_error(msg);
+            });
+    }
+};
+
+/**
  * @brief This class is used to perform a DELETE action.
  */
 class DeleteAction final : public IAction
