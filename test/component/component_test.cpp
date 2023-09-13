@@ -12,7 +12,10 @@
 #include "component_test.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
+#include "json.hpp"
 #include "urlRequest.hpp"
+#include <map>
+#include <string>
 
 /**
  * @brief Test the get request.
@@ -523,4 +526,108 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
     {
         EXPECT_NO_THROW(thread.join());
     }
+}
+
+/**
+ * @brief Test the GET request appending a custom HTTP header. The header is expected to be on the server response.
+ *
+ */
+TEST_F(ComponentTestInterface, GetWithCustomHeader)
+{
+    const std::string headerKey {"Custom-Key"};
+    const std::string headerValue {"Custom-Value"};
+
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44441/check-headers"),
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), headerValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {headerKey + ": " + headerValue});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the GET request without custom HTTP headers. The expected headers are the default ones.
+ *
+ */
+TEST_F(ComponentTestInterface, GetWithDefaultHeaders)
+{
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44441/check-headers"),
+        [&](const std::string& result)
+        {
+            const std::map<std::string, std::string> defaultHeaders = {
+                {"Content-Type", "application/json"}, {"Accept", "application/json"}, {"Accept-Charset", "utf-8"}};
+            const auto response = nlohmann::json::parse(result);
+
+            ASSERT_FALSE(response.empty());
+            for (const auto& [headerKey, headerValue] : defaultHeaders)
+            {
+                ASSERT_EQ(response.at(headerKey), headerValue);
+            }
+
+            m_callbackComplete = true;
+        });
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the POST request appending two custom HTTP headers. The headers are expected to be on the server
+ * response.
+ *
+ */
+TEST_F(ComponentTestInterface, PostWithCustomHeaders)
+{
+    const std::string headerKeyA {"Custom-Key-A"};
+    const std::string headerValueA {"Custom-Value-A"};
+    const std::string headerKeyB {"Custom-Key-B"};
+    const std::string headerValueB {"Custom-Value-B"};
+
+    HTTPRequest::instance().post(
+        HttpURL("http://localhost:44441/check-headers"),
+        "",
+        [&](const std::string& result)
+        {
+            const auto response = nlohmann::json::parse(result);
+
+            ASSERT_EQ(response.at(headerKeyA), headerValueA);
+            ASSERT_EQ(response.at(headerKeyB), headerValueB);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {headerKeyA + ":" + headerValueA, headerKeyB + ":" + headerValueB});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the PUT request appending two equal custom HTTP headers. Because headers are inserted in a set (as unique
+ * values), just one header is expected to be on the server response.
+ *
+ */
+TEST_F(ComponentTestInterface, PutWithCustomHeaders)
+{
+    const std::string headerKey {"Custom-Key"};
+    const std::string headerValue {"Custom-Value"};
+
+    HTTPRequest::instance().update(
+        HttpURL("http://localhost:44441/check-headers"),
+        "",
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), headerValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {headerKey + ":" + headerValue, headerKey + ":" + headerValue});
+
+    EXPECT_TRUE(m_callbackComplete);
 }

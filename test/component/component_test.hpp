@@ -14,7 +14,9 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <memory>
+#include <string>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -56,6 +58,18 @@ public:
      */
     void run()
     {
+        // Lambda that returns a JSON holding all headers within a request.
+        // For example, if the request has the headers "Key-1: Value-1" and "Key-2: Value-2",
+        // this lambda will return the JSON '{"Key-1":"Value-1","Key-2":"Value-2"}'.
+        const auto getHttpHeaders = [](const httplib::Request& req)
+        {
+            nlohmann::json httpHeaders;
+            std::for_each(req.headers.begin(),
+                          req.headers.end(),
+                          [&httpHeaders](const auto& header) { httpHeaders[header.first] = header.second; });
+            return httpHeaders;
+        };
+
         m_server.Get("/",
                      [](const httplib::Request& /*req*/, httplib::Response& res)
                      { res.set_content("Hello World!", "text/json"); });
@@ -64,11 +78,23 @@ public:
                      [](const httplib::Request& /*req*/, httplib::Response& res)
                      { res.set_redirect("http://localhost:44441/", 301); });
 
+        m_server.Get("/check-headers",
+                     [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+                     { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
+
         m_server.Post(
             "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
 
+        m_server.Post("/check-headers",
+                      [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+                      { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
+
         m_server.Put(
             "/", [](const httplib::Request& req, httplib::Response& res) { res.set_content(req.body, "text/json"); });
+
+        m_server.Put("/check-headers",
+                     [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+                     { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
 
         m_server.Delete(R"(/(\d+))",
                         [](const httplib::Request& req, httplib::Response& res)
