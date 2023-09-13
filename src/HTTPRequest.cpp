@@ -122,11 +122,7 @@ void HTTPRequest::patch(const URL& url,
     try
     {
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url())
-            .postData(data)
-            .appendHeaders(httpHeaders)
-            .outputFile(fileName)
-            .execute();
+        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }
