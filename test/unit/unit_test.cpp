@@ -326,4 +326,3 @@ TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
     EXPECT_CALL(getRequestNoCert, exists(_)).Times(5).WillRepeatedly(Return(false));
     EXPECT_NO_THROW(getRequestNoCert.url("https://www.wazuh.com/").execute());
 }
-

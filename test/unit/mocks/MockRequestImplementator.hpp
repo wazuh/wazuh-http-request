@@ -50,4 +50,3 @@ public:
 };
 
 #endif // _MOCKREQUESTIMPLEMENTATOR_HPP
-
