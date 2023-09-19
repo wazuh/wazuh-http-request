@@ -44,7 +44,7 @@ public:
     /**
      * @brief Performs a HTTP POST request.
      * @param url URL to send the request.
-     * @param data Data to send.
+     * @param data Data to send (nlohmann::json).
      * @param onSuccess Callback to be called in case of success.
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
@@ -53,6 +53,23 @@ public:
     void post(
         const URL& url,
         const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+
+    /**
+     * @brief Performs a HTTP POST request.
+     * @param url URL to send the request.
+     * @param data Data to send (string).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    void post(
+        const URL& url,
+        const std::string& data,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
@@ -76,13 +93,48 @@ public:
     /**
      * @brief Performs a HTTP UPDATE request.
      * @param url URL to send the request.
-     * @param data Data to send.
+     * @param data Data to send (nlohmann::json).
      * @param onSuccess Callback to be called in case of success.
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      */
-    void update(
+    void put(
+        const URL& url,
+        const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+
+    /**
+     * @brief Performs a HTTP UPDATE request.
+     * @param url URL to send the request.
+     * @param data Data to send (std::string).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    void put(
+        const URL& url,
+        const std::string& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+
+    /**
+     * @brief Performs an HTTP PATCH request.
+     *
+     * @param url URL to send the request.
+     * @param data Data to send (nlohmann::json).
+     * @param onSuccess Callback to be called when the request is successful.
+     * @param onError Callback to be called when an error occurs.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    void patch(
         const URL& url,
         const nlohmann::json& data,
         std::function<void(const std::string&)> onSuccess,
@@ -94,7 +146,7 @@ public:
      * @brief Performs an HTTP PATCH request.
      *
      * @param url URL to send the request.
-     * @param data Data to send.
+     * @param data Data to send (std::string).
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
@@ -102,7 +154,7 @@ public:
      */
     void patch(
         const URL& url,
-        const nlohmann::json& data,
+        const std::string& data,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",

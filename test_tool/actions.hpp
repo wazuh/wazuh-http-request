@@ -163,7 +163,7 @@ public:
      */
     void execute() override
     {
-        HTTPRequest::instance().update(
+        HTTPRequest::instance().put(
             HttpURL(m_url),
             m_data,
             [](const std::string& msg) { std::cout << msg << std::endl; },

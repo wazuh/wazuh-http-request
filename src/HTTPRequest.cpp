@@ -50,6 +50,23 @@ void HTTPRequest::post(const URL& url,
 {
     try
     {
+        post(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void HTTPRequest::post(const URL& url,
+                       const std::string& data,
+                       std::function<void(const std::string&)> onSuccess,
+                       std::function<void(const std::string&, const long)> onError,
+                       const std::string& fileName,
+                       const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
         req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
@@ -88,12 +105,29 @@ void HTTPRequest::get(const URL& url,
     }
 }
 
-void HTTPRequest::update(const URL& url,
-                         const nlohmann::json& data,
-                         std::function<void(const std::string&)> onSuccess,
-                         std::function<void(const std::string&, const long)> onError,
-                         const std::string& fileName,
-                         const std::unordered_set<std::string>& httpHeaders)
+void HTTPRequest::put(const URL& url,
+                      const nlohmann::json& data,
+                      std::function<void(const std::string&)> onSuccess,
+                      std::function<void(const std::string&, const long)> onError,
+                      const std::string& fileName,
+                      const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        put(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void HTTPRequest::put(const URL& url,
+                      const std::string& data,
+                      std::function<void(const std::string&)> onSuccess,
+                      std::function<void(const std::string&, const long)> onError,
+                      const std::string& fileName,
+                      const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {
@@ -114,6 +148,23 @@ void HTTPRequest::update(const URL& url,
 
 void HTTPRequest::patch(const URL& url,
                         const nlohmann::json& data,
+                        std::function<void(const std::string&)> onSuccess,
+                        std::function<void(const std::string&, const long)> onError,
+                        const std::string& fileName,
+                        const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void HTTPRequest::patch(const URL& url,
+                        const std::string& data,
                         std::function<void(const std::string&)> onSuccess,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,

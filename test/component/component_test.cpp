@@ -68,13 +68,13 @@ TEST_F(ComponentTestInterface, PostHelloWorld)
  */
 TEST_F(ComponentTestInterface, PutHelloWorld)
 {
-    HTTPRequest::instance().update(HttpURL("http://localhost:44441/"),
-                                   R"({"hello":"world"})"_json,
-                                   [&](const std::string& result)
-                                   {
-                                       EXPECT_EQ(result, R"({"hello":"world"})");
-                                       m_callbackComplete = true;
-                                   });
+    HTTPRequest::instance().put(HttpURL("http://localhost:44441/"),
+                                R"({"hello":"world"})"_json,
+                                [&](const std::string& result)
+                                {
+                                    EXPECT_EQ(result, R"({"hello":"world"})");
+                                    m_callbackComplete = true;
+                                });
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -235,7 +235,7 @@ TEST_F(ComponentTestInterface, PostHelloWorldFileEmptyURL)
  */
 TEST_F(ComponentTestInterface, PutHelloWorldFile)
 {
-    HTTPRequest::instance().update(
+    HTTPRequest::instance().put(
         HttpURL("http://localhost:44441/"),
         R"({"hello":"world"})"_json,
         [&](const std::string& result) { std::cout << result << std::endl; },
@@ -253,7 +253,7 @@ TEST_F(ComponentTestInterface, PutHelloWorldFile)
  */
 TEST_F(ComponentTestInterface, PutHelloWorldFileEmptyURL)
 {
-    HTTPRequest::instance().update(
+    HTTPRequest::instance().put(
         HttpURL(""),
         R"({"hello":"world"})"_json,
         [&](const std::string& result) { std::cout << result << std::endl; },
@@ -383,7 +383,7 @@ TEST_F(ComponentTestInternalParameters, PostError)
     {
         PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())
             .url("http://localhost:44441/invalid_file")
-            .postData(R"({"hello":"world"})"_json)
+            .postData(R"({"hello":"world"})")
             .execute();
     }
     catch (const std::exception& ex)
@@ -403,7 +403,7 @@ TEST_F(ComponentTestInternalParameters, PutError)
     {
         PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())
             .url("http://localhost:44441/invalid_file")
-            .postData(R"({"hello":"world"})"_json)
+            .postData(R"({"hello":"world"})")
             .execute();
     }
     catch (const std::exception& ex)
@@ -591,7 +591,7 @@ TEST_F(ComponentTestInterface, PostWithCustomHeaders)
 
     HTTPRequest::instance().post(
         HttpURL("http://localhost:44441/check-headers"),
-        "",
+        std::string(),
         [&](const std::string& result)
         {
             const auto response = nlohmann::json::parse(result);
@@ -617,9 +617,9 @@ TEST_F(ComponentTestInterface, PutWithCustomHeaders)
     const std::string headerKey {"Custom-Key"};
     const std::string headerValue {"Custom-Value"};
 
-    HTTPRequest::instance().update(
+    HTTPRequest::instance().put(
         HttpURL("http://localhost:44441/check-headers"),
-        "",
+        std::string(),
         [&](const std::string& result)
         {
             ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), headerValue);
