@@ -277,13 +277,11 @@ public:
      * @param postData Post data to set.
      * @return A reference to the object.
      */
-    T& postData(const nlohmann::json& postData)
+    T& postData(const std::string& postData)
     {
-        m_postDataString = postData.dump();
+        m_handleReference->setOption(OPT_POSTFIELDS, postData);
 
-        m_handleReference->setOption(OPT_POSTFIELDS, m_postDataString);
-
-        m_handleReference->setOption(OPT_POSTFIELDSIZE, m_postDataString.size());
+        m_handleReference->setOption(OPT_POSTFIELDSIZE, postData.size());
 
         return static_cast<T&>(*this);
     }

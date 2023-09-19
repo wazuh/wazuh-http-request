@@ -20,7 +20,7 @@ using wrapperType = cURLWrapper;
 void UNIXSocketRequest::download(const URL& url,
                                  const std::string& outputFile,
                                  std::function<void(const std::string&, const long)> onError,
-                                 [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+                                 const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {
@@ -45,7 +45,24 @@ void UNIXSocketRequest::post(const URL& url,
                              std::function<void(const std::string&)> onSuccess,
                              std::function<void(const std::string&, const long)> onError,
                              const std::string& fileName,
-                             [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+                             const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        post(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void UNIXSocketRequest::post(const URL& url,
+                             const std::string& data,
+                             std::function<void(const std::string&)> onSuccess,
+                             std::function<void(const std::string&, const long)> onError,
+                             const std::string& fileName,
+                             const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {
@@ -68,7 +85,7 @@ void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
-                            [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+                            const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {
@@ -87,12 +104,29 @@ void UNIXSocketRequest::get(const URL& url,
     }
 }
 
-void UNIXSocketRequest::update(const URL& url,
-                               const nlohmann::json& data,
-                               std::function<void(const std::string&)> onSuccess,
-                               std::function<void(const std::string&, const long)> onError,
-                               const std::string& fileName,
-                               [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+void UNIXSocketRequest::put(const URL& url,
+                            const nlohmann::json& data,
+                            std::function<void(const std::string&)> onSuccess,
+                            std::function<void(const std::string&, const long)> onError,
+                            const std::string& fileName,
+                            const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        put(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void UNIXSocketRequest::put(const URL& url,
+                            const std::string& data,
+                            std::function<void(const std::string&)> onSuccess,
+                            std::function<void(const std::string&, const long)> onError,
+                            const std::string& fileName,
+                            const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {
@@ -116,7 +150,24 @@ void UNIXSocketRequest::patch(const URL& url,
                               std::function<void(const std::string&)> onSuccess,
                               std::function<void(const std::string&, const long)> onError,
                               const std::string& fileName,
-                              [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+                              const std::unordered_set<std::string>& httpHeaders)
+{
+    try
+    {
+        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void UNIXSocketRequest::patch(const URL& url,
+                              const std::string& data,
+                              std::function<void(const std::string&)> onSuccess,
+                              std::function<void(const std::string&, const long)> onError,
+                              const std::string& fileName,
+                              const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {
@@ -139,7 +190,7 @@ void UNIXSocketRequest::delete_(const URL& url,
                                 std::function<void(const std::string&)> onSuccess,
                                 std::function<void(const std::string&, const long)> onError,
                                 const std::string& fileName,
-                                [[maybe_unused]] const std::unordered_set<std::string>& httpHeaders)
+                                const std::unordered_set<std::string>& httpHeaders)
 {
     try
     {

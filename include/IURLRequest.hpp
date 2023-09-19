@@ -138,7 +138,7 @@ public:
     /**
      * @brief Virtual method to send a POST request to a URL.
      * @param url URL to send the request.
-     * @param data Data to send.
+     * @param data Data to send (nlohmann::json).
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
@@ -147,6 +147,23 @@ public:
     virtual void post(
         const URL& url,
         const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+
+    /**
+     * @brief Virtual method to send a POST request to a URL.
+     * @param url URL to send the request.
+     * @param data Data to send (string).
+     * @param onSuccess Callback to be called when the request is successful.
+     * @param onError Callback to be called when an error occurs.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    virtual void post(
+        const URL& url,
+        const std::string& data,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
@@ -170,13 +187,48 @@ public:
     /**
      * @brief Virtual method to send a UPDATE request to a URL.
      * @param url URL to send the request.
-     * @param data Data to send.
+     * @param data Data to sendi (nlohmann::json).
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      */
-    virtual void update(
+    virtual void put(
+        const URL& url,
+        const nlohmann::json& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+
+    /**
+     * @brief Virtual method to send a UPDATE request to a URL.
+     * @param url URL to send the request.
+     * @param data Data to send (string).
+     * @param onSuccess Callback to be called when the request is successful.
+     * @param onError Callback to be called when an error occurs.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    virtual void put(
+        const URL& url,
+        const std::string& data,
+        std::function<void(const std::string&)> onSuccess,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::string& fileName = "",
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+
+    /**
+     * @brief Virtual method to send a PATCH request to a URL.
+     *
+     * @param url URL to send the request.
+     * @param data Data to send (nlohmann::json).
+     * @param onSuccess Callback to be called when the request is successful.
+     * @param onError Callback to be called when an error occurs.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     */
+    virtual void patch(
         const URL& url,
         const nlohmann::json& data,
         std::function<void(const std::string&)> onSuccess,
@@ -188,7 +240,7 @@ public:
      * @brief Virtual method to send a PATCH request to a URL.
      *
      * @param url URL to send the request.
-     * @param data Data to send.
+     * @param data Data to send (string).
      * @param onSuccess Callback to be called when the request is successful.
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
@@ -196,7 +248,7 @@ public:
      */
     virtual void patch(
         const URL& url,
-        const nlohmann::json& data,
+        const std::string& data,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",

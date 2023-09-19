@@ -142,7 +142,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
         .userAgent("Wazuh-Agent/1.0")
         .certificate("cert.ca")
         .timeout(10)
-        .postData(R"({"name":"wazuh"})"_json)
+        .postData(R"({"name":"wazuh"})")
         .execute();
 }
 
@@ -171,7 +171,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
         .userAgent("Wazuh-Agent/1.0")
         .certificate("cert.ca")
         .timeout(10)
-        .postData(R"({"name":"wazuh"})"_json)
+        .postData(R"({"name":"wazuh"})")
         .unixSocketPath("/tmp/wazuh-agent.sock")
         .execute();
 }
@@ -326,4 +326,3 @@ TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
     EXPECT_CALL(getRequestNoCert, exists(_)).Times(5).WillRepeatedly(Return(false));
     EXPECT_NO_THROW(getRequestNoCert.url("https://www.wazuh.com/").execute());
 }
-
