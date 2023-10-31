@@ -34,12 +34,14 @@ public:
      * @param fileName Output file.
      * @param onError Callback to be called in case of error.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
      */
     void download(
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>());
+        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>(),
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
      * @brief Performs a HTTP POST request.
@@ -49,6 +51,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
      */
     void post(
         const URL& url,
@@ -56,7 +59,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
      * @brief Performs a HTTP POST request.
@@ -73,7 +77,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
      * @brief Performs a HTTP GET request.
@@ -88,7 +93,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
      * @brief Performs a HTTP UPDATE request.
@@ -98,6 +104,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     void put(
         const URL& url,
@@ -105,7 +112,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
      * @brief Performs a HTTP UPDATE request.
@@ -122,7 +130,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
      * @brief Performs an HTTP PATCH request.
@@ -173,7 +182,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 };
 
 #endif // _HTTP_REQUEST_HPP
