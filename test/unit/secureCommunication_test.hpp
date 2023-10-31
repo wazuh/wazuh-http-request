@@ -14,6 +14,10 @@
 
 #include "gtest/gtest.h"
 
+/**
+ * @brief SecureCommunicationTest class.
+ *
+ */
 class SecureCommunicationTest : public ::testing::Test
 {
 protected:

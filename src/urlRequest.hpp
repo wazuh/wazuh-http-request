@@ -152,6 +152,7 @@ public:
     /**
      * @brief This method sets the URL and returns a reference to the object.
      * @param url Url to set.
+     * @param secureCommunication Secure communication object.
      * @return A reference to the object.
      */
     T& url(const std::string& url, std::shared_ptr<SecureCommunication> secureCommunication = nullptr)

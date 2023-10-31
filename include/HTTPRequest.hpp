@@ -70,6 +70,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     void post(
         const URL& url,
@@ -87,6 +88,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     void get(
         const URL& url,
@@ -123,6 +125,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     void put(
         const URL& url,
@@ -176,6 +179,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     void delete_(
         const URL& url,

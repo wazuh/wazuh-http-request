@@ -29,11 +29,29 @@ class UNIXSocketRequest final
     , public Singleton<UNIXSocketRequest>
 {
 public:
+    /**
+     * @brief Performs a UNIX SOCKET DOWNLOAD request.
+     *
+     * @param url
+     * @param fileName
+     * @param onError
+     * @param httpHeaders
+     */
     void download(
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET POST request.
+     *
+     * @param url
+     * @param data
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void post(
         const URL& url,
         const nlohmann::json& data,
@@ -41,6 +59,16 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET POST request.
+     *
+     * @param url
+     * @param data
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void post(
         const URL& url,
         const std::string& data,
@@ -48,12 +76,31 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET GET request.
+     *
+     * @param url
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void get(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET PUT request.
+     *
+     * @param url
+     * @param data
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void put(
         const URL& url,
         const nlohmann::json& data,
@@ -61,6 +108,16 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET PUT request.
+     *
+     * @param url
+     * @param data
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void put(
         const URL& url,
         const std::string& data,
@@ -68,6 +125,16 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET PATCH request.
+     *
+     * @param url
+     * @param data
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void patch(
         const URL& url,
         const nlohmann::json& data,
@@ -75,6 +142,16 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET PATCH request.
+     *
+     * @param url
+     * @param data
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void patch(
         const URL& url,
         const std::string& data,
@@ -82,6 +159,15 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS);
+    /**
+     * @brief Performs a UNIX SOCKET DELETE request.
+     *
+     * @param url
+     * @param onSuccess
+     * @param onError
+     * @param fileName
+     * @param httpHeaders
+     */
     void delete_(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,

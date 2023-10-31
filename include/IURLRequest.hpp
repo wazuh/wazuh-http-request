@@ -129,6 +129,7 @@ public:
      * @param fileName File name to save the response.
      * @param onError Callback to be called when an error occurs.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void download(
         const URL& url,
@@ -164,6 +165,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void post(
         const URL& url,
@@ -181,6 +183,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void get(
         const URL& url,
@@ -217,6 +220,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void put(
         const URL& url,
@@ -270,6 +274,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void delete_(
         const URL& url,
