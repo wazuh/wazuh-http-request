@@ -20,7 +20,8 @@ using wrapperType = cURLWrapper;
 void UNIXSocketRequest::download(const URL& url,
                                  const std::string& outputFile,
                                  std::function<void(const std::string&, const long)> onError,
-                                 const std::unordered_set<std::string>& httpHeaders)
+                                 const std::unordered_set<std::string>& httpHeaders,
+                                 std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
@@ -45,7 +46,8 @@ void UNIXSocketRequest::post(const URL& url,
                              std::function<void(const std::string&)> onSuccess,
                              std::function<void(const std::string&, const long)> onError,
                              const std::string& fileName,
-                             const std::unordered_set<std::string>& httpHeaders)
+                             const std::unordered_set<std::string>& httpHeaders,
+                             std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
@@ -62,7 +64,8 @@ void UNIXSocketRequest::post(const URL& url,
                              std::function<void(const std::string&)> onSuccess,
                              std::function<void(const std::string&, const long)> onError,
                              const std::string& fileName,
-                             const std::unordered_set<std::string>& httpHeaders)
+                             const std::unordered_set<std::string>& httpHeaders,
+                             std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
@@ -85,7 +88,8 @@ void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders)
+                            const std::unordered_set<std::string>& httpHeaders,
+                            std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
@@ -109,7 +113,8 @@ void UNIXSocketRequest::put(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders)
+                            const std::unordered_set<std::string>& httpHeaders,
+                            std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
@@ -126,7 +131,8 @@ void UNIXSocketRequest::put(const URL& url,
                             std::function<void(const std::string&)> onSuccess,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders)
+                            const std::unordered_set<std::string>& httpHeaders,
+                            std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
@@ -190,7 +196,8 @@ void UNIXSocketRequest::delete_(const URL& url,
                                 std::function<void(const std::string&)> onSuccess,
                                 std::function<void(const std::string&, const long)> onError,
                                 const std::string& fileName,
-                                const std::unordered_set<std::string>& httpHeaders)
+                                const std::unordered_set<std::string>& httpHeaders,
+                                std::shared_ptr<SecureCommunication> secureCommunication)
 {
     try
     {
