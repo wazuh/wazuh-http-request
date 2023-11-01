@@ -34,8 +34,8 @@ public:
      * @param caRootCertificate CA certificate path.
      */
     SecureCommunication(const std::string& caRootCertificate)
+        : m_caRootCertificate {caRootCertificate}
     {
-        m_caRootCertificate = caRootCertificate;
     }
 
     /**

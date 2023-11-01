@@ -40,7 +40,7 @@ public:
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>(),
+        const std::unordered_set<std::string>& httpHeaders = {},
         std::shared_ptr<SecureCommunication> secureCommunication = nullptr);
 
     /**
