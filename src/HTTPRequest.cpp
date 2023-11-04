@@ -22,7 +22,7 @@ void HTTPRequest::download(const URL& url,
                            const std::string& outputFile,
                            std::function<void(const std::string&, const long)> onError,
                            const std::unordered_set<std::string>& httpHeaders,
-                           std::shared_ptr<SecureCommunication> secureCommunication)
+                           const SecureCommunication& secureCommunication)
 {
     try
     {
@@ -48,7 +48,7 @@ void HTTPRequest::post(const URL& url,
                        std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName,
                        const std::unordered_set<std::string>& httpHeaders,
-                       std::shared_ptr<SecureCommunication> secureCommunication)
+                       const SecureCommunication& secureCommunication)
 {
     try
     {
@@ -66,7 +66,7 @@ void HTTPRequest::post(const URL& url,
                        std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName,
                        const std::unordered_set<std::string>& httpHeaders,
-                       std::shared_ptr<SecureCommunication> secureCommunication)
+                       const SecureCommunication& secureCommunication)
 {
     try
     {
@@ -94,7 +94,7 @@ void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
                       const std::unordered_set<std::string>& httpHeaders,
-                      std::shared_ptr<SecureCommunication> secureCommunication)
+                      const SecureCommunication& secureCommunication)
 {
     try
     {
@@ -119,7 +119,7 @@ void HTTPRequest::put(const URL& url,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
                       const std::unordered_set<std::string>& httpHeaders,
-                      std::shared_ptr<SecureCommunication> secureCommunication)
+                      const SecureCommunication& secureCommunication)
 {
     try
     {
@@ -137,7 +137,7 @@ void HTTPRequest::put(const URL& url,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
                       const std::unordered_set<std::string>& httpHeaders,
-                      std::shared_ptr<SecureCommunication> secureCommunication)
+                      const SecureCommunication& secureCommunication)
 {
     try
     {
@@ -165,11 +165,12 @@ void HTTPRequest::patch(const URL& url,
                         std::function<void(const std::string&)> onSuccess,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,
-                        const std::unordered_set<std::string>& httpHeaders)
+                        const std::unordered_set<std::string>& httpHeaders,
+                        const SecureCommunication& secureCommunication)
 {
     try
     {
-        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {
@@ -182,12 +183,17 @@ void HTTPRequest::patch(const URL& url,
                         std::function<void(const std::string&)> onSuccess,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,
-                        const std::unordered_set<std::string>& httpHeaders)
+                        const std::unordered_set<std::string>& httpHeaders,
+                        const SecureCommunication& secureCommunication)
 {
     try
     {
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication)
+            .postData(data)
+            .appendHeaders(httpHeaders)
+            .outputFile(fileName)
+            .execute();
 
         onSuccess(req.response());
     }
@@ -206,7 +212,7 @@ void HTTPRequest::delete_(const URL& url,
                           std::function<void(const std::string&, const long)> onError,
                           const std::string& fileName,
                           const std::unordered_set<std::string>& httpHeaders,
-                          std::shared_ptr<SecureCommunication> secureCommunication)
+                          const SecureCommunication& secureCommunication)
 {
     try
     {

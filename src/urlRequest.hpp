@@ -155,7 +155,7 @@ public:
      * @param secureCommunication Secure communication object.
      * @return A reference to the object.
      */
-    T& url(const std::string& url, std::shared_ptr<SecureCommunication> secureCommunication = nullptr)
+    T& url(const std::string& url, const SecureCommunication& secureCommunication = {})
     {
         m_url = url;
         m_requestImplementator->setOption(OPT_URL, m_url);
@@ -167,7 +167,15 @@ public:
             // If the certificate is not set, we try to find it in the default paths.
             if (m_certificate.empty())
             {
-                if (secureCommunication == nullptr)
+                const auto caRootCert = secureCommunication.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE);
+                const auto sslKey = secureCommunication.getParameter(AuthenticationParameter::SSL_KEY);
+                const auto sslCert = secureCommunication.getParameter(AuthenticationParameter::SSL_CERTIFICATE);
+
+                if (!caRootCert.empty())
+                {
+                    certificate(caRootCert);
+                }
+                else
                 {
                     for (const auto& path : DEFAULT_CAINFO_PATHS)
                     {
@@ -178,28 +186,24 @@ public:
                         }
                     }
                 }
-                else
+
+                if (!sslKey.empty() && !sslCert.empty())
                 {
-                    if (!secureCommunication->getCARootCert().empty())
-                    {
-                        certificate(secureCommunication->getCARootCert());
-                    }
-                    if (!secureCommunication->getSslCertificate().empty() && !secureCommunication->getSslKey().empty())
-                    {
-                        clientAuth(secureCommunication->getSslCertificate(), secureCommunication->getSslKey());
-                    }
-                    if (!secureCommunication->getBasicAuthCreds().empty())
-                    {
-                        basicAuth(secureCommunication->getBasicAuthCreds());
-                    }
+                    clientAuth(sslCert, sslKey);
                 }
             }
+
             if (m_certificate.empty())
             {
                 m_requestImplementator->setOption(OPT_VERIFYPEER, 0L);
             }
         }
 
+        const auto authCreds = secureCommunication.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS);
+        if (!authCreds.empty())
+        {
+            basicAuth(authCreds);
+        }
         return static_cast<T&>(*this);
     }
 

@@ -13,87 +13,59 @@
 #define __SECURE_COMMUNICATION_HPP
 
 #include "builder.hpp"
+#include <map>
 #include <string>
+
+enum class AuthenticationParameter
+{
+    SSL_CERTIFICATE,
+    SSL_KEY,
+    CA_ROOT_CERTIFICATE,
+    BASIC_AUTH_CREDS
+};
 
 /**
  * @brief SecureCommunication class.
  *
  */
-class SecureCommunication final : public Utils::Builder<SecureCommunication, std::string>
+class SecureCommunication final : public Utils::Builder<SecureCommunication>
 {
 private:
-    std::string m_caRootCertificate;
-    std::string m_sslCertificate;
-    std::string m_sslKey;
-    std::string m_basicAuthCreds;
+    std::map<AuthenticationParameter, std::string> m_parameters;
 
 public:
-    /**
-     * @brief Construct a new Secure Communication object.
-     *
-     * @param caRootCertificate CA certificate path.
-     */
-    SecureCommunication(const std::string& caRootCertificate)
-        : m_caRootCertificate {caRootCertificate}
-    {
-    }
-
-    /**
-     * @brief Destroy the Secure Communication object.
-     *
-     */
-    ~SecureCommunication() = default;
-
-    /**
-     * @brief Return the CA certificate path.
-     *
-     * @return std::string
-     */
-    std::string getCARootCert()
-    {
-        return m_caRootCertificate;
-    }
-
-    /**
-     * @brief Returns the credentials for basic authentication.
-     *
-     * @return std::string
-     */
-    std::string getBasicAuthCreds()
-    {
-        return m_basicAuthCreds;
-    }
-
-    /**
-     * @brief Get the Ssl Certificate path.
-     *
-     * @return std::string
-     */
-    std::string getSslCertificate()
-    {
-        return m_sslCertificate;
-    }
-
-    /**
-     * @brief Get the Ssl Key pah.
-     *
-     * @return std::string
-     */
-    std::string getSslKey()
-    {
-        return m_sslKey;
-    }
-
     /**
      * @brief Set the Client Authentication.
      *
      * @param sslCertificate SSL certificate path.
+     */
+    SecureCommunication& sslCertificate(const std::string& sslCertificate)
+    {
+        m_parameters[AuthenticationParameter::SSL_CERTIFICATE] = sslCertificate;
+
+        return (*this);
+    }
+
+    /**
+     * @brief Set the client key.
+     *
      * @param sslKey SSL key path.
      */
-    SecureCommunication& setClientAuth(const std::string& sslCertificate, const std::string& sslKey)
+    SecureCommunication& sslKey(const std::string& sslKey)
     {
-        m_sslCertificate = sslCertificate;
-        m_sslKey = sslKey;
+        m_parameters[AuthenticationParameter::SSL_KEY] = sslKey;
+
+        return (*this);
+    }
+
+    /**
+     * @brief Set the CA Root Certificate.
+     *
+     * @param caRootCertificate CA certificate path.
+     */
+    SecureCommunication& caRootCertificate(const std::string& caRootCertificate)
+    {
+        m_parameters[AuthenticationParameter::CA_ROOT_CERTIFICATE] = caRootCertificate;
 
         return (*this);
     }
@@ -103,11 +75,29 @@ public:
      *
      * @param basicAuthCreds Username and password.
      */
-    SecureCommunication& setBasicAuth(const std::string& basicAuthCreds)
+    SecureCommunication& basicAuth(const std::string& basicAuthCreds)
     {
-        m_basicAuthCreds = basicAuthCreds;
+        m_parameters[AuthenticationParameter::BASIC_AUTH_CREDS] = basicAuthCreds;
 
         return (*this);
+    }
+
+    /**
+     * @brief Get parameters.
+     *
+     * @param parameter AuthenticationParameter Parameter to get.
+     * @param value Parameter value.
+     *
+     * @return True if the parameter is found, false otherwise.
+     */
+    std::string getParameter(const AuthenticationParameter parameter) const
+    {
+        std::string value;
+        if (m_parameters.find(parameter) != m_parameters.end())
+        {
+            value = m_parameters.at(parameter);
+        }
+        return value;
     }
 };
 

@@ -53,7 +53,8 @@ TEST_F(UrlRequestUnitTest, GetFileHttp)
 TEST_F(UrlRequestUnitTest, HttpSecureConnection)
 {
     auto request {std::make_shared<RequestWrapper>()};
-    auto secureCommunication {std::make_shared<SecureCommunication>("root-ca.pem")};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem");
 
     EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
     EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
@@ -67,8 +68,8 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnection)
 TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAuth)
 {
     auto request {std::make_shared<RequestWrapper>()};
-    auto secureCommunication {std::make_shared<SecureCommunication>("root-ca.pem")};
-    secureCommunication->setBasicAuth("admin:admin");
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem").basicAuth("admin:admin");
 
     EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
     EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
@@ -83,8 +84,8 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAuth)
 TEST_F(UrlRequestUnitTest, HttpSecureConnectionClientAuth)
 {
     auto request {std::make_shared<RequestWrapper>()};
-    auto secureCommunication {std::make_shared<SecureCommunication>("root-ca.pem")};
-    secureCommunication->setClientAuth("ssl_cert.pem", "ssl_key.pem");
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem").sslCertificate("ssl_cert.pem").sslKey("ssl_key.pem");
 
     EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
     EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
@@ -100,9 +101,11 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnectionClientAuth)
 TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAndClientAuth)
 {
     auto request {std::make_shared<RequestWrapper>()};
-    auto secureCommunication {std::make_shared<SecureCommunication>("root-ca.pem")};
-    secureCommunication->setBasicAuth("admin:admin");
-    secureCommunication->setClientAuth("ssl_cert.pem", "ssl_key.pem");
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem")
+        .sslCertificate("ssl_cert.pem")
+        .sslKey("ssl_key.pem")
+        .basicAuth("admin:admin");
 
     EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
     EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
