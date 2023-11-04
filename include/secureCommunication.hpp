@@ -86,18 +86,17 @@ public:
      * @brief Get parameters.
      *
      * @param parameter AuthenticationParameter Parameter to get.
-     * @param value Parameter value.
      *
-     * @return True if the parameter is found, false otherwise.
+     * @return std::string Parameter value.
      */
     std::string getParameter(const AuthenticationParameter parameter) const
     {
-        std::string value;
-        if (m_parameters.find(parameter) != m_parameters.end())
+        auto it = m_parameters.find(parameter);
+        if (it != m_parameters.end())
         {
-            value = m_parameters.at(parameter);
+            return it->second;
         }
-        return value;
+        return {};
     }
 };
 
