@@ -13,6 +13,7 @@
 #define _URL_REQUEST_HPP
 
 #include "json.hpp"
+#include "secureCommunication.hpp"
 #include <functional>
 #include <string>
 #include <unordered_set>
@@ -128,12 +129,14 @@ public:
      * @param fileName File name to save the response.
      * @param onError Callback to be called when an error occurs.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void download(
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = std::unordered_set<std::string>()) = 0;
+        const std::unordered_set<std::string>& httpHeaders = {},
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a POST request to a URL.
@@ -143,6 +146,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void post(
         const URL& url,
@@ -150,7 +154,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a POST request to a URL.
@@ -160,6 +165,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void post(
         const URL& url,
@@ -167,7 +173,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a GET request to a URL.
@@ -176,13 +183,15 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void get(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a UPDATE request to a URL.
@@ -192,6 +201,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void put(
         const URL& url,
@@ -199,7 +209,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a UPDATE request to a URL.
@@ -209,6 +220,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void put(
         const URL& url,
@@ -216,7 +228,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a PATCH request to a URL.
@@ -227,6 +240,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void patch(
         const URL& url,
@@ -234,7 +248,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a PATCH request to a URL.
@@ -245,6 +260,7 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void patch(
         const URL& url,
@@ -252,7 +268,8 @@ public:
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 
     /**
      * @brief Virtual method to send a DELETE request to a URL.
@@ -261,13 +278,15 @@ public:
      * @param onError Callback to be called when an error occurs.
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Secure communication object.
      */
     virtual void delete_(
         const URL& url,
         std::function<void(const std::string&)> onSuccess,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS) = 0;
+        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
+        const SecureCommunication& secureCommunication = {}) = 0;
 };
 
 #endif // _URL_REQUEST_HPP

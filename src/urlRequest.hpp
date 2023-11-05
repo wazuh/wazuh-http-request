@@ -17,6 +17,7 @@
 #include "customDeleter.hpp"
 #include "fsWrapper.hpp"
 #include "json.hpp"
+#include "secureCommunication.hpp"
 #include <algorithm>
 #include <functional>
 #include <map>
@@ -69,6 +70,29 @@ private:
     std::string m_userAgent;
     std::string m_certificate;
     std::unique_ptr<FILE, deleterFP> m_fpHandle;
+
+    /**
+     * @brief This method sets client authentication.
+     *
+     * @param sshCert SSL Certificate.
+     * @param sshKey SSL private key.
+     * @return A reference to the object.
+     */
+    void clientAuth(const std::string& sshCert, const std::string& sshKey)
+    {
+        m_requestImplementator->setOption(OPT_SSL_CERT, sshCert);
+        m_requestImplementator->setOption(OPT_SSL_KEY, sshKey);
+    }
+
+    /**
+     * @brief This method sets basic authentication.
+     *
+     * @param basicAuthCreds Credentials.
+     */
+    void basicAuth(const std::string& basicAuthCreds)
+    {
+        m_requestImplementator->setOption(OPT_BASIC_AUTH, basicAuthCreds);
+    }
 
 protected:
     /**
@@ -128,28 +152,44 @@ public:
     /**
      * @brief This method sets the URL and returns a reference to the object.
      * @param url Url to set.
+     * @param secureCommunication Secure communication object.
      * @return A reference to the object.
      */
-    T& url(const std::string& url)
+    T& url(const std::string& url, const SecureCommunication& secureCommunication = {})
     {
         m_url = url;
         m_requestImplementator->setOption(OPT_URL, m_url);
 
         // If the URL starts with "https", we need set CAINFO option.
         // Otherwise, we need to set the SSL_VERIFYPEER option to false.
-
         if (m_url.find("https") == 0)
         {
             // If the certificate is not set, we try to find it in the default paths.
             if (m_certificate.empty())
             {
-                for (const auto& path : DEFAULT_CAINFO_PATHS)
+                const auto caRootCert = secureCommunication.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE);
+                const auto sslKey = secureCommunication.getParameter(AuthenticationParameter::SSL_KEY);
+                const auto sslCert = secureCommunication.getParameter(AuthenticationParameter::SSL_CERTIFICATE);
+
+                if (!caRootCert.empty())
                 {
-                    if (TFileSystem::exists(path))
+                    certificate(caRootCert);
+                }
+                else
+                {
+                    for (const auto& path : DEFAULT_CAINFO_PATHS)
                     {
-                        certificate(path);
-                        break;
+                        if (TFileSystem::exists(path))
+                        {
+                            certificate(path);
+                            break;
+                        }
                     }
+                }
+
+                if (!sslKey.empty() && !sslCert.empty())
+                {
+                    clientAuth(sslCert, sslKey);
                 }
             }
 
@@ -159,6 +199,11 @@ public:
             }
         }
 
+        const auto authCreds = secureCommunication.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS);
+        if (!authCreds.empty())
+        {
+            basicAuth(authCreds);
+        }
         return static_cast<T&>(*this);
     }
 

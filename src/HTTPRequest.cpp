@@ -21,12 +21,13 @@ using wrapperType = cURLWrapper;
 void HTTPRequest::download(const URL& url,
                            const std::string& outputFile,
                            std::function<void(const std::string&, const long)> onError,
-                           const std::unordered_set<std::string>& httpHeaders)
+                           const std::unordered_set<std::string>& httpHeaders,
+                           const SecureCommunication& secureCommunication)
 {
     try
     {
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
-            .url(url.url())
+            .url(url.url(), secureCommunication)
             .outputFile(outputFile)
             .appendHeaders(httpHeaders)
             .execute();
@@ -46,11 +47,12 @@ void HTTPRequest::post(const URL& url,
                        std::function<void(const std::string&)> onSuccess,
                        std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName,
-                       const std::unordered_set<std::string>& httpHeaders)
+                       const std::unordered_set<std::string>& httpHeaders,
+                       const SecureCommunication& secureCommunication)
 {
     try
     {
-        post(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+        post(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {
@@ -63,12 +65,17 @@ void HTTPRequest::post(const URL& url,
                        std::function<void(const std::string&)> onSuccess,
                        std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName,
-                       const std::unordered_set<std::string>& httpHeaders)
+                       const std::unordered_set<std::string>& httpHeaders,
+                       const SecureCommunication& secureCommunication)
 {
     try
     {
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication)
+            .postData(data)
+            .appendHeaders(httpHeaders)
+            .outputFile(fileName)
+            .execute();
 
         onSuccess(req.response());
     }
@@ -86,12 +93,13 @@ void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&)> onSuccess,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
-                      const std::unordered_set<std::string>& httpHeaders)
+                      const std::unordered_set<std::string>& httpHeaders,
+                      const SecureCommunication& secureCommunication)
 {
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url()).appendHeaders(httpHeaders).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }
@@ -110,11 +118,12 @@ void HTTPRequest::put(const URL& url,
                       std::function<void(const std::string&)> onSuccess,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
-                      const std::unordered_set<std::string>& httpHeaders)
+                      const std::unordered_set<std::string>& httpHeaders,
+                      const SecureCommunication& secureCommunication)
 {
     try
     {
-        put(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+        put(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {
@@ -127,12 +136,17 @@ void HTTPRequest::put(const URL& url,
                       std::function<void(const std::string&)> onSuccess,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
-                      const std::unordered_set<std::string>& httpHeaders)
+                      const std::unordered_set<std::string>& httpHeaders,
+                      const SecureCommunication& secureCommunication)
 {
     try
     {
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication)
+            .postData(data)
+            .appendHeaders(httpHeaders)
+            .outputFile(fileName)
+            .execute();
 
         onSuccess(req.response());
     }
@@ -151,11 +165,12 @@ void HTTPRequest::patch(const URL& url,
                         std::function<void(const std::string&)> onSuccess,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,
-                        const std::unordered_set<std::string>& httpHeaders)
+                        const std::unordered_set<std::string>& httpHeaders,
+                        const SecureCommunication& secureCommunication)
 {
     try
     {
-        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders);
+        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {
@@ -168,12 +183,17 @@ void HTTPRequest::patch(const URL& url,
                         std::function<void(const std::string&)> onSuccess,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,
-                        const std::unordered_set<std::string>& httpHeaders)
+                        const std::unordered_set<std::string>& httpHeaders,
+                        const SecureCommunication& secureCommunication)
 {
     try
     {
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
-        req.url(url.url()).postData(data).appendHeaders(httpHeaders).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication)
+            .postData(data)
+            .appendHeaders(httpHeaders)
+            .outputFile(fileName)
+            .execute();
 
         onSuccess(req.response());
     }
@@ -191,12 +211,13 @@ void HTTPRequest::delete_(const URL& url,
                           std::function<void(const std::string&)> onSuccess,
                           std::function<void(const std::string&, const long)> onError,
                           const std::string& fileName,
-                          const std::unordered_set<std::string>& httpHeaders)
+                          const std::unordered_set<std::string>& httpHeaders,
+                          const SecureCommunication& secureCommunication)
 {
     try
     {
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
-        req.url(url.url()).appendHeaders(httpHeaders).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
     }
