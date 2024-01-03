@@ -10,6 +10,8 @@
  */
 
 #include "HTTPRequest.hpp"
+#include "curlHandlerType.hpp"
+#include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"
 #include "urlRequest.hpp"
@@ -27,6 +29,31 @@ void HTTPRequest::download(const URL& url,
     try
     {
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+            .url(url.url(), secureCommunication)
+            .outputFile(outputFile)
+            .appendHeaders(httpHeaders)
+            .execute();
+    }
+    catch (const Curl::CurlException& ex)
+    {
+        onError(ex.what(), ex.responseCode());
+    }
+    catch (const std::exception& ex)
+    {
+        onError(ex.what(), NOT_USED);
+    }
+}
+
+void HTTPRequest::customDownload(const URL& url,
+                                 const std::string& outputFile,
+                                 std::function<void(const std::string&, const long)> onError,
+                                 const std::unordered_set<std::string>& httpHeaders,
+                                 const SecureCommunication& secureCommunication,
+                                 const CurlHandlerTypeEnum& handlerType)
+{
+    try
+    {
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType))
             .url(url.url(), secureCommunication)
             .outputFile(outputFile)
             .appendHeaders(httpHeaders)

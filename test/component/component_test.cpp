@@ -10,6 +10,8 @@
  */
 
 #include "component_test.hpp"
+#include "curlHandlerCache.hpp"
+#include "curlHandlerType.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"
@@ -144,6 +146,128 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 
                                          m_callbackComplete = true;
                                      });
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the custom download request using the single handler.
+ */
+TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
+{
+    HTTPRequest::instance().customDownload(
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
+}
+
+/**
+ * @brief Test the custom download request using the single handler with empty URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
+{
+    HTTPRequest::instance().customDownload(
+        HttpURL(""),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+            EXPECT_EQ(responseCode, -1);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::SINGLE);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "");
+}
+
+/**
+ * @brief Test the custom download request using the single handler with a invalid URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
+{
+    HTTPRequest::instance().customDownload(
+        HttpURL("http://localhost:44441/invalid_file"),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "HTTP response code said error");
+            EXPECT_EQ(responseCode, 404);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::SINGLE);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the custom download request using the multi handler.
+ */
+TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
+{
+    HTTPRequest::instance().customDownload(
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::MULTI);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
+}
+
+/**
+ * @brief Test the custom download request using the multi handler with empty URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
+{
+    HTTPRequest::instance().customDownload(
+        HttpURL(""),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
+            EXPECT_EQ(responseCode, -1);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "");
+}
+
+/**
+ * @brief Test the custom download request using the multi handler with a invalid URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
+{
+    HTTPRequest::instance().customDownload(
+        HttpURL("http://localhost:44441/invalid_file"),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
+            EXPECT_EQ(responseCode, -1);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -509,7 +633,7 @@ TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
 TEST_F(ComponentTestInternalParameters, MultipleThreads)
 {
     std::vector<std::thread> threads;
-    for (int i = 0; i < QUEUE_SIZE * 2; ++i)
+    for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
     {
         threads.emplace_back(
             []()
@@ -519,9 +643,36 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
                                     .execute());
             });
 
-        EXPECT_LE(HANDLER_QUEUE.size(), QUEUE_SIZE);
+        EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);
     }
 
+    for (auto& thread : threads)
+    {
+        EXPECT_NO_THROW(thread.join());
+    }
+}
+
+/**
+ * @brief This test checks the behavior of multiple threads for multi handler.
+ * This test create multiple threads that exceed the size of the queue where each thread will create a cURLWrapper
+ * object.
+ */
+TEST_F(ComponentTestInternalParameters, MultipleThreadsWithMultHandlers)
+{
+    std::vector<std::thread> threads;
+    for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
+    {
+        threads.emplace_back(
+            []()
+            {
+                EXPECT_NO_THROW(
+                    GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI))
+                        .url("http://localhost:44441/")
+                        .execute());
+            });
+
+        EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);
+    }
     for (auto& thread : threads)
     {
         EXPECT_NO_THROW(thread.join());

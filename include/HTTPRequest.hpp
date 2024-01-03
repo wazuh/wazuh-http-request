@@ -13,6 +13,7 @@
 #define _HTTP_REQUEST_HPP
 
 #include "IURLRequest.hpp"
+#include "curlHandlerType.hpp"
 #include "json.hpp"
 #include "singleton.hpp"
 #include <functional>
@@ -42,6 +43,23 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = {},
         const SecureCommunication& secureCommunication = {});
+
+    /**
+     * @brief Performs a HTTP DOWNLOAD request using a single or multi curl handler.
+     * @param url URL to send the request.
+     * @param fileName Output file.
+     * @param onError Callback to be called in case of error.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param handlerType Type of the curl handler. Default is 'SINGLE'.
+     */
+    void customDownload(
+        const URL& url,
+        const std::string& fileName,
+        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
+        const std::unordered_set<std::string>& httpHeaders = {},
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE);
 
     /**
      * @brief Performs a HTTP POST request.

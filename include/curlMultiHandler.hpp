@@ -1,0 +1,109 @@
+/*
+ * Wazuh shared modules utils
+ * Copyright (C) 2015, Wazuh Inc.
+ * December 27, 2023.
+ *
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General Public
+ * License (version 2) as published by the FSF - Free Software
+ * Foundation.
+ */
+
+#ifndef _CURL_MULTI_HANDLER_HPP
+#define _CURL_MULTI_HANDLER_HPP
+
+#include "ICURLHandler.hpp"
+#include "curlHandlerType.hpp"
+#include "customDeleter.hpp"
+#include <chrono>
+#include <memory>
+#include <stdexcept>
+#include <thread>
+
+static const int CURL_MULTI_HANDLER_TIMEOUT_MS = 1000;
+static const int CURL_MULTI_HANDLER_EXTRA_FDS = 0;
+
+using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
+using deleterCurlMultiHandler = CustomDeleter<decltype(&curl_multi_cleanup), curl_multi_cleanup>;
+
+//! cURLMultiHandler class
+/**
+ * This class implements the ICURLHandler interface to represents a multi curl handler.
+ */
+class cURLMultiHandler final : public ICURLHandler
+{
+private:
+    std::shared_ptr<CURLM> m_curlMultiHandler;
+
+public:
+    /**
+     * @brief Construct a new cURLMultiHandler object
+     *
+     * @param curlHandlerType Enum value of the curl handler.
+     */
+    explicit cURLMultiHandler(CurlHandlerTypeEnum curlHandlerType)
+        : ICURLHandler(curlHandlerType)
+    {
+        m_curlHandler = std::shared_ptr<CURL>(curl_easy_init(), deleterCurlHandler());
+        m_curlMultiHandler = std::shared_ptr<CURLM>(curl_multi_init(), deleterCurlMultiHandler());
+    }
+
+    // LCOV_EXCL_START
+    ~cURLMultiHandler() override
+    {
+        curl_multi_remove_handle(m_curlMultiHandler.get(), m_curlHandler.get());
+        curl_global_cleanup();
+    }
+    // LCOV_EXCL_STOP
+
+    /**
+     * @brief This method performs the request.
+     */
+    void execute() override
+    {
+        int stillRunning {1};
+        CURLMcode multiCode = curl_multi_add_handle(m_curlMultiHandler.get(), m_curlHandler.get());
+
+        if (multiCode != CURLM_OK)
+        {
+            throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_add_handle");
+        }
+
+        do
+        {
+            multiCode = curl_multi_perform(m_curlMultiHandler.get(), &stillRunning);
+
+            if (multiCode != CURLM_OK)
+            {
+                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_perform");
+            }
+
+            int fileDescriptors;
+
+            multiCode = curl_multi_wait(m_curlMultiHandler.get(),
+                                        nullptr,
+                                        CURL_MULTI_HANDLER_EXTRA_FDS,
+                                        CURL_MULTI_HANDLER_TIMEOUT_MS,
+                                        &fileDescriptors);
+            if (multiCode != CURLM_OK)
+            {
+                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_wait");
+            }
+            // Check if there is still activity
+            if (fileDescriptors == 0)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        } while (stillRunning);
+
+        long responseCode;
+        const auto resGetInfo = curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+
+        if (resGetInfo != CURLE_OK)
+        {
+            throw std::runtime_error("cURLMultiHandler::execute() failed: Couldn't get HTTP response code");
+        }
+    }
+};
+
+#endif // _CURL_MULTI_HANDLER_HPP
