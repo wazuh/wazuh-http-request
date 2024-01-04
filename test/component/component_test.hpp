@@ -107,6 +107,14 @@ public:
                            res.set_content(response.dump(), "text/json");
                        });
 
+        m_server.Get(R"(/custom-download/(\d+))",
+                     [](const httplib::Request& req, httplib::Response& res)
+                     {
+                         auto sleepInterval = std::stoi(req.matches[1]);
+                         std::this_thread::sleep_for(std::chrono::seconds(sleepInterval));
+                         res.set_content("Hello World!", "text/json");
+                     });
+
         m_server.Delete(R"(/(\d+))",
                         [](const httplib::Request& req, httplib::Response& res)
                         { res.set_content(req.matches[1], "text/json"); });

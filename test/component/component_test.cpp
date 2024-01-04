@@ -256,6 +256,67 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
 }
 
 /**
+ * @brief Test two instances of the custom download request using the multi handler and interrupt the handler.
+ *
+ */
+TEST_F(ComponentTestInterface, InterruptCustomDownload)
+{
+    std::atomic<bool> shouldRun {true};
+
+    auto sleepFirstHandler {std::to_string(1)};
+    auto sleepSecondHandler {std::to_string(4)};
+    auto sleepMainThread {6};
+    auto intervalToInterruptTheHandler {2};
+
+    std::thread thread1(
+        [&shouldRun, &sleepFirstHandler]()
+        {
+            HTTPRequest::instance().customDownload(
+                HttpURL("http://localhost:44441/custom-download/" + sleepFirstHandler),
+                "./test1.txt",
+                [](auto, auto) {},
+                {},
+                {},
+                CurlHandlerTypeEnum::MULTI,
+                shouldRun);
+        });
+
+    std::thread thread2(
+        [&shouldRun, &sleepSecondHandler]()
+        {
+            HTTPRequest::instance().customDownload(
+                HttpURL("http://localhost:44441/custom-download/" + sleepSecondHandler),
+                "./test2.txt",
+                [](auto, auto) {},
+                {},
+                {},
+                CurlHandlerTypeEnum::MULTI,
+                shouldRun);
+        });
+
+    // Sleep interval to interrupt the second handler.
+    std::this_thread::sleep_for(std::chrono::seconds(intervalToInterruptTheHandler));
+    shouldRun.store(false);
+
+    // Sleep main thread until the thread1 and thread2 finish
+    std::this_thread::sleep_for(std::chrono::seconds(sleepMainThread));
+
+    thread1.join();
+    thread2.join();
+
+    std::ifstream file1("./test1.txt");
+    std::string line1;
+    std::getline(file1, line1);
+    EXPECT_EQ(line1, "Hello World!");
+
+    std::ifstream file2("./test2.txt");
+    std::string line2;
+    std::getline(file2, line2);
+    // As the second thread was interrupted, there is no response from the endpoint 'custom-download'
+    EXPECT_EQ(line2, "");
+}
+
+/**
  * @brief Test the custom download request using the multi handler with empty URL.
  */
 TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
