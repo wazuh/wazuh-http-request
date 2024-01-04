@@ -15,6 +15,7 @@
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"
 #include "urlRequest.hpp"
+#include <atomic>
 #include <string>
 #include <unordered_set>
 
@@ -49,11 +50,12 @@ void HTTPRequest::customDownload(const URL& url,
                                  std::function<void(const std::string&, const long)> onError,
                                  const std::unordered_set<std::string>& httpHeaders,
                                  const SecureCommunication& secureCommunication,
-                                 const CurlHandlerTypeEnum& handlerType)
+                                 const CurlHandlerTypeEnum& handlerType,
+                                 const std::atomic<bool>& shouldRun)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType))
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))
             .url(url.url(), secureCommunication)
             .outputFile(outputFile)
             .appendHeaders(httpHeaders)

@@ -16,6 +16,7 @@
 #include "curlHandlerType.hpp"
 #include "json.hpp"
 #include "singleton.hpp"
+#include <atomic>
 #include <functional>
 #include <string>
 #include <unordered_set>
@@ -45,13 +46,14 @@ public:
         const SecureCommunication& secureCommunication = {});
 
     /**
-     * @brief Performs a HTTP DOWNLOAD request using a single or multi curl handler.
+     * @brief Performs a HTTP DOWNLOAD request using a single or multi cURL handler.
      * @param url URL to send the request.
      * @param fileName Output file.
      * @param onError Callback to be called in case of error.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Object that provides secure communication.
-     * @param handlerType Type of the curl handler. Default is 'SINGLE'.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler.
      */
     void customDownload(
         const URL& url,
@@ -59,7 +61,8 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = {},
         const SecureCommunication& secureCommunication = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE);
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP POST request.

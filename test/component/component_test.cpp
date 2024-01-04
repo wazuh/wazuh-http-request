@@ -216,8 +216,16 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
 {
+    std::atomic<bool> shouldRun {true};
+
     HTTPRequest::instance().customDownload(
-        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::MULTI);
+        HttpURL("http://localhost:44441/"),
+        "./test.txt",
+        [](auto, auto) {},
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -226,10 +234,34 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
 }
 
 /**
+ * @brief Test the custom download request using the multi handler and interrupt the handler.
+ */
+TEST_F(ComponentTestInterface, InterruptMultiHandler)
+{
+    std::atomic<bool> shouldRun {false};
+
+    HTTPRequest::instance().customDownload(
+        HttpURL("http://localhost:44441/"),
+        "./test.txt",
+        [](auto, auto) {},
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "");
+}
+
+/**
  * @brief Test the custom download request using the multi handler with empty URL.
  */
 TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
 {
+    std::atomic<bool> shouldRun {true};
+
     HTTPRequest::instance().customDownload(
         HttpURL(""),
         "./test.txt",
@@ -242,7 +274,8 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
         },
         {},
         {},
-        CurlHandlerTypeEnum::MULTI);
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -255,6 +288,8 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
 {
+    std::atomic<bool> shouldRun {true};
+
     HTTPRequest::instance().customDownload(
         HttpURL("http://localhost:44441/invalid_file"),
         "./test.txt",
@@ -267,7 +302,8 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
         },
         {},
         {},
-        CurlHandlerTypeEnum::MULTI);
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -660,15 +696,17 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
 TEST_F(ComponentTestInternalParameters, MultipleThreadsWithMultHandlers)
 {
     std::vector<std::thread> threads;
+    std::atomic<bool> shouldRun {true};
+
     for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
     {
         threads.emplace_back(
-            []()
+            [&shouldRun]()
             {
-                EXPECT_NO_THROW(
-                    GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI))
-                        .url("http://localhost:44441/")
-                        .execute());
+                EXPECT_NO_THROW(GetRequest::builder(
+                                    FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI, shouldRun))
+                                    .url("http://localhost:44441/")
+                                    .execute());
             });
 
         EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);

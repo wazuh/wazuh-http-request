@@ -22,6 +22,7 @@
 #include "curlSingleHandler.hpp"
 #include "customDeleter.hpp"
 #include <algorithm>
+#include <atomic>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -70,24 +71,29 @@ private:
     }
 
     /**
-     * @brief Get the cURL Handler object
+     * @brief Get the cURL Handler object.
      *
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the cURL handler.
      * @return std::shared_ptr<ICURLHandler>
      */
-    std::shared_ptr<ICURLHandler> curlHandlerInit(CurlHandlerTypeEnum handlerType)
+    std::shared_ptr<ICURLHandler> curlHandlerInit(CurlHandlerTypeEnum handlerType,
+                                                  const std::atomic<bool>& shouldRun = true)
     {
-        return cURLHandlerCache::instance().getCurlHandler(handlerType);
+        return cURLHandlerCache::instance().getCurlHandler(handlerType, shouldRun);
     }
 
 public:
     /**
      * @brief Create a cURLWrapper.
      *
-     * @param handlerType Type of the curl handler. Default is 'SINGLE'.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler.
      */
-    cURLWrapper(CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE)
+    cURLWrapper(CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
+                const std::atomic<bool>& shouldRun = true)
     {
-        m_curlHandler = curlHandlerInit(handlerType);
+        m_curlHandler = curlHandlerInit(handlerType, shouldRun);
 
         if (!m_curlHandler || !m_curlHandler->getHandler())
         {

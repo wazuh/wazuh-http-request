@@ -21,7 +21,7 @@
  */
 TEST_F(cURLHandlerCacheTest, SingleHandlerCreation)
 {
-    // Create the handler and check that it is a Single handler.
+    // Create the cURL handler and check that it is a Single handler.
     EXPECT_TRUE(std::dynamic_pointer_cast<cURLSingleHandler>(
         cURLHandlerCache::instance().getCurlHandler(CurlHandlerTypeEnum::SINGLE)));
 }
@@ -31,7 +31,7 @@ TEST_F(cURLHandlerCacheTest, SingleHandlerCreation)
  */
 TEST_F(cURLHandlerCacheTest, MultiHandlerCreation)
 {
-    // Create the handler and check that it is a Multi handler.
+    // Create the cURL handler and check that it is a Multi handler.
     EXPECT_TRUE(std::dynamic_pointer_cast<cURLMultiHandler>(
         cURLHandlerCache::instance().getCurlHandler(CurlHandlerTypeEnum::MULTI)));
 }

@@ -15,6 +15,7 @@
 #include "ICURLHandler.hpp"
 #include "curlHandlerType.hpp"
 #include "customDeleter.hpp"
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <stdexcept>
@@ -28,21 +29,25 @@ using deleterCurlMultiHandler = CustomDeleter<decltype(&curl_multi_cleanup), cur
 
 //! cURLMultiHandler class
 /**
- * This class implements the ICURLHandler interface to represents a multi curl handler.
+ * @brief This class implements the ICURLHandler interface to represents a multi cURL handler.
+ *
  */
 class cURLMultiHandler final : public ICURLHandler
 {
 private:
-    std::shared_ptr<CURLM> m_curlMultiHandler;
+    std::shared_ptr<CURLM> m_curlMultiHandler; ///< Pointer to the cURL multi handler.
+    const std::atomic<bool>& m_shouldRun;      ///< Variable to control the graceful shutdown of the cURL multi handler.
 
 public:
     /**
      * @brief Construct a new cURLMultiHandler object
      *
-     * @param curlHandlerType Enum value of the curl handler.
+     * @param curlHandlerType Enum value of the cURL handler.
+     * @param shouldRun Flag used to interrupt the cURL handler.
      */
-    explicit cURLMultiHandler(CurlHandlerTypeEnum curlHandlerType)
-        : ICURLHandler(curlHandlerType)
+    explicit cURLMultiHandler(CurlHandlerTypeEnum curlHandlerType, const std::atomic<bool>& shouldRun = true)
+        : m_shouldRun(shouldRun)
+        , ICURLHandler(curlHandlerType)
     {
         m_curlHandler = std::shared_ptr<CURL>(curl_easy_init(), deleterCurlHandler());
         m_curlMultiHandler = std::shared_ptr<CURLM>(curl_multi_init(), deleterCurlMultiHandler());
@@ -57,12 +62,13 @@ public:
     // LCOV_EXCL_STOP
 
     /**
-     * @brief This method performs the request.
+     * @brief Performs the request.
+     *
      */
     void execute() override
     {
         int stillRunning {1};
-        CURLMcode multiCode = curl_multi_add_handle(m_curlMultiHandler.get(), m_curlHandler.get());
+        auto multiCode {curl_multi_add_handle(m_curlMultiHandler.get(), m_curlHandler.get())};
 
         if (multiCode != CURLM_OK)
         {
@@ -94,10 +100,10 @@ public:
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
-        } while (stillRunning);
+        } while (stillRunning && m_shouldRun.load());
 
         long responseCode;
-        const auto resGetInfo = curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+        const auto resGetInfo {curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode)};
 
         if (resGetInfo != CURLE_OK)
         {

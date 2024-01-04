@@ -18,19 +18,20 @@
 
 //! ICURLHandler abstract class
 /**
- * This class serves as the interface that represents a curl handler.
+ * @brief This class serves as the interface that represents a cURL handler.
+ *
  */
 class ICURLHandler
 {
 protected:
-    std::shared_ptr<CURL> m_curlHandler;   ///< Pointer to the CURL handle.
-    CurlHandlerTypeEnum m_curlHandlerType; ///< Enum value for this curl handler type.
+    std::shared_ptr<CURL> m_curlHandler;         ///< Pointer to the CURL handle.
+    const CurlHandlerTypeEnum m_curlHandlerType; ///< Enum value for this cURL handler.
 
 public:
     /**
      * @brief Construct a new ICURLHandler object
      *
-     * @param curlHandlerType Enum value of the curl handler.
+     * @param curlHandlerType Enum value of the cURL handler.
      */
     ICURLHandler(CurlHandlerTypeEnum curlHandlerType)
         : m_curlHandlerType(curlHandlerType) {};
@@ -40,14 +41,14 @@ public:
     // LCOV_EXCL_STOP
 
     /**
-     * @brief This method performs the request.
+     * @brief Performs the request.
      */
     virtual void execute() = 0;
 
     /**
      * @brief Returns the pointer to the CURL handle.
      *
-     * @return std::shared_ptr<CURL>
+     * @return std::shared_ptr<CURL> cURL handler object.
      */
     [[nodiscard]] const std::shared_ptr<CURL>& getHandler() const
     {
@@ -55,9 +56,9 @@ public:
     }
 
     /**
-     * @brief Returns the type of the curl handle.
+     * @brief Returns the type of the cURL handler.
      *
-     * @return CurlHandlerTypeEnum
+     * @return CurlHandlerTypeEnum Enum value of the cURL handler type.
      */
     [[nodiscard]] CurlHandlerTypeEnum getHandlerType() const
     {

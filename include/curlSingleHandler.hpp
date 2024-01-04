@@ -25,7 +25,7 @@ using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy
 
 //! cURLSingleHandler class
 /**
- * This class implements the ICURLHandler interface to represents a single curl handler.
+ * @brief class implements the ICURLHandler interface to represents a single cURL handler.
  */
 class cURLSingleHandler final : public ICURLHandler
 {
@@ -33,7 +33,7 @@ public:
     /**
      * @brief Construct a new cURLSingleHandler object
      *
-     * @param curlHandlerType Enum value of the curl handler.
+     * @param curlHandlerType Enum value of the cURL handler.
      */
     explicit cURLSingleHandler(CurlHandlerTypeEnum curlHandlerType)
         : ICURLHandler(curlHandlerType)
@@ -53,7 +53,7 @@ public:
         const auto resPerform {curl_easy_perform(m_curlHandler.get())};
 
         long responseCode;
-        const auto resGetInfo = curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+        const auto resGetInfo {curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode)};
 
         curl_easy_reset(m_curlHandler.get());
 

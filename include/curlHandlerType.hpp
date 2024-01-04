@@ -13,7 +13,7 @@
 #define _CURL_HANDLER_TYPE_HPP
 
 /**
- * @brief Valid types of curl handler.
+ * @brief Valid types of cURL handler.
  */
 enum CurlHandlerTypeEnum
 {

@@ -15,6 +15,7 @@
 #include "IRequestImplementator.hpp"
 #include "curlHandlerType.hpp"
 #include "curlWrapper.hpp"
+#include <atomic>
 #include <memory>
 #include <stdexcept>
 
@@ -50,12 +51,14 @@ public:
     /**
      * @brief Create a cURLRequest with the corresponding CurlHandlerTypeEnum for the given enum.
      *
-     * @param handlerType Type of the curl handler. Default is 'SINGLE'.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the cURL handler.
      * @return A shared pointer to a cURLRequest.
      */
-    static std::shared_ptr<IRequestImplementator> create(CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE)
+    static std::shared_ptr<IRequestImplementator> create(CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
+                                                         const std::atomic<bool>& shouldRun = true)
     {
-        return std::make_shared<cURLWrapper>(handlerType);
+        return std::make_shared<cURLWrapper>(handlerType, shouldRun);
     }
 };
 

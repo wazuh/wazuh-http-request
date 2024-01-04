@@ -19,6 +19,7 @@
 #include "customDeleter.hpp"
 #include "singleton.hpp"
 #include <algorithm>
+#include <atomic>
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -42,15 +43,16 @@ private:
 
 public:
     /**
-     * @brief Get the curl handler object
-     * This method creates a single or multi curl handler and returns it, but ensures that only one curl handler is used
+     * @brief Get the cURL handler object
+     * This method creates a single or multi cURL handler and returns it, but ensures that only one cURL handler is used
      * per thread and keeps the queue size to a maximum of QUEUE_MAX_SIZE.
      *
-     * @param curlHandlerType Type of the curl handler. Default is 'SINGLE'.
-     *
+     * @param curlHandlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler.
      * @return std::shared_ptr<ICURLHandler>
      */
-    std::shared_ptr<ICURLHandler> getCurlHandler(CurlHandlerTypeEnum curlHandlerType = CurlHandlerTypeEnum::SINGLE)
+    std::shared_ptr<ICURLHandler> getCurlHandler(CurlHandlerTypeEnum curlHandlerType = CurlHandlerTypeEnum::SINGLE,
+                                                 const std::atomic<bool>& shouldRun = true)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         const auto it {std::find_if(
@@ -73,7 +75,9 @@ public:
             switch (curlHandlerType)
             {
                 case CurlHandlerTypeEnum::SINGLE: handler = std::make_shared<cURLSingleHandler>(curlHandlerType); break;
-                case CurlHandlerTypeEnum::MULTI: handler = std::make_shared<cURLMultiHandler>(curlHandlerType); break;
+                case CurlHandlerTypeEnum::MULTI:
+                    handler = std::make_shared<cURLMultiHandler>(curlHandlerType, shouldRun);
+                    break;
                 default: throw std::invalid_argument("Invalid handler type.");
             }
             m_handlerQueue.emplace_back(std::this_thread::get_id(), handler);
