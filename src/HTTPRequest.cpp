@@ -25,33 +25,9 @@ void HTTPRequest::download(const URL& url,
                            const std::string& outputFile,
                            std::function<void(const std::string&, const long)> onError,
                            const std::unordered_set<std::string>& httpHeaders,
-                           const SecureCommunication& secureCommunication)
-{
-    try
-    {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
-            .url(url.url(), secureCommunication)
-            .outputFile(outputFile)
-            .appendHeaders(httpHeaders)
-            .execute();
-    }
-    catch (const Curl::CurlException& ex)
-    {
-        onError(ex.what(), ex.responseCode());
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-    }
-}
-
-void HTTPRequest::customDownload(const URL& url,
-                                 const std::string& outputFile,
-                                 std::function<void(const std::string&, const long)> onError,
-                                 const std::unordered_set<std::string>& httpHeaders,
-                                 const SecureCommunication& secureCommunication,
-                                 const CurlHandlerTypeEnum& handlerType,
-                                 const std::atomic<bool>& shouldRun)
+                           const SecureCommunication& secureCommunication,
+                           const CurlHandlerTypeEnum& handlerType,
+                           const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -77,7 +53,9 @@ void HTTPRequest::post(const URL& url,
                        std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName,
                        const std::unordered_set<std::string>& httpHeaders,
-                       const SecureCommunication& secureCommunication)
+                       const SecureCommunication& secureCommunication,
+                       const CurlHandlerTypeEnum& handlerType,
+                       const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -95,11 +73,13 @@ void HTTPRequest::post(const URL& url,
                        std::function<void(const std::string&, const long)> onError,
                        const std::string& fileName,
                        const std::unordered_set<std::string>& httpHeaders,
-                       const SecureCommunication& secureCommunication)
+                       const SecureCommunication& secureCommunication,
+                       const CurlHandlerTypeEnum& handlerType,
+                       const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
@@ -123,11 +103,13 @@ void HTTPRequest::get(const URL& url,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
                       const std::unordered_set<std::string>& httpHeaders,
-                      const SecureCommunication& secureCommunication)
+                      const SecureCommunication& secureCommunication,
+                      const CurlHandlerTypeEnum& handlerType,
+                      const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication).appendHeaders(httpHeaders).outputFile(fileName).execute();
 
         onSuccess(req.response());
@@ -148,7 +130,9 @@ void HTTPRequest::put(const URL& url,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
                       const std::unordered_set<std::string>& httpHeaders,
-                      const SecureCommunication& secureCommunication)
+                      const SecureCommunication& secureCommunication,
+                      const CurlHandlerTypeEnum& handlerType,
+                      const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -166,11 +150,13 @@ void HTTPRequest::put(const URL& url,
                       std::function<void(const std::string&, const long)> onError,
                       const std::string& fileName,
                       const std::unordered_set<std::string>& httpHeaders,
-                      const SecureCommunication& secureCommunication)
+                      const SecureCommunication& secureCommunication,
+                      const CurlHandlerTypeEnum& handlerType,
+                      const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
@@ -195,7 +181,9 @@ void HTTPRequest::patch(const URL& url,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,
                         const std::unordered_set<std::string>& httpHeaders,
-                        const SecureCommunication& secureCommunication)
+                        const SecureCommunication& secureCommunication,
+                        const CurlHandlerTypeEnum& handlerType,
+                        const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -213,11 +201,13 @@ void HTTPRequest::patch(const URL& url,
                         std::function<void(const std::string&, const long)> onError,
                         const std::string& fileName,
                         const std::unordered_set<std::string>& httpHeaders,
-                        const SecureCommunication& secureCommunication)
+                        const SecureCommunication& secureCommunication,
+                        const CurlHandlerTypeEnum& handlerType,
+                        const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
@@ -241,7 +231,9 @@ void HTTPRequest::delete_(const URL& url,
                           std::function<void(const std::string&, const long)> onError,
                           const std::string& fileName,
                           const std::unordered_set<std::string>& httpHeaders,
-                          const SecureCommunication& secureCommunication)
+                          const SecureCommunication& secureCommunication,
+                          const CurlHandlerTypeEnum& handlerType,
+                          const std::atomic<bool>& shouldRun)
 {
     try
     {

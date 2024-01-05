@@ -19,7 +19,6 @@
 #include <chrono>
 #include <memory>
 #include <stdexcept>
-#include <thread>
 
 static const int CURL_MULTI_HANDLER_TIMEOUT_MS = 1000;
 static const int CURL_MULTI_HANDLER_EXTRA_FDS = 0;
@@ -94,11 +93,6 @@ public:
             if (multiCode != CURLM_OK)
             {
                 throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_wait");
-            }
-            // Check if there is still activity
-            if (fileDescriptors == 0)
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         } while (stillRunning && m_shouldRun.load());
 

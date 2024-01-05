@@ -10,8 +10,10 @@
  */
 
 #include "UNIXSocketRequest.hpp"
+#include "curlHandlerType.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
+#include <atomic>
 #include <string>
 #include <unordered_set>
 
@@ -21,11 +23,13 @@ void UNIXSocketRequest::download(const URL& url,
                                  const std::string& outputFile,
                                  std::function<void(const std::string&, const long)> onError,
                                  const std::unordered_set<std::string>& httpHeaders,
-                                 const SecureCommunication& secureCommunication)
+                                 const SecureCommunication& secureCommunication,
+                                 const CurlHandlerTypeEnum& handlerType,
+                                 const std::atomic<bool>& shouldRun)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))
             .url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .outputFile(outputFile)
@@ -47,7 +51,9 @@ void UNIXSocketRequest::post(const URL& url,
                              std::function<void(const std::string&, const long)> onError,
                              const std::string& fileName,
                              const std::unordered_set<std::string>& httpHeaders,
-                             const SecureCommunication& secureCommunication)
+                             const SecureCommunication& secureCommunication,
+                             const CurlHandlerTypeEnum& handlerType,
+                             const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -65,11 +71,13 @@ void UNIXSocketRequest::post(const URL& url,
                              std::function<void(const std::string&, const long)> onError,
                              const std::string& fileName,
                              const std::unordered_set<std::string>& httpHeaders,
-                             const SecureCommunication& secureCommunication)
+                             const SecureCommunication& secureCommunication,
+                             const CurlHandlerTypeEnum& handlerType,
+                             const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .postData(data)
@@ -93,11 +101,13 @@ void UNIXSocketRequest::get(const URL& url,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
                             const std::unordered_set<std::string>& httpHeaders,
-                            const SecureCommunication& secureCommunication)
+                            const SecureCommunication& secureCommunication,
+                            const CurlHandlerTypeEnum& handlerType,
+                            const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication).unixSocketPath(url.unixSocketPath()).outputFile(fileName).execute();
 
         onSuccess(req.response());
@@ -118,7 +128,9 @@ void UNIXSocketRequest::put(const URL& url,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
                             const std::unordered_set<std::string>& httpHeaders,
-                            const SecureCommunication& secureCommunication)
+                            const SecureCommunication& secureCommunication,
+                            const CurlHandlerTypeEnum& handlerType,
+                            const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -136,11 +148,13 @@ void UNIXSocketRequest::put(const URL& url,
                             std::function<void(const std::string&, const long)> onError,
                             const std::string& fileName,
                             const std::unordered_set<std::string>& httpHeaders,
-                            const SecureCommunication& secureCommunication)
+                            const SecureCommunication& secureCommunication,
+                            const CurlHandlerTypeEnum& handlerType,
+                            const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .postData(data)
@@ -165,7 +179,9 @@ void UNIXSocketRequest::patch(const URL& url,
                               std::function<void(const std::string&, const long)> onError,
                               const std::string& fileName,
                               const std::unordered_set<std::string>& httpHeaders,
-                              const SecureCommunication& secureCommunication)
+                              const SecureCommunication& secureCommunication,
+                              const CurlHandlerTypeEnum& handlerType,
+                              const std::atomic<bool>& shouldRun)
 {
     try
     {
@@ -183,11 +199,13 @@ void UNIXSocketRequest::patch(const URL& url,
                               std::function<void(const std::string&, const long)> onError,
                               const std::string& fileName,
                               const std::unordered_set<std::string>& httpHeaders,
-                              const SecureCommunication& secureCommunication)
+                              const SecureCommunication& secureCommunication,
+                              const CurlHandlerTypeEnum& handlerType,
+                              const std::atomic<bool>& shouldRun)
 {
     try
     {
-        auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+        auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .postData(data)
@@ -211,7 +229,9 @@ void UNIXSocketRequest::delete_(const URL& url,
                                 std::function<void(const std::string&, const long)> onError,
                                 const std::string& fileName,
                                 const std::unordered_set<std::string>& httpHeaders,
-                                const SecureCommunication& secureCommunication)
+                                const SecureCommunication& secureCommunication,
+                                const CurlHandlerTypeEnum& handlerType,
+                                const std::atomic<bool>& shouldRun)
 {
     try
     {

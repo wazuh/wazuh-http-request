@@ -171,11 +171,11 @@ BENCHMARK(BM_Download);
  *
  * @param state Benchmark state.
  */
-static void BM_CustomDownloadUsingTheSingleHandler(benchmark::State& state)
+static void BM_DownloadUsingTheSingleHandler(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().customDownload(
+        HTTPRequest::instance().download(
             HttpURL("http://localhost:44441/"),
             "out.txt",
             [&](const std::string& /*result*/, const long /*responseCode*/) {},
@@ -184,7 +184,7 @@ static void BM_CustomDownloadUsingTheSingleHandler(benchmark::State& state)
             CurlHandlerTypeEnum::SINGLE);
     }
 }
-BENCHMARK(BM_CustomDownloadUsingTheSingleHandler);
+BENCHMARK(BM_DownloadUsingTheSingleHandler);
 
 /**
  * @brief This function is a benchmark test for the HTTP DOWNLOAD request using the multi handler.
@@ -195,7 +195,7 @@ static void BM_CustomDownloadUsingTheMultiHandler(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().customDownload(
+        HTTPRequest::instance().download(
             HttpURL("http://localhost:44441/"),
             "out.txt",
             [&](const std::string& /*result*/, const long /*responseCode*/) {},

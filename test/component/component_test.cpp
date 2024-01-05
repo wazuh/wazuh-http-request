@@ -155,7 +155,7 @@ TEST_F(ComponentTestInterface, DownloadFileError)
  */
 TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
 {
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
 
     std::ifstream file("./test.txt");
@@ -169,7 +169,7 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
 {
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL(""),
         "./test.txt",
         [&](const std::string& result, const long responseCode)
@@ -194,7 +194,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
 {
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL("http://localhost:44441/invalid_file"),
         "./test.txt",
         [&](const std::string& result, const long responseCode)
@@ -218,7 +218,7 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
 {
     std::atomic<bool> shouldRun {true};
 
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL("http://localhost:44441/"),
         "./test.txt",
         [](auto, auto) {},
@@ -240,7 +240,7 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
 {
     std::atomic<bool> shouldRun {false};
 
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL("http://localhost:44441/"),
         "./test.txt",
         [](auto, auto) {},
@@ -259,7 +259,7 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
  * @brief Test two instances of the custom download request using the multi handler and interrupt the handler.
  *
  */
-TEST_F(ComponentTestInterface, InterruptCustomDownload)
+TEST_F(ComponentTestInterface, InterruptDownload)
 {
     std::atomic<bool> shouldRun {true};
 
@@ -271,7 +271,7 @@ TEST_F(ComponentTestInterface, InterruptCustomDownload)
     std::thread thread1(
         [&shouldRun, &sleepFirstHandler]()
         {
-            HTTPRequest::instance().customDownload(
+            HTTPRequest::instance().download(
                 HttpURL("http://localhost:44441/custom-download/" + sleepFirstHandler),
                 "./test1.txt",
                 [](auto, auto) {},
@@ -284,7 +284,7 @@ TEST_F(ComponentTestInterface, InterruptCustomDownload)
     std::thread thread2(
         [&shouldRun, &sleepSecondHandler]()
         {
-            HTTPRequest::instance().customDownload(
+            HTTPRequest::instance().download(
                 HttpURL("http://localhost:44441/custom-download/" + sleepSecondHandler),
                 "./test2.txt",
                 [](auto, auto) {},
@@ -323,7 +323,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
 {
     std::atomic<bool> shouldRun {true};
 
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL(""),
         "./test.txt",
         [&](const std::string& result, const long responseCode)
@@ -351,7 +351,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
 {
     std::atomic<bool> shouldRun {true};
 
-    HTTPRequest::instance().customDownload(
+    HTTPRequest::instance().download(
         HttpURL("http://localhost:44441/invalid_file"),
         "./test.txt",
         [&](const std::string& result, const long responseCode)

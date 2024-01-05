@@ -13,8 +13,10 @@
 #define _UNIX_SOCKET_REQUEST_HPP
 
 #include "IURLRequest.hpp"
+#include "curlHandlerType.hpp"
 #include "json.hpp"
 #include "singleton.hpp"
+#include <atomic>
 #include <functional>
 #include <iostream>
 #include <string>
@@ -37,13 +39,17 @@ public:
      * @param onError
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void download(
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET POST request.
      *
@@ -54,6 +60,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void post(
         const URL& url,
@@ -62,7 +70,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a UNIX SOCKET POST request.
@@ -74,6 +84,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void post(
         const URL& url,
@@ -82,7 +94,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET GET request.
      *
@@ -92,6 +106,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void get(
         const URL& url,
@@ -99,7 +115,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PUT request.
      *
@@ -110,6 +128,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void put(
         const URL& url,
@@ -118,7 +138,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PUT request.
      *
@@ -129,6 +151,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void put(
         const URL& url,
@@ -137,7 +161,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PATCH request.
      *
@@ -148,6 +174,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void patch(
         const URL& url,
@@ -156,7 +184,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PATCH request.
      *
@@ -167,6 +197,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void patch(
         const URL& url,
@@ -175,7 +207,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET DELETE request.
      *
@@ -185,6 +219,8 @@ public:
      * @param fileName
      * @param httpHeaders
      * @param secureCommunication
+     * @param handlerType
+     * @param shouldRun
      */
     void delete_(
         const URL& url,
@@ -192,7 +228,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 };
 
 #endif // _UNIX_SOCKET_REQUEST_HPP
