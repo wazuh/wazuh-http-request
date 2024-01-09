@@ -166,4 +166,17 @@ static void BM_Download(benchmark::State& state)
 }
 BENCHMARK(BM_Download);
 
+static void BM_ReturnStringByValue(benchmark::State& state)
+{
+    SecureCommunication secureComm;
+    secureComm.sslCertificate("path/to/certificate");
+
+    for (auto _ : state)
+    {
+        std::string result = secureComm.getParameter(AuthenticationParameter::SSL_CERTIFICATE);
+        benchmark::DoNotOptimize(result);
+    }
+}
+BENCHMARK(BM_ReturnStringByValue);
+
 BENCHMARK_MAIN();

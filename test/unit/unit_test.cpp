@@ -12,6 +12,7 @@
 #include "unit_test.hpp"
 #include "mocks/MockRequest.hpp"
 #include "mocks/MockRequestImplementator.hpp"
+#include "secureCommunication.hpp"
 #include "tests/mocks/mockFsWrapper.hpp"
 
 using namespace testing;
@@ -27,6 +28,9 @@ constexpr OPTION_REQUEST_TYPE optPostFields {OPT_POSTFIELDS};
 constexpr OPTION_REQUEST_TYPE optWriteFunction {OPT_WRITEFUNCTION};
 constexpr OPTION_REQUEST_TYPE optPostFieldSize {OPT_POSTFIELDSIZE};
 constexpr OPTION_REQUEST_TYPE optVerifyPeer {OPT_VERIFYPEER};
+constexpr OPTION_REQUEST_TYPE optSslCert {OPT_SSL_CERT};
+constexpr OPTION_REQUEST_TYPE optSslKey {OPT_SSL_KEY};
+constexpr OPTION_REQUEST_TYPE optBasicAuth {OPT_BASIC_AUTH};
 constexpr long zero {0};
 
 /**
@@ -44,6 +48,75 @@ TEST_F(UrlRequestUnitTest, GetFileHttp)
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
     GetRequest::builder(request).url("http://www.wazuh.com/").outputFile("/tmp/hello_world.html").execute();
+}
+
+TEST_F(UrlRequestUnitTest, HttpSecureConnection)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem");
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+
+    GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
+}
+
+TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAuth)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem").basicAuth("admin:admin");
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOption(optBasicAuth, "admin:admin")).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+
+    GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
+}
+
+TEST_F(UrlRequestUnitTest, HttpSecureConnectionClientAuth)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem").sslCertificate("ssl_cert.pem").sslKey("ssl_key.pem");
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOption(optSslCert, "ssl_cert.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optSslKey, "ssl_key.pem")).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+
+    GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
+}
+
+TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAndClientAuth)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.caRootCertificate("root-ca.pem")
+        .sslCertificate("ssl_cert.pem")
+        .sslKey("ssl_key.pem")
+        .basicAuth("admin:admin");
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOption(optBasicAuth, "admin:admin")).Times(1);
+    EXPECT_CALL(*request, setOption(optSslCert, "ssl_cert.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optSslKey, "ssl_key.pem")).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+
+    GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
 }
 
 /**

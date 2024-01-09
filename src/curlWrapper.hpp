@@ -42,7 +42,9 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_FOLLOW_REDIRECT, CURLOPT_FOLLOWLOCATION},
     {OPT_MAX_REDIRECTIONS, CURLOPT_MAXREDIRS},
     {OPT_VERIFYPEER, CURLOPT_SSL_VERIFYPEER},
-};
+    {OPT_SSL_CERT, CURLOPT_SSLCERT},
+    {OPT_SSL_KEY, CURLOPT_SSLKEY},
+    {OPT_BASIC_AUTH, CURLOPT_USERPWD}};
 
 static std::deque<std::pair<std::thread::id, std::shared_ptr<CURL>>> HANDLER_QUEUE;
 
@@ -201,7 +203,11 @@ public:
      */
     void execute() override
     {
-        curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
+        CURLcode setOptResult = curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
+        if (CURLE_OK != setOptResult)
+        {
+            throw std::runtime_error("cURLWrapper::execute() failed: Couldn't set HTTP headers");
+        }
 
         const auto resPerform {curl_easy_perform(m_curlHandle.get())};
 
