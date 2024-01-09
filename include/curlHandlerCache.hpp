@@ -95,6 +95,15 @@ public:
         std::lock_guard<std::mutex> lock(m_mutex);
         return m_handlerQueue.size();
     }
+
+    /**
+     * @brief Removes all handlers in the 'm_handlerQueue'.
+     */
+    void clear()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_handlerQueue.clear();
+    }
 };
 
 #endif // _CURL_HANDLER_CACHE_HPP

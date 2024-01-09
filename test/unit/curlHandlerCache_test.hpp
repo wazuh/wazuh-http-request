@@ -12,6 +12,7 @@
 #ifndef _CURL_HANDLER_CACHE_TEST_HPP
 #define _CURL_HANDLER_CACHE_TEST_HPP
 
+#include "curlHandlerCache.hpp"
 #include "gtest/gtest.h"
 
 /**
@@ -22,6 +23,15 @@ class cURLHandlerCacheTest : public ::testing::Test
 protected:
     cURLHandlerCacheTest() = default;
     ~cURLHandlerCacheTest() override = default;
+
+    /**
+     * @brief Cleans the test environment
+     *
+     */
+    void TearDown() override
+    {
+        cURLHandlerCache::instance().clear();
+    }
 };
 
 #endif // _CURL_HANDLER_CACHE_TEST_HPP
