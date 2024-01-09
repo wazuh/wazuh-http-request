@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #define NOT_USED -1
@@ -107,7 +108,7 @@ protected:
      * @param requestImplementator Pointer to the request implementator.
      */
     explicit cURLRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
-        : m_requestImplementator {requestImplementator}
+        : m_requestImplementator {std::move(requestImplementator)}
     {
         if (!m_requestImplementator)
         {
@@ -313,7 +314,7 @@ public:
      * @param handle Shared pointer to the IRequestImplementator.
      */
     explicit PostData(std::shared_ptr<IRequestImplementator> handle)
-        : m_handleReference {handle}
+        : m_handleReference {std::move(handle)}
     {
     }
 

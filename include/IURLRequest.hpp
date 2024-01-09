@@ -90,7 +90,7 @@ public:
      * @param sock Unix socket path.
      * @param url Socket URL.
      */
-    HttpUnixSocketURL(const std::string& sock, std::string url)
+    HttpUnixSocketURL(const std::string& sock, const std::string& url)
     {
         m_socketType = SOCKET_UNIX;
         m_sock = sock;
