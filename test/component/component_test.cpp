@@ -263,16 +263,15 @@ TEST_F(ComponentTestInterface, InterruptDownload)
 {
     std::atomic<bool> shouldRun {true};
 
-    auto sleepFirstHandler {std::to_string(1)};
-    auto sleepSecondHandler {std::to_string(4)};
-    auto sleepMainThread {6};
-    auto intervalToInterruptTheHandler {2};
+    auto sleepFirstHandler {std::to_string(10)};
+    auto sleepSecondHandler {std::to_string(40)};
+    auto intervalToInterruptTheHandler {20};
 
     std::thread thread1(
         [&shouldRun, &sleepFirstHandler]()
         {
             HTTPRequest::instance().download(
-                HttpURL("http://localhost:44441/custom-download/" + sleepFirstHandler),
+                HttpURL("http://localhost:44441/sleep/" + sleepFirstHandler),
                 "./test1.txt",
                 [](auto, auto) {},
                 {},
@@ -285,7 +284,7 @@ TEST_F(ComponentTestInterface, InterruptDownload)
         [&shouldRun, &sleepSecondHandler]()
         {
             HTTPRequest::instance().download(
-                HttpURL("http://localhost:44441/custom-download/" + sleepSecondHandler),
+                HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler),
                 "./test2.txt",
                 [](auto, auto) {},
                 {},
@@ -295,11 +294,8 @@ TEST_F(ComponentTestInterface, InterruptDownload)
         });
 
     // Sleep interval to interrupt the second handler.
-    std::this_thread::sleep_for(std::chrono::seconds(intervalToInterruptTheHandler));
+    std::this_thread::sleep_for(std::chrono::milliseconds(intervalToInterruptTheHandler));
     shouldRun.store(false);
-
-    // Sleep main thread until the thread1 and thread2 finish
-    std::this_thread::sleep_for(std::chrono::seconds(sleepMainThread));
 
     thread1.join();
     thread2.join();
@@ -312,7 +308,7 @@ TEST_F(ComponentTestInterface, InterruptDownload)
     std::ifstream file2("./test2.txt");
     std::string line2;
     std::getline(file2, line2);
-    // As the second thread was interrupted, there is no response from the endpoint 'custom-download'
+    // As the second thread was interrupted, there is no response from the endpoint 'sleep'
     EXPECT_EQ(line2, "");
 }
 

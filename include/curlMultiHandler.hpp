@@ -61,12 +61,15 @@ public:
     // LCOV_EXCL_STOP
 
     /**
-     * @brief Performs the request.
+     * @brief Performs the request using the curl multi-handler, the request execution can be canceled when the
+     * 'm_shouldRun' variable is set to false by the class utilizing this method.
      *
      */
     void execute() override
     {
         int stillRunning {1};
+
+        // Adds the single-handler to the multi-handler
         auto multiCode {curl_multi_add_handle(m_curlMultiHandler.get(), m_curlHandler.get())};
 
         if (multiCode != CURLM_OK)
@@ -76,6 +79,7 @@ public:
 
         do
         {
+            // Performs transfers on the added single-handler
             multiCode = curl_multi_perform(m_curlMultiHandler.get(), &stillRunning);
 
             if (multiCode != CURLM_OK)
@@ -85,6 +89,7 @@ public:
 
             int fileDescriptors;
 
+            // Waits until activity is detected or `CURL_MULTI_HANDLER_TIMEOUT_MS` has passed
             multiCode = curl_multi_wait(m_curlMultiHandler.get(),
                                         nullptr,
                                         CURL_MULTI_HANDLER_EXTRA_FDS,
