@@ -35,7 +35,7 @@ namespace Utils
              */
             static T builder(Ts... args)
             {
-                return T(args...); // Default constructor
+                return T(std::move(args)...); // Default constructor
             }
 
             /**

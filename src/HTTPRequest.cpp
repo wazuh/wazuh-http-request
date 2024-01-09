@@ -52,7 +52,7 @@ void HTTPRequest::post(const URL& url,
 {
     try
     {
-        post(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
+        post(url, data.dump(), std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {
@@ -123,7 +123,7 @@ void HTTPRequest::put(const URL& url,
 {
     try
     {
-        put(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
+        put(url, data.dump(), std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {
@@ -170,7 +170,7 @@ void HTTPRequest::patch(const URL& url,
 {
     try
     {
-        patch(url, data.dump(), onSuccess, onError, fileName, httpHeaders, secureCommunication);
+        patch(url, data.dump(), std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
     }
     catch (const std::exception& ex)
     {

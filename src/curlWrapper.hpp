@@ -203,7 +203,11 @@ public:
      */
     void execute() override
     {
-        curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
+        CURLcode setOptResult = curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
+        if (CURLE_OK != setOptResult)
+        {
+            throw std::runtime_error("cURLWrapper::execute() failed: Couldn't set HTTP headers");
+        }
 
         const auto resPerform {curl_easy_perform(m_curlHandle.get())};
 
