@@ -16,7 +16,6 @@
 #include "curlHandlerType.hpp"
 #include "customDeleter.hpp"
 #include <atomic>
-#include <chrono>
 #include <memory>
 #include <stdexcept>
 
@@ -28,7 +27,7 @@ using deleterCurlMultiHandler = CustomDeleter<decltype(&curl_multi_cleanup), cur
 
 //! cURLMultiHandler class
 /**
- * @brief This class implements the ICURLHandler interface to represents a multi cURL handler.
+ * @brief This class implements the ICURLHandler interface to represent a multi cURL handler.
  *
  */
 class cURLMultiHandler final : public ICURLHandler
@@ -45,8 +44,8 @@ public:
      * @param shouldRun Flag used to interrupt the cURL handler.
      */
     explicit cURLMultiHandler(CurlHandlerTypeEnum curlHandlerType, const std::atomic<bool>& shouldRun = true)
-        : m_shouldRun(shouldRun)
-        , ICURLHandler(curlHandlerType)
+        : ICURLHandler(curlHandlerType)
+        , m_shouldRun(shouldRun)
     {
         m_curlHandler = std::shared_ptr<CURL>(curl_easy_init(), deleterCurlHandler());
         m_curlMultiHandler = std::shared_ptr<CURLM>(curl_multi_init(), deleterCurlMultiHandler());

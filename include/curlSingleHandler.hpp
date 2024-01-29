@@ -25,7 +25,7 @@ using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy
 
 //! cURLSingleHandler class
 /**
- * @brief class implements the ICURLHandler interface to represents a single cURL handler.
+ * @brief class implements the ICURLHandler interface to represent a single cURL handler.
  */
 class cURLSingleHandler final : public ICURLHandler
 {

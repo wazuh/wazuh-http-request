@@ -33,7 +33,7 @@ public:
      *
      * @param curlHandlerType Enum value of the cURL handler.
      */
-    ICURLHandler(CurlHandlerTypeEnum curlHandlerType)
+    explicit ICURLHandler(CurlHandlerTypeEnum curlHandlerType)
         : m_curlHandlerType(curlHandlerType) {};
 
     // LCOV_EXCL_START

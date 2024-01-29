@@ -16,7 +16,6 @@
 #include "curlHandlerType.hpp"
 #include "curlMultiHandler.hpp"
 #include "curlSingleHandler.hpp"
-#include "customDeleter.hpp"
 #include "singleton.hpp"
 #include <algorithm>
 #include <atomic>

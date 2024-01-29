@@ -15,7 +15,7 @@
 /**
  * @brief Valid types of cURL handler.
  */
-enum CurlHandlerTypeEnum
+enum class CurlHandlerTypeEnum
 {
     SINGLE,
     MULTI

@@ -15,7 +15,6 @@
 #include "ICURLHandler.hpp"
 #include "IRequestImplementator.hpp"
 #include "curl.h"
-#include "curlException.hpp"
 #include "curlHandlerCache.hpp"
 #include "curlHandlerType.hpp"
 #include "curlMultiHandler.hpp"
@@ -25,9 +24,7 @@
 #include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <ostream>
-#include <queue>
 #include <stdexcept>
 #include <thread>
 
