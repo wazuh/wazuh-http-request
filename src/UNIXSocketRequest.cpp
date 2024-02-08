@@ -10,7 +10,6 @@
  */
 
 #include "UNIXSocketRequest.hpp"
-#include "curlHandlerType.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
 #include <atomic>

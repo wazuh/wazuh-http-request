@@ -12,6 +12,7 @@
 #ifndef _CURL_HANDLER_CACHE_TEST_HPP
 #define _CURL_HANDLER_CACHE_TEST_HPP
 
+#include "IURLRequest.hpp"
 #include "curlHandlerCache.hpp"
 #include "gtest/gtest.h"
 

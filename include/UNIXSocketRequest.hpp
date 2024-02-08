@@ -13,7 +13,6 @@
 #define _UNIX_SOCKET_REQUEST_HPP
 
 #include "IURLRequest.hpp"
-#include "curlHandlerType.hpp"
 #include "json.hpp"
 #include "singleton.hpp"
 #include <atomic>

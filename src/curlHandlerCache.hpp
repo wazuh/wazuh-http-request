@@ -13,7 +13,6 @@
 #define _CURL_HANDLER_CACHE_HPP
 
 #include "ICURLHandler.hpp"
-#include "curlHandlerType.hpp"
 #include "curlMultiHandler.hpp"
 #include "curlSingleHandler.hpp"
 #include "singleton.hpp"

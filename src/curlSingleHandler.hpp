@@ -15,7 +15,6 @@
 #include "ICURLHandler.hpp"
 #include "curl.h"
 #include "curlException.hpp"
-#include "curlHandlerType.hpp"
 #include "customDeleter.hpp"
 #include <memory>
 #include <stdexcept>

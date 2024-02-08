@@ -10,7 +10,6 @@
  */
 
 #include "HTTPRequest.hpp"
-#include "curlHandlerType.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"

@@ -8,10 +8,8 @@
  * License (version 2) as published by the FSF - Free Software
  * Foundation.
  */
-
 #include "curlHandlerCache_test.hpp"
 #include "curlHandlerCache.hpp"
-#include "curlHandlerType.hpp"
 #include "curlMultiHandler.hpp"
 #include "curlSingleHandler.hpp"
 #include "curlWrapper.hpp"

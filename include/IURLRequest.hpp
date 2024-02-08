@@ -12,7 +12,6 @@
 #ifndef _URL_REQUEST_HPP
 #define _URL_REQUEST_HPP
 
-#include "curlHandlerType.hpp"
 #include "json.hpp"
 #include "secureCommunication.hpp"
 #include <atomic>
@@ -24,6 +23,12 @@ enum SOCKET_TYPE
 {
     SOCKET_UNIX,
     SOCKET_TCP
+};
+
+enum class CurlHandlerTypeEnum
+{
+    SINGLE,
+    MULTI
 };
 
 // HTTP headers used by default in queries.

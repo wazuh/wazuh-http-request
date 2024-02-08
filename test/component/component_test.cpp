@@ -11,7 +11,6 @@
 
 #include "component_test.hpp"
 #include "curlHandlerCache.hpp"
-#include "curlHandlerType.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"

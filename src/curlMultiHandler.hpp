@@ -13,7 +13,6 @@
 #define _CURL_MULTI_HANDLER_HPP
 
 #include "ICURLHandler.hpp"
-#include "curlHandlerType.hpp"
 #include "customDeleter.hpp"
 #include <atomic>
 #include <memory>

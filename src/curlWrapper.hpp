@@ -16,7 +16,6 @@
 #include "IRequestImplementator.hpp"
 #include "curl.h"
 #include "curlHandlerCache.hpp"
-#include "curlHandlerType.hpp"
 #include "curlMultiHandler.hpp"
 #include "curlSingleHandler.hpp"
 #include "customDeleter.hpp"

@@ -13,7 +13,6 @@
 #define _CURL_HANDLER_HPP
 
 #include "curl.h"
-#include "curlHandlerType.hpp"
 #include <memory>
 
 //! ICURLHandler abstract class

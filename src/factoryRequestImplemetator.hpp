@@ -13,7 +13,6 @@
 #define _FACTORY_REQUEST_WRAPPER_HPP
 
 #include "IRequestImplementator.hpp"
-#include "curlHandlerType.hpp"
 #include "curlWrapper.hpp"
 #include <atomic>
 #include <memory>
