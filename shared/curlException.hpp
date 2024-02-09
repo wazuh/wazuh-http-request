@@ -12,6 +12,10 @@
 #ifndef _CURL_EXCEPTION_HPP
 #define _CURL_EXCEPTION_HPP
 
+#include <stdexcept>
+#include <string>
+#include <utility>
+
 namespace Curl
 {
     /**

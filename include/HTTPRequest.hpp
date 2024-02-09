@@ -15,6 +15,7 @@
 #include "IURLRequest.hpp"
 #include "json.hpp"
 #include "singleton.hpp"
+#include <atomic>
 #include <functional>
 #include <string>
 #include <unordered_set>
@@ -35,13 +36,17 @@ public:
      * @param onError Callback to be called in case of error.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Object that provides secure communication.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void download(
         const URL& url,
         const std::string& fileName,
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = {},
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP POST request.
@@ -52,6 +57,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Object that provides secure communication.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void post(
         const URL& url,
@@ -60,7 +67,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP POST request.
@@ -71,6 +80,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void post(
         const URL& url,
@@ -79,7 +90,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP GET request.
@@ -89,6 +102,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void get(
         const URL& url,
@@ -96,7 +111,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP UPDATE request.
@@ -107,6 +124,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void put(
         const URL& url,
@@ -115,7 +134,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP UPDATE request.
@@ -126,6 +147,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void put(
         const URL& url,
@@ -134,7 +157,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs an HTTP PATCH request.
@@ -146,6 +171,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void patch(
         const URL& url,
@@ -154,7 +181,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs an HTTP PATCH request.
@@ -166,6 +195,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void patch(
         const URL& url,
@@ -174,7 +205,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a HTTP DELETE request.
@@ -184,6 +217,8 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void delete_(
         const URL& url,
@@ -191,7 +226,9 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {});
+        const SecureCommunication& secureCommunication = {},
+        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
+        const std::atomic<bool>& shouldRun = true);
 };
 
 #endif // _HTTP_REQUEST_HPP

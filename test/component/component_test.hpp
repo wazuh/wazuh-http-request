@@ -107,6 +107,15 @@ public:
                            res.set_content(response.dump(), "text/json");
                        });
 
+        // This endpoint helps simulate the waiting time during an HTTP request.
+        m_server.Get(R"(/sleep/(\d+))",
+                     [](const httplib::Request& req, httplib::Response& res)
+                     {
+                         auto sleepInterval = std::stoi(req.matches[1]);
+                         std::this_thread::sleep_for(std::chrono::milliseconds(sleepInterval));
+                         res.set_content("Hello World!", "text/json");
+                     });
+
         m_server.Delete(R"(/(\d+))",
                         [](const httplib::Request& req, httplib::Response& res)
                         { res.set_content(req.matches[1], "text/json"); });

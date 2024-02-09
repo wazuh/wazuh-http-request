@@ -10,6 +10,7 @@
  */
 
 #include "component_test.hpp"
+#include "curlHandlerCache.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"
@@ -144,6 +145,221 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 
                                          m_callbackComplete = true;
                                      });
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the custom download request using the single handler.
+ */
+TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
+{
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
+}
+
+/**
+ * @brief Test the custom download request using the single handler with empty URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
+{
+    HTTPRequest::instance().download(
+        HttpURL(""),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+            EXPECT_EQ(responseCode, -1);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::SINGLE);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "");
+}
+
+/**
+ * @brief Test the custom download request using the single handler with a invalid URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
+{
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/invalid_file"),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "HTTP response code said error");
+            EXPECT_EQ(responseCode, 404);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::SINGLE);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the custom download request using the multi handler.
+ */
+TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/"),
+        "./test.txt",
+        [](auto, auto) {},
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
+}
+
+/**
+ * @brief Test the custom download request using the multi handler and interrupt the handler.
+ */
+TEST_F(ComponentTestInterface, InterruptMultiHandler)
+{
+    std::atomic<bool> shouldRun {false};
+
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/"),
+        "./test.txt",
+        [](auto, auto) {},
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "");
+}
+
+/**
+ * @brief Test two instances of the custom download request using the multi handler and interrupt the handler.
+ *
+ */
+TEST_F(ComponentTestInterface, InterruptDownload)
+{
+    std::atomic<bool> shouldRun {true};
+
+    auto sleepFirstHandler {std::to_string(10)};
+    auto sleepSecondHandler {std::to_string(40)};
+    auto intervalToInterruptTheHandler {20};
+
+    std::thread thread1(
+        [&shouldRun, &sleepFirstHandler]()
+        {
+            HTTPRequest::instance().download(
+                HttpURL("http://localhost:44441/sleep/" + sleepFirstHandler),
+                "./test1.txt",
+                [](auto, auto) {},
+                {},
+                {},
+                CurlHandlerTypeEnum::MULTI,
+                shouldRun);
+        });
+
+    std::thread thread2(
+        [&shouldRun, &sleepSecondHandler]()
+        {
+            HTTPRequest::instance().download(
+                HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler),
+                "./test2.txt",
+                [](auto, auto) {},
+                {},
+                {},
+                CurlHandlerTypeEnum::MULTI,
+                shouldRun);
+        });
+
+    // Sleep interval to interrupt the second handler.
+    std::this_thread::sleep_for(std::chrono::milliseconds(intervalToInterruptTheHandler));
+    shouldRun.store(false);
+
+    thread1.join();
+    thread2.join();
+
+    std::ifstream file1("./test1.txt");
+    std::string line1;
+    std::getline(file1, line1);
+    EXPECT_EQ(line1, "Hello World!");
+
+    std::ifstream file2("./test2.txt");
+    std::string line2;
+    std::getline(file2, line2);
+    // As the second thread was interrupted, there is no response from the endpoint 'sleep'
+    EXPECT_EQ(line2, "");
+}
+
+/**
+ * @brief Test the custom download request using the multi handler with empty URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    HTTPRequest::instance().download(
+        HttpURL(""),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
+            EXPECT_EQ(responseCode, -1);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "");
+}
+
+/**
+ * @brief Test the custom download request using the multi handler with a invalid URL.
+ */
+TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/invalid_file"),
+        "./test.txt",
+        [&](const std::string& result, const long responseCode)
+        {
+            EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
+            EXPECT_EQ(responseCode, -1);
+
+            m_callbackComplete = true;
+        },
+        {},
+        {},
+        CurlHandlerTypeEnum::MULTI,
+        shouldRun);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -509,7 +725,7 @@ TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
 TEST_F(ComponentTestInternalParameters, MultipleThreads)
 {
     std::vector<std::thread> threads;
-    for (int i = 0; i < QUEUE_SIZE * 2; ++i)
+    for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
     {
         threads.emplace_back(
             []()
@@ -519,9 +735,38 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
                                     .execute());
             });
 
-        EXPECT_LE(HANDLER_QUEUE.size(), QUEUE_SIZE);
+        EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);
     }
 
+    for (auto& thread : threads)
+    {
+        EXPECT_NO_THROW(thread.join());
+    }
+}
+
+/**
+ * @brief This test checks the behavior of multiple threads for multi handler.
+ * This test create multiple threads that exceed the size of the queue where each thread will create a cURLWrapper
+ * object.
+ */
+TEST_F(ComponentTestInternalParameters, MultipleThreadsWithMultHandlers)
+{
+    std::vector<std::thread> threads;
+    std::atomic<bool> shouldRun {true};
+
+    for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
+    {
+        threads.emplace_back(
+            [&shouldRun]()
+            {
+                EXPECT_NO_THROW(GetRequest::builder(
+                                    FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI, shouldRun))
+                                    .url("http://localhost:44441/")
+                                    .execute());
+            });
+
+        EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);
+    }
     for (auto& thread : threads)
     {
         EXPECT_NO_THROW(thread.join());

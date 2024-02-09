@@ -12,20 +12,20 @@
 #ifndef _CURL_WRAPPER_HPP
 #define _CURL_WRAPPER_HPP
 
+#include "ICURLHandler.hpp"
 #include "IRequestImplementator.hpp"
 #include "curl.h"
-#include "curlException.hpp"
+#include "curlHandlerCache.hpp"
+#include "curlMultiHandler.hpp"
+#include "curlSingleHandler.hpp"
 #include "customDeleter.hpp"
 #include <algorithm>
+#include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <ostream>
-#include <queue>
 #include <stdexcept>
 #include <thread>
-
-using deleterCurl = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 
 static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP = {
     {OPT_URL, CURLOPT_URL},
@@ -46,12 +46,6 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_SSL_KEY, CURLOPT_SSLKEY},
     {OPT_BASIC_AUTH, CURLOPT_USERPWD}};
 
-static std::deque<std::pair<std::thread::id, std::shared_ptr<CURL>>> HANDLER_QUEUE;
-
-static std::mutex CURL_WRAPPER_MUTEX;
-
-static const int QUEUE_SIZE = 5;
-
 auto constexpr MAX_REDIRECTIONS {20l};
 
 /**
@@ -63,7 +57,7 @@ private:
     using deleterCurlStringList = CustomDeleter<decltype(&curl_slist_free_all), curl_slist_free_all>;
     std::unique_ptr<curl_slist, deleterCurlStringList> m_curlHeaders;
     std::string m_returnValue;
-    std::shared_ptr<CURL> m_curlHandle;
+    std::shared_ptr<ICURLHandler> m_curlHandler;
 
     static size_t writeData(char* data, size_t size, size_t nmemb, void* userdata)
     {
@@ -73,44 +67,31 @@ private:
     }
 
     /**
-     * @brief Get the cURL Handler object
-     * This method creates a cURL handler and returns it, but ensures that only one cURL handler is used per thread and
-     * keeps the queue size to a maximum of QUEUE_SIZE.
+     * @brief Get the cURL Handler object.
      *
-     * @return std::shared_ptr<CURL>
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the cURL handler.
+     * @return std::shared_ptr<ICURLHandler>
      */
-    std::shared_ptr<CURL> curlHandlerInit()
+    std::shared_ptr<ICURLHandler> curlHandlerInit(CurlHandlerTypeEnum handlerType,
+                                                  const std::atomic<bool>& shouldRun = true)
     {
-        std::lock_guard<std::mutex> lock(CURL_WRAPPER_MUTEX);
-        const auto it {std::find_if(HANDLER_QUEUE.cbegin(),
-                                    HANDLER_QUEUE.cend(),
-                                    [](const std::pair<std::thread::id, std::shared_ptr<CURL>>& pair)
-                                    { return std::this_thread::get_id() == pair.first; })};
-
-        if (HANDLER_QUEUE.end() != it)
-        {
-            return it->second;
-        }
-        else
-        {
-            if (QUEUE_SIZE <= HANDLER_QUEUE.size())
-            {
-                HANDLER_QUEUE.pop_front();
-            }
-
-            HANDLER_QUEUE.emplace_back(std::this_thread::get_id(),
-                                       std::shared_ptr<CURL>(curl_easy_init(), deleterCurl()));
-
-            return HANDLER_QUEUE.back().second;
-        }
+        return cURLHandlerCache::instance().getCurlHandler(handlerType, shouldRun);
     }
 
 public:
-    cURLWrapper()
+    /**
+     * @brief Create a cURLWrapper.
+     *
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler.
+     */
+    cURLWrapper(CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
+                const std::atomic<bool>& shouldRun = true)
     {
-        m_curlHandle = curlHandlerInit();
+        m_curlHandler = curlHandlerInit(handlerType, shouldRun);
 
-        if (!m_curlHandle)
+        if (!m_curlHandler || !m_curlHandler->getHandler())
         {
             throw std::runtime_error("cURL initialization failed");
         }
@@ -144,7 +125,7 @@ public:
      */
     void setOption(const OPTION_REQUEST_TYPE optIndex, void* ptr) override
     {
-        auto ret = curl_easy_setopt(m_curlHandle.get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), ptr);
+        auto ret = curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), ptr);
 
         if (ret != CURLE_OK)
         {
@@ -159,7 +140,8 @@ public:
      */
     void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) override
     {
-        auto ret = curl_easy_setopt(m_curlHandle.get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt.c_str());
+        auto ret =
+            curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt.c_str());
 
         if (ret != CURLE_OK)
         {
@@ -174,7 +156,7 @@ public:
      */
     void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) override
     {
-        auto ret = curl_easy_setopt(m_curlHandle.get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt);
+        auto ret = curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt);
 
         if (ret != CURLE_OK)
         {
@@ -203,31 +185,14 @@ public:
      */
     void execute() override
     {
-        CURLcode setOptResult = curl_easy_setopt(m_curlHandle.get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
+        CURLcode setOptResult =
+            curl_easy_setopt(m_curlHandler->getHandler().get(), CURLOPT_HTTPHEADER, m_curlHeaders.get());
         if (CURLE_OK != setOptResult)
         {
             throw std::runtime_error("cURLWrapper::execute() failed: Couldn't set HTTP headers");
         }
 
-        const auto resPerform {curl_easy_perform(m_curlHandle.get())};
-
-        long responseCode;
-        const auto resGetInfo = curl_easy_getinfo(m_curlHandle.get(), CURLINFO_RESPONSE_CODE, &responseCode);
-
-        curl_easy_reset(m_curlHandle.get());
-
-        if (CURLE_OK != resPerform)
-        {
-            if (CURLE_HTTP_RETURNED_ERROR == resPerform)
-            {
-                if (CURLE_OK != resGetInfo)
-                {
-                    throw std::runtime_error("cURLWrapper::execute() failed: Couldn't get HTTP response code");
-                }
-                throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
-            }
-            throw std::runtime_error(curl_easy_strerror(resPerform));
-        }
+        m_curlHandler->execute();
     }
 };
 

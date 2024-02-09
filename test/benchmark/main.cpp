@@ -166,6 +166,46 @@ static void BM_Download(benchmark::State& state)
 }
 BENCHMARK(BM_Download);
 
+/**
+ * @brief This function is a benchmark test for the HTTP DOWNLOAD request using the single handler.
+ *
+ * @param state Benchmark state.
+ */
+static void BM_DownloadUsingTheSingleHandler(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        HTTPRequest::instance().download(
+            HttpURL("http://localhost:44441/"),
+            "out.txt",
+            [&](const std::string& /*result*/, const long /*responseCode*/) {},
+            {},
+            {},
+            CurlHandlerTypeEnum::SINGLE);
+    }
+}
+BENCHMARK(BM_DownloadUsingTheSingleHandler);
+
+/**
+ * @brief This function is a benchmark test for the HTTP DOWNLOAD request using the multi handler.
+ *
+ * @param state Benchmark state.
+ */
+static void BM_CustomDownloadUsingTheMultiHandler(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        HTTPRequest::instance().download(
+            HttpURL("http://localhost:44441/"),
+            "out.txt",
+            [&](const std::string& /*result*/, const long /*responseCode*/) {},
+            {},
+            {},
+            CurlHandlerTypeEnum::MULTI);
+    }
+}
+BENCHMARK(BM_CustomDownloadUsingTheMultiHandler);
+
 static void BM_ReturnStringByValue(benchmark::State& state)
 {
     SecureCommunication secureComm;
