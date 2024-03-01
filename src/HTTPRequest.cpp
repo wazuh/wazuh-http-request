@@ -56,14 +56,18 @@ void HTTPRequest::post(const URL& url,
                        const CurlHandlerTypeEnum& handlerType,
                        const std::atomic<bool>& shouldRun)
 {
+    std::string dataStr;
     try
     {
-        post(url, data.dump(), std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
+        dataStr = data.dump();
     }
     catch (const std::exception& ex)
     {
         onError(ex.what(), NOT_USED);
+        return;
     }
+
+    post(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
 }
 
 void HTTPRequest::post(const URL& url,
@@ -133,14 +137,18 @@ void HTTPRequest::put(const URL& url,
                       const CurlHandlerTypeEnum& handlerType,
                       const std::atomic<bool>& shouldRun)
 {
+    std::string dataStr;
     try
     {
-        put(url, data.dump(), std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
+        dataStr = data.dump();
     }
     catch (const std::exception& ex)
     {
         onError(ex.what(), NOT_USED);
+        return;
     }
+
+    put(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
 }
 
 void HTTPRequest::put(const URL& url,
@@ -184,14 +192,17 @@ void HTTPRequest::patch(const URL& url,
                         const CurlHandlerTypeEnum& handlerType,
                         const std::atomic<bool>& shouldRun)
 {
+    std::string dataStr;
     try
     {
-        patch(url, data.dump(), std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
+        dataStr = data.dump();
     }
     catch (const std::exception& ex)
     {
         onError(ex.what(), NOT_USED);
+        return;
     }
+    patch(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
 }
 
 void HTTPRequest::patch(const URL& url,
