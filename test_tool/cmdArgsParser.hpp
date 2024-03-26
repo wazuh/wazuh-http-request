@@ -33,6 +33,12 @@ public:
         : m_url {paramValueOf(argc, argv, "-u")}
         , m_outputFile {paramValueOf(argc, argv, "-o", {false, ""})}
         , m_type {paramValueOf(argc, argv, "-t")}
+        , m_headers {paramValueOf(argc, argv, "-H", {false, ""})}
+        , m_cacert {paramValueOf(argc, argv, "--cacert", {false, ""})}
+        , m_cert {paramValueOf(argc, argv, "--cert", {false, ""})}
+        , m_key {paramValueOf(argc, argv, "--key", {false, ""})}
+        , m_username {paramValueOf(argc, argv, "--username", {false, ""})}
+        , m_password {paramValueOf(argc, argv, "--password", {false, ""})}
     {
         auto postArgumentsFile {paramValueOf(argc, argv, "-p", {false, ""})};
 
@@ -82,6 +88,54 @@ public:
     }
 
     /**
+     * @brief Returns the headers.
+     */
+    const std::string& headers() const
+    {
+        return m_headers;
+    }
+
+    /**
+     * @brief Returns the cacert.
+     */
+    const std::string& cacert() const
+    {
+        return m_cacert;
+    }
+
+    /**
+     * @brief Returns the cert.
+     */
+    const std::string& cert() const
+    {
+        return m_cert;
+    }
+
+    /**
+     * @brief Returns the key.
+     */
+    const std::string& key() const
+    {
+        return m_key;
+    }
+
+    /**
+     * @brief Returns the username.
+     */
+    const std::string& username() const
+    {
+        return m_username;
+    }
+
+    /**
+     * @brief Returns the password.
+     */
+    const std::string& password() const
+    {
+        return m_password;
+    }
+
+    /**
      * @brief Shows the help to the user.
      */
     static void showHelp()
@@ -89,16 +143,24 @@ public:
         std::cout << "\nUsage: urlrequester_testtool <option(s)> SOURCES \n"
                   << "Options:\n"
                   << "\t-h \t\t\tShow this help message\n"
-                  << "\t-u URL_ADDRESS\tSpecifies the URL of the file to download or the RESTful address.\n"
-                  << "\t-t TYPE\t\tSpecifies the type of action to execute [download, post, get, put, delete].\n"
-                  << "\t-p JSON_FILE\tSpecifies the file containing the JSON data to send in the POST request.\n"
-                  << "\t-o OUTPUT_FILE\tSpecifies the output file of the downloaded file.\n"
+                  << "\t-u URL_ADDRESS\t\tSpecifies the URL of the file to download or the RESTful address.\n"
+                  << "\t-t TYPE\t\t\tSpecifies the type of action to execute [download, post, get, put, delete].\n"
+                  << "\t-p JSON_FILE\t\tSpecifies the file containing the JSON data to send in the POST request.\n"
+                  << "\t-o OUTPUT_FILE\t\tSpecifies the output file of the downloaded file.\n"
+                  << "\t-H HEADERS\t\tSpecifies the headers to send in the request. If not preset, DEFAULT_HEADERS will be used.\n"
+                  << "\t--cacert CACERT\t\tSpecifies the CA certificate file to use in the request.\n"
+                  << "\t--cert CERT\t\tSpecifies the certificate file to use in the request.\n"
+                  << "\t--key KEY\t\tSpecifies the key file to use in the request.\n"
+                  << "\t--username USERNAME\tSpecifies the username to use in the request.\n"
+                  << "\t--password PASSWORD\tSpecifies the password to use in the request.\n"
                   << "\nExample:"
                   << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t download -o out \n"
                   << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get\n"
                   << "\n\t./urlrequester_testtool -u https://httpbin.org/post -t post -p input.json\n"
                   << "\n\t./urlrequester_testtool -u https://httpbin.org/put -t put -p input.json\n"
                   << "\n\t./urlrequester_testtool -u https://httpbin.org/delete -t delete\n"
+                  << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get -H \"Authorization: Bearer token\"\n"
+                  << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get --cacert cacert.pem --cert cert.pem --key key.pem --username admin --password admin\n"
                   << std::endl;
     }
 
@@ -131,6 +193,12 @@ private:
     const std::string m_outputFile;
     const std::string m_type;
     nlohmann::json m_postData;
+    const std::string m_headers;
+    const std::string m_cacert;
+    const std::string m_cert;
+    const std::string m_key;
+    const std::string m_username;
+    const std::string m_password;
 };
 
 #endif // _CMD_ARGS_PARSER_HPP_
