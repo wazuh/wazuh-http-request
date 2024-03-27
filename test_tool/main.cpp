@@ -26,6 +26,7 @@ int main(const int argc, const char* argv[])
     {
         std::cerr << e.what() << std::endl;
         retVal = 1;
+        CmdLineArgs::showHelp();
     }
 
     return retVal;
