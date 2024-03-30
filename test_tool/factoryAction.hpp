@@ -14,7 +14,6 @@
 
 #include "actions.hpp"
 #include "cmdArgsParser.hpp"
-#include <iostream>
 #include <memory>
 
 /**

@@ -16,7 +16,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
 
 /**
  * @brief Class to parse command line arguments.
@@ -140,35 +139,38 @@ public:
      */
     static void showHelp()
     {
-        std::cout << "\nUsage: urlrequester_testtool <option(s)> SOURCES \n"
-                  << "Options:\n"
-                  << "\t-h \t\t\tShow this help message\n"
-                  << "\t-u URL_ADDRESS\t\tSpecifies the URL of the file to download or the RESTful address.\n"
-                  << "\t-t TYPE\t\t\tSpecifies the type of action to execute [download, post, get, put, delete].\n"
-                  << "\t-p JSON_FILE\t\tSpecifies the file containing the JSON data to send in the POST request.\n"
-                  << "\t-o OUTPUT_FILE\t\tSpecifies the output file of the downloaded file.\n"
-                  << "\t-H HEADERS\t\tSpecifies the headers to send in the request. If not preset, DEFAULT_HEADERS will be used.\n"
-                  << "\t--cacert CACERT\t\tSpecifies the CA certificate file to use in the request.\n"
-                  << "\t--cert CERT\t\tSpecifies the certificate file to use in the request.\n"
-                  << "\t--key KEY\t\tSpecifies the key file to use in the request.\n"
-                  << "\t--username USERNAME\tSpecifies the username to use in the request.\n"
-                  << "\t--password PASSWORD\tSpecifies the password to use in the request.\n"
-                  << "\nExample:"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t download -o out \n"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get\n"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/post -t post -p input.json\n"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/put -t put -p input.json\n"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/delete -t delete\n"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get -H \"Authorization: Bearer token\"\n"
-                  << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get --cacert cacert.pem --cert cert.pem --key key.pem --username admin --password admin\n"
-                  << std::endl;
+        std::cout
+            << "\nUsage: urlrequester_testtool <option(s)> SOURCES \n"
+            << "Options:\n"
+            << "\t-h \t\t\tShow this help message\n"
+            << "\t-u URL_ADDRESS\t\tSpecifies the URL of the file to download or the RESTful address.\n"
+            << "\t-t TYPE\t\t\tSpecifies the type of action to execute [download, post, get, put, delete].\n"
+            << "\t-p JSON_FILE\t\tSpecifies the file containing the JSON data to send in the POST request.\n"
+            << "\t-o OUTPUT_FILE\t\tSpecifies the output file of the downloaded file.\n"
+            << "\t-H HEADERS\t\tSpecifies the headers to send in the request. If not preset, DEFAULT_HEADERS will be "
+               "used.\n"
+            << "\t--cacert CACERT\t\tSpecifies the CA certificate file to use in the request.\n"
+            << "\t--cert CERT\t\tSpecifies the certificate file to use in the request.\n"
+            << "\t--key KEY\t\tSpecifies the key file to use in the request.\n"
+            << "\t--username USERNAME\tSpecifies the username to use in the request.\n"
+            << "\t--password PASSWORD\tSpecifies the password to use in the request.\n"
+            << "\nExample:"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t download -o out \n"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get\n"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/post -t post -p input.json\n"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/put -t put -p input.json\n"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/delete -t delete\n"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get -H \"Authorization: Bearer token\"\n"
+            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get --cacert cacert.pem --cert cert.pem "
+               "--key key.pem --username admin --password admin\n"
+            << std::endl;
     }
 
 private:
     static std::string paramValueOf(const int argc,
                                     const char* argv[],
                                     const std::string& switchValue,
-                                    const std::pair<bool, std::string> required = std::make_pair(true, ""))
+                                    const std::pair<bool, std::string>& required = std::make_pair(true, ""))
     {
         for (int i = 1; i < argc; ++i)
         {

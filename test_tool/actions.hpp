@@ -12,7 +12,6 @@
 #ifndef _ACTION_HPP
 #define _ACTION_HPP
 #include "HTTPRequest.hpp"
-#include "curlException.hpp"
 #include <iostream>
 
 /**
