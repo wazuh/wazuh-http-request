@@ -12,7 +12,6 @@
 #ifndef _ACTION_HPP
 #define _ACTION_HPP
 #include "HTTPRequest.hpp"
-#include "curlException.hpp"
 #include <iostream>
 
 /**
@@ -37,16 +36,25 @@ class DownloadAction final : public IAction
 private:
     std::string m_url;
     std::string m_outputFile;
+    std::unordered_set<std::string> m_headers;
+    SecureCommunication m_secureCommunication;
 
 public:
     /**
      * @brief Constructor for DownloadAction class.
      * @param url URL to download.
      * @param outputFile Output file.
+     * @param headers Headers to send in the request.
+     * @param secureCommunication Secure communication settings.
      */
-    explicit DownloadAction(const std::string& url, const std::string& outputFile)
+    explicit DownloadAction(const std::string& url,
+                            const std::string& outputFile,
+                            const std::unordered_set<std::string>& headers,
+                            const SecureCommunication& secureCommunication)
         : m_url(url)
         , m_outputFile(outputFile)
+        , m_headers(headers)
+        , m_secureCommunication(secureCommunication)
     {
     }
 
@@ -55,13 +63,16 @@ public:
      */
     void execute() override
     {
-        HTTPRequest::instance().download(HttpURL(m_url),
-                                         m_outputFile,
-                                         [](const std::string& msg, const long responseCode)
-                                         {
-                                             std::cerr << msg << ": " << responseCode << std::endl;
-                                             throw std::runtime_error(msg);
-                                         });
+        HTTPRequest::instance().download(
+            HttpURL(m_url),
+            m_outputFile,
+            [](const std::string& msg, const long responseCode)
+            {
+                std::cerr << msg << ": " << responseCode << std::endl;
+                throw std::runtime_error(msg);
+            },
+            m_headers,
+            m_secureCommunication);
     }
 };
 
@@ -72,14 +83,22 @@ class GetAction final : public IAction
 {
 private:
     std::string m_url;
+    std::unordered_set<std::string> m_headers;
+    SecureCommunication m_secureCommunication;
 
 public:
     /**
      * @brief Constructor of GetAction class.
      * @param url URL to perform the GET request.
+     * @param headers Headers to send in the request.
+     * @param secureCommunication Secure communication settings.
      */
-    explicit GetAction(const std::string& url)
+    explicit GetAction(const std::string& url,
+                       const std::unordered_set<std::string>& headers,
+                       const SecureCommunication& secureCommunication)
         : m_url(url)
+        , m_headers(headers)
+        , m_secureCommunication(secureCommunication)
     {
     }
 
@@ -95,7 +114,10 @@ public:
             {
                 std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
-            });
+            },
+            "",
+            m_headers,
+            m_secureCommunication);
     }
 };
 
@@ -107,16 +129,25 @@ class PostAction final : public IAction
 private:
     std::string m_url;
     nlohmann::json m_data;
+    std::unordered_set<std::string> m_headers;
+    SecureCommunication m_secureCommunication;
 
 public:
     /**
      * @brief Constructor of PostAction class.
      * @param url URL to perform the POST request.
      * @param data Data to send in the POST request.
+     * @param headers Headers to send in the request.
+     * @param secureCommunication Secure communication settings.
      */
-    explicit PostAction(const std::string& url, const nlohmann::json& data)
+    explicit PostAction(const std::string& url,
+                        const nlohmann::json& data,
+                        const std::unordered_set<std::string>& headers,
+                        const SecureCommunication& secureCommunication)
         : m_url(url)
         , m_data(data)
+        , m_headers(headers)
+        , m_secureCommunication(secureCommunication)
     {
     }
 
@@ -133,7 +164,10 @@ public:
             {
                 std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
-            });
+            },
+            "",
+            m_headers,
+            m_secureCommunication);
     }
 };
 
@@ -145,16 +179,25 @@ class PutAction final : public IAction
 private:
     std::string m_url;
     nlohmann::json m_data;
+    std::unordered_set<std::string> m_headers;
+    SecureCommunication m_secureCommunication;
 
 public:
     /**
      * @brief Constructor of PutAction class.
      * @param url URL to perform the PUT request.
      * @param data Data to send in the PUT request.
+     * @param headers Headers to send in the request.
+     * @param secureCommunication Secure communication settings.
      */
-    explicit PutAction(const std::string& url, const nlohmann::json& data)
+    explicit PutAction(const std::string& url,
+                       const nlohmann::json& data,
+                       const std::unordered_set<std::string>& headers,
+                       const SecureCommunication& secureCommunication)
         : m_url(url)
         , m_data(data)
+        , m_headers(headers)
+        , m_secureCommunication(secureCommunication)
     {
     }
 
@@ -171,7 +214,10 @@ public:
             {
                 std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
-            });
+            },
+            "",
+            m_headers,
+            m_secureCommunication);
     }
 };
 
@@ -184,6 +230,8 @@ class PatchAction final : public IAction
 private:
     std::string m_url;
     nlohmann::json m_data;
+    std::unordered_set<std::string> m_headers;
+    SecureCommunication m_secureCommunication;
 
 public:
     /**
@@ -191,10 +239,17 @@ public:
      *
      * @param url URL to perform the PATCH request.
      * @param data Data to send in the PATCH request.
+     * @param headers Headers to send in the request.
+     * @param secureCommunication Secure communication settings.
      */
-    explicit PatchAction(const std::string& url, const nlohmann::json& data)
+    explicit PatchAction(const std::string& url,
+                         const nlohmann::json& data,
+                         const std::unordered_set<std::string>& headers,
+                         const SecureCommunication& secureCommunication)
         : m_url(url)
         , m_data(data)
+        , m_headers(headers)
+        , m_secureCommunication(secureCommunication)
     {
     }
 
@@ -212,7 +267,10 @@ public:
             {
                 std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
-            });
+            },
+            "",
+            m_headers,
+            m_secureCommunication);
     }
 };
 
@@ -223,14 +281,22 @@ class DeleteAction final : public IAction
 {
 private:
     std::string m_url;
+    std::unordered_set<std::string> m_headers;
+    SecureCommunication m_secureCommunication;
 
 public:
     /**
      * @brief Constructor of DeleteAction class.
      * @param url URL to perform the DELETE request.
+     * @param headers Headers to send in the request.
+     * @param secureCommunication Secure communication settings.
      */
-    explicit DeleteAction(const std::string& url)
+    explicit DeleteAction(const std::string& url,
+                          const std::unordered_set<std::string>& headers,
+                          const SecureCommunication& secureCommunication)
         : m_url(url)
+        , m_headers(headers)
+        , m_secureCommunication(secureCommunication)
     {
     }
 
@@ -246,7 +312,10 @@ public:
             {
                 std::cerr << msg << ": " << responseCode << std::endl;
                 throw std::runtime_error(msg);
-            });
+            },
+            "",
+            m_headers,
+            m_secureCommunication);
     }
 };
 
