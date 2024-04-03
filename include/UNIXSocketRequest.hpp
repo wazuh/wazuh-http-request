@@ -33,13 +33,14 @@ public:
     /**
      * @brief Performs a UNIX SOCKET DOWNLOAD request.
      *
-     * @param url
-     * @param fileName
-     * @param onError
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param fileName File name of output file.
+     * @param onError Callback to be called in case of error.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void download(
         const URL& url,
@@ -47,20 +48,22 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET POST request.
      *
-     * @param url
-     * @param data
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param data Data to send (nlohmann::json).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void post(
         const URL& url,
@@ -70,21 +73,23 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
     /**
      * @brief Performs a UNIX SOCKET POST request.
      *
-     * @param url
-     * @param data
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param data Data to send (string).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void post(
         const URL& url,
@@ -94,19 +99,21 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET GET request.
      *
-     * @param url
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void get(
         const URL& url,
@@ -115,20 +122,22 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PUT request.
      *
-     * @param url
-     * @param data
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param data Data to send (nlohmann::json).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void put(
         const URL& url,
@@ -138,20 +147,22 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PUT request.
      *
-     * @param url
-     * @param data
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param data Data to send (string).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void put(
         const URL& url,
@@ -161,20 +172,22 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PATCH request.
      *
-     * @param url
-     * @param data
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param data Data to send (nlohmann::json).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void patch(
         const URL& url,
@@ -184,20 +197,22 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET PATCH request.
      *
-     * @param url
-     * @param data
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param data Data to send (string).
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void patch(
         const URL& url,
@@ -207,19 +222,21 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
     /**
      * @brief Performs a UNIX SOCKET DELETE request.
      *
-     * @param url
-     * @param onSuccess
-     * @param onError
-     * @param fileName
-     * @param httpHeaders
-     * @param secureCommunication
-     * @param handlerType
-     * @param shouldRun
+     * @param url URL to send the request.
+     * @param onSuccess Callback to be called in case of success.
+     * @param onError Callback to be called in case of error.
+     * @param fileName File name of output file.
+     * @param httpHeaders Headers to be added to the query.
+     * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
+     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
     void delete_(
         const URL& url,
@@ -228,6 +245,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 };
