@@ -155,7 +155,7 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
 {
     HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -178,6 +178,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
 
             m_callbackComplete = true;
         },
+        {},
         {},
         {},
         CurlHandlerTypeEnum::SINGLE);
@@ -205,6 +206,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
         },
         {},
         {},
+        {},
         CurlHandlerTypeEnum::SINGLE);
 
     EXPECT_TRUE(m_callbackComplete);
@@ -221,6 +223,7 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
         HttpURL("http://localhost:44441/"),
         "./test.txt",
         [](auto, auto) {},
+        {},
         {},
         {},
         CurlHandlerTypeEnum::MULTI,
@@ -243,6 +246,7 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
         HttpURL("http://localhost:44441/"),
         "./test.txt",
         [](auto, auto) {},
+        {},
         {},
         {},
         CurlHandlerTypeEnum::MULTI,
@@ -275,6 +279,7 @@ TEST_F(ComponentTestInterface, InterruptDownload)
                 [](auto, auto) {},
                 {},
                 {},
+                {},
                 CurlHandlerTypeEnum::MULTI,
                 shouldRun);
         });
@@ -286,6 +291,7 @@ TEST_F(ComponentTestInterface, InterruptDownload)
                 HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler),
                 "./test2.txt",
                 [](auto, auto) {},
+                {},
                 {},
                 {},
                 CurlHandlerTypeEnum::MULTI,
@@ -330,6 +336,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
         },
         {},
         {},
+        {},
         CurlHandlerTypeEnum::MULTI,
         shouldRun);
 
@@ -356,6 +363,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
 
             m_callbackComplete = true;
         },
+        {},
         {},
         {},
         CurlHandlerTypeEnum::MULTI,
