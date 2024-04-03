@@ -910,3 +910,122 @@ TEST_F(ComponentTestInterface, PatchSimpleFunctionality)
 
     EXPECT_TRUE(m_callbackComplete);
 }
+
+/**
+ * @brief Test the DOWNLOAD request setting a custom user-agent.
+ */
+TEST_F(ComponentTestInterface, DownloadWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, DEFAULT_HEADERS, {}, userAgent);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
+}
+
+/**
+ * @brief Test the POST request setting a custom user-agent.
+ */
+TEST_F(ComponentTestInterface, PostWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+
+    HTTPRequest::instance().post(
+        HttpURL("http://localhost:44441/"),
+        R"({"hello":"world"})"_json,
+        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [](auto, auto) {},
+        "",
+        DEFAULT_HEADERS,
+        {},
+        userAgent);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the GET request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, GetWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44441/"),
+        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [](auto, auto) {},
+        "",
+        DEFAULT_HEADERS,
+        {},
+        userAgent);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the PUT request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, PutWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+
+    HTTPRequest::instance().put(
+        HttpURL("http://localhost:44441/"),
+        R"({"hello":"world"})"_json,
+        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [](auto, auto) {},
+        "",
+        DEFAULT_HEADERS,
+        {},
+        userAgent);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the PATCH request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, PatchWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+
+    HTTPRequest::instance().patch(
+        HttpURL("http://localhost:44441/"),
+        R"({"hello":"world"})"_json,
+        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [](auto, auto) {},
+        "",
+        DEFAULT_HEADERS,
+        {},
+        userAgent);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the DELETE request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+    auto random {std::to_string(std::rand())};
+
+    HTTPRequest::instance().delete_(
+        HttpURL("http://localhost:44441/" + random),
+        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [](auto, auto) {},
+        "",
+        DEFAULT_HEADERS,
+        {},
+        userAgent);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
