@@ -932,17 +932,22 @@ TEST_F(ComponentTestInterface, DownloadWithCustomUserAgent)
  */
 TEST_F(ComponentTestInterface, PostWithCustomUserAgent)
 {
-    const std::string userAgent {"Custom-User-Agent"};
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().post(
-        HttpURL("http://localhost:44441/"),
+        HttpURL("http://localhost:44441/check-headers"),
         R"({"hello":"world"})"_json,
-        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
         [](auto, auto) {},
         "",
-        DEFAULT_HEADERS,
         {},
-        userAgent);
+        {},
+        userAgentValue);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -953,16 +958,21 @@ TEST_F(ComponentTestInterface, PostWithCustomUserAgent)
  */
 TEST_F(ComponentTestInterface, GetWithCustomUserAgent)
 {
-    const std::string userAgent {"Custom-User-Agent"};
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().get(
-        HttpURL("http://localhost:44441/"),
-        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        HttpURL("http://localhost:44441/check-headers"),
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
         [](auto, auto) {},
         "",
-        DEFAULT_HEADERS,
         {},
-        userAgent);
+        {},
+        userAgentValue);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -973,17 +983,22 @@ TEST_F(ComponentTestInterface, GetWithCustomUserAgent)
  */
 TEST_F(ComponentTestInterface, PutWithCustomUserAgent)
 {
-    const std::string userAgent {"Custom-User-Agent"};
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().put(
-        HttpURL("http://localhost:44441/"),
+        HttpURL("http://localhost:44441/check-headers"),
         R"({"hello":"world"})"_json,
-        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
         [](auto, auto) {},
         "",
-        DEFAULT_HEADERS,
         {},
-        userAgent);
+        {},
+        userAgentValue);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -994,17 +1009,22 @@ TEST_F(ComponentTestInterface, PutWithCustomUserAgent)
  */
 TEST_F(ComponentTestInterface, PatchWithCustomUserAgent)
 {
-    const std::string userAgent {"Custom-User-Agent"};
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().patch(
-        HttpURL("http://localhost:44441/"),
+        HttpURL("http://localhost:44441/check-headers"),
         R"({"hello":"world"})"_json,
-        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
         [](auto, auto) {},
         "",
-        DEFAULT_HEADERS,
         {},
-        userAgent);
+        {},
+        userAgentValue);
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -1015,17 +1035,21 @@ TEST_F(ComponentTestInterface, PatchWithCustomUserAgent)
  */
 TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
 {
-    const std::string userAgent {"Custom-User-Agent"};
-    auto random {std::to_string(std::rand())};
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().delete_(
-        HttpURL("http://localhost:44441/" + random),
-        [&](const std::string& /*response*/) { m_callbackComplete = true; },
+        HttpURL("http://localhost:44441/check-headers"),
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
         [](auto, auto) {},
         "",
-        DEFAULT_HEADERS,
         {},
-        userAgent);
+        {},
+        userAgentValue);
 
     EXPECT_TRUE(m_callbackComplete);
 }
