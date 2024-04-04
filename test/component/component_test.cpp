@@ -155,7 +155,7 @@ TEST_F(ComponentTestInterface, DownloadFileError)
 TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
 {
     HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -178,6 +178,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
 
             m_callbackComplete = true;
         },
+        {},
         {},
         {},
         CurlHandlerTypeEnum::SINGLE);
@@ -205,6 +206,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
         },
         {},
         {},
+        {},
         CurlHandlerTypeEnum::SINGLE);
 
     EXPECT_TRUE(m_callbackComplete);
@@ -221,6 +223,7 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
         HttpURL("http://localhost:44441/"),
         "./test.txt",
         [](auto, auto) {},
+        {},
         {},
         {},
         CurlHandlerTypeEnum::MULTI,
@@ -243,6 +246,7 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
         HttpURL("http://localhost:44441/"),
         "./test.txt",
         [](auto, auto) {},
+        {},
         {},
         {},
         CurlHandlerTypeEnum::MULTI,
@@ -275,6 +279,7 @@ TEST_F(ComponentTestInterface, InterruptDownload)
                 [](auto, auto) {},
                 {},
                 {},
+                {},
                 CurlHandlerTypeEnum::MULTI,
                 shouldRun);
         });
@@ -286,6 +291,7 @@ TEST_F(ComponentTestInterface, InterruptDownload)
                 HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler),
                 "./test2.txt",
                 [](auto, auto) {},
+                {},
                 {},
                 {},
                 CurlHandlerTypeEnum::MULTI,
@@ -330,6 +336,7 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
         },
         {},
         {},
+        {},
         CurlHandlerTypeEnum::MULTI,
         shouldRun);
 
@@ -356,6 +363,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
 
             m_callbackComplete = true;
         },
+        {},
         {},
         {},
         CurlHandlerTypeEnum::MULTI,
@@ -899,6 +907,149 @@ TEST_F(ComponentTestInterface, PatchSimpleFunctionality)
                                       EXPECT_EQ(nlohmann::json::parse(response), expectedResponse);
                                       m_callbackComplete = true;
                                   });
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the DOWNLOAD request setting a custom user-agent.
+ */
+TEST_F(ComponentTestInterface, DownloadWithCustomUserAgent)
+{
+    const std::string userAgent {"Custom-User-Agent"};
+
+    HTTPRequest::instance().download(
+        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, DEFAULT_HEADERS, {}, userAgent);
+
+    std::ifstream file("./test.txt");
+    std::string line;
+    std::getline(file, line);
+    EXPECT_EQ(line, "Hello World!");
+}
+
+/**
+ * @brief Test the POST request setting a custom user-agent.
+ */
+TEST_F(ComponentTestInterface, PostWithCustomUserAgent)
+{
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
+
+    HTTPRequest::instance().post(
+        HttpURL("http://localhost:44441/check-headers"),
+        R"({"hello":"world"})"_json,
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {},
+        {},
+        userAgentValue);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the GET request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, GetWithCustomUserAgent)
+{
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
+
+    HTTPRequest::instance().get(
+        HttpURL("http://localhost:44441/check-headers"),
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {},
+        {},
+        userAgentValue);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the PUT request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, PutWithCustomUserAgent)
+{
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
+
+    HTTPRequest::instance().put(
+        HttpURL("http://localhost:44441/check-headers"),
+        R"({"hello":"world"})"_json,
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {},
+        {},
+        userAgentValue);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the PATCH request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, PatchWithCustomUserAgent)
+{
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
+
+    HTTPRequest::instance().patch(
+        HttpURL("http://localhost:44441/check-headers"),
+        R"({"hello":"world"})"_json,
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {},
+        {},
+        userAgentValue);
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the DELETE request setting a custom user-agent.
+ *
+ */
+TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
+{
+    const std::string headerKey {"User-Agent"};
+    const std::string userAgentValue {"Custom-User-Agent"};
+
+    HTTPRequest::instance().delete_(
+        HttpURL("http://localhost:44441/check-headers"),
+        [&](const std::string& result)
+        {
+            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+            m_callbackComplete = true;
+        },
+        [](auto, auto) {},
+        "",
+        {},
+        {},
+        userAgentValue);
 
     EXPECT_TRUE(m_callbackComplete);
 }

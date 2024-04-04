@@ -107,6 +107,10 @@ public:
                            res.set_content(response.dump(), "text/json");
                        });
 
+        m_server.Patch("/check-headers",
+                       [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+                       { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
+
         // This endpoint helps simulate the waiting time during an HTTP request.
         m_server.Get(R"(/sleep/(\d+))",
                      [](const httplib::Request& req, httplib::Response& res)
@@ -116,9 +120,17 @@ public:
                          res.set_content("Hello World!", "text/json");
                      });
 
+        m_server.Get("/check-headers",
+                     [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+                     { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
+
         m_server.Delete(R"(/(\d+))",
                         [](const httplib::Request& req, httplib::Response& res)
                         { res.set_content(req.matches[1], "text/json"); });
+
+        m_server.Delete("/check-headers",
+                        [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+                        { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
 
         m_server.set_keep_alive_max_count(1);
         m_server.listen("localhost", 44441);

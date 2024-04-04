@@ -181,6 +181,7 @@ static void BM_DownloadUsingTheSingleHandler(benchmark::State& state)
             [&](const std::string& /*result*/, const long /*responseCode*/) {},
             {},
             {},
+            {},
             CurlHandlerTypeEnum::SINGLE);
     }
 }
@@ -199,6 +200,7 @@ static void BM_CustomDownloadUsingTheMultiHandler(benchmark::State& state)
             HttpURL("http://localhost:44441/"),
             "out.txt",
             [&](const std::string& /*result*/, const long /*responseCode*/) {},
+            {},
             {},
             {},
             CurlHandlerTypeEnum::MULTI);

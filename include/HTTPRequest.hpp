@@ -36,6 +36,7 @@ public:
      * @param onError Callback to be called in case of error.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -45,6 +46,7 @@ public:
         std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
         const std::unordered_set<std::string>& httpHeaders = {},
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -57,6 +59,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Object that provides secure communication.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -68,6 +71,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -80,6 +84,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -91,6 +96,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -102,6 +108,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -112,6 +119,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -124,6 +132,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -135,6 +144,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -147,6 +157,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -158,6 +169,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -171,6 +183,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -182,6 +195,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -195,6 +209,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -206,6 +221,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 
@@ -217,6 +233,7 @@ public:
      * @param fileName File name of output file.
      * @param httpHeaders Headers to be added to the query.
      * @param secureCommunication Secure communication object.
+     * @param userAgent User agent to be used in the request.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
      */
@@ -227,6 +244,7 @@ public:
         const std::string& fileName = "",
         const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
         const SecureCommunication& secureCommunication = {},
+        const std::string& userAgent = {},
         const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
         const std::atomic<bool>& shouldRun = true);
 };

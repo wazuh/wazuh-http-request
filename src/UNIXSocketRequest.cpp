@@ -23,6 +23,7 @@ void UNIXSocketRequest::download(const URL& url,
                                  std::function<void(const std::string&, const long)> onError,
                                  const std::unordered_set<std::string>& httpHeaders,
                                  const SecureCommunication& secureCommunication,
+                                 const std::string& userAgent,
                                  const CurlHandlerTypeEnum& handlerType,
                                  const std::atomic<bool>& shouldRun)
 {
@@ -31,6 +32,7 @@ void UNIXSocketRequest::download(const URL& url,
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))
             .url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
     }
@@ -51,6 +53,7 @@ void UNIXSocketRequest::post(const URL& url,
                              const std::string& fileName,
                              const std::unordered_set<std::string>& httpHeaders,
                              const SecureCommunication& secureCommunication,
+                             const std::string& userAgent,
                              const CurlHandlerTypeEnum& handlerType,
                              const std::atomic<bool>& shouldRun)
 {
@@ -64,7 +67,7 @@ void UNIXSocketRequest::post(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    post(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
+    post(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void UNIXSocketRequest::post(const URL& url,
@@ -74,6 +77,7 @@ void UNIXSocketRequest::post(const URL& url,
                              const std::string& fileName,
                              const std::unordered_set<std::string>& httpHeaders,
                              const SecureCommunication& secureCommunication,
+                             const std::string& userAgent,
                              const CurlHandlerTypeEnum& handlerType,
                              const std::atomic<bool>& shouldRun)
 {
@@ -82,6 +86,7 @@ void UNIXSocketRequest::post(const URL& url,
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .userAgent(userAgent)
             .postData(data)
             .outputFile(fileName)
             .execute();
@@ -104,13 +109,18 @@ void UNIXSocketRequest::get(const URL& url,
                             const std::string& fileName,
                             const std::unordered_set<std::string>& httpHeaders,
                             const SecureCommunication& secureCommunication,
+                            const std::string& userAgent,
                             const CurlHandlerTypeEnum& handlerType,
                             const std::atomic<bool>& shouldRun)
 {
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
-        req.url(url.url(), secureCommunication).unixSocketPath(url.unixSocketPath()).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication)
+            .unixSocketPath(url.unixSocketPath())
+            .userAgent(userAgent)
+            .outputFile(fileName)
+            .execute();
 
         onSuccess(req.response());
     }
@@ -131,6 +141,7 @@ void UNIXSocketRequest::put(const URL& url,
                             const std::string& fileName,
                             const std::unordered_set<std::string>& httpHeaders,
                             const SecureCommunication& secureCommunication,
+                            const std::string& userAgent,
                             const CurlHandlerTypeEnum& handlerType,
                             const std::atomic<bool>& shouldRun)
 {
@@ -144,7 +155,7 @@ void UNIXSocketRequest::put(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    put(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
+    put(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void UNIXSocketRequest::put(const URL& url,
@@ -154,6 +165,7 @@ void UNIXSocketRequest::put(const URL& url,
                             const std::string& fileName,
                             const std::unordered_set<std::string>& httpHeaders,
                             const SecureCommunication& secureCommunication,
+                            const std::string& userAgent,
                             const CurlHandlerTypeEnum& handlerType,
                             const std::atomic<bool>& shouldRun)
 {
@@ -162,6 +174,7 @@ void UNIXSocketRequest::put(const URL& url,
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .userAgent(userAgent)
             .postData(data)
             .outputFile(fileName)
             .execute();
@@ -185,6 +198,7 @@ void UNIXSocketRequest::patch(const URL& url,
                               const std::string& fileName,
                               const std::unordered_set<std::string>& httpHeaders,
                               const SecureCommunication& secureCommunication,
+                              const std::string& userAgent,
                               const CurlHandlerTypeEnum& handlerType,
                               const std::atomic<bool>& shouldRun)
 {
@@ -198,7 +212,7 @@ void UNIXSocketRequest::patch(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    patch(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication);
+    patch(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void UNIXSocketRequest::patch(const URL& url,
@@ -208,6 +222,7 @@ void UNIXSocketRequest::patch(const URL& url,
                               const std::string& fileName,
                               const std::unordered_set<std::string>& httpHeaders,
                               const SecureCommunication& secureCommunication,
+                              const std::string& userAgent,
                               const CurlHandlerTypeEnum& handlerType,
                               const std::atomic<bool>& shouldRun)
 {
@@ -216,6 +231,7 @@ void UNIXSocketRequest::patch(const URL& url,
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .userAgent(userAgent)
             .postData(data)
             .outputFile(fileName)
             .execute();
@@ -238,13 +254,18 @@ void UNIXSocketRequest::delete_(const URL& url,
                                 const std::string& fileName,
                                 const std::unordered_set<std::string>& httpHeaders,
                                 const SecureCommunication& secureCommunication,
+                                const std::string& userAgent,
                                 const CurlHandlerTypeEnum& handlerType,
                                 const std::atomic<bool>& shouldRun)
 {
     try
     {
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
-        req.url(url.url(), secureCommunication).unixSocketPath(url.unixSocketPath()).outputFile(fileName).execute();
+        req.url(url.url(), secureCommunication)
+            .unixSocketPath(url.unixSocketPath())
+            .userAgent(userAgent)
+            .outputFile(fileName)
+            .execute();
 
         onSuccess(req.response());
     }
