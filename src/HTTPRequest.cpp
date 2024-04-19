@@ -70,7 +70,7 @@ void HTTPRequest::post(const URL& url,
         return;
     }
 
-    post(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
+    post(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void HTTPRequest::post(const URL& url,
@@ -159,7 +159,7 @@ void HTTPRequest::put(const URL& url,
         return;
     }
 
-    put(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
+    put(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void HTTPRequest::put(const URL& url,
@@ -216,7 +216,8 @@ void HTTPRequest::patch(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    patch(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
+    patch(
+        url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void HTTPRequest::patch(const URL& url,

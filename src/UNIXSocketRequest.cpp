@@ -67,7 +67,7 @@ void UNIXSocketRequest::post(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    post(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
+    post(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void UNIXSocketRequest::post(const URL& url,
@@ -155,7 +155,7 @@ void UNIXSocketRequest::put(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    put(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
+    put(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void UNIXSocketRequest::put(const URL& url,
@@ -212,7 +212,8 @@ void UNIXSocketRequest::patch(const URL& url,
         onError(ex.what(), NOT_USED);
         return;
     }
-    patch(url, dataStr, std::move(onSuccess), onError, fileName, httpHeaders, secureCommunication, userAgent);
+    patch(
+        url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
 }
 
 void UNIXSocketRequest::patch(const URL& url,
