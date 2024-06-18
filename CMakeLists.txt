@@ -49,7 +49,6 @@ function(check_and_download_dep libname url)
 endfunction(check_and_download_dep)
 
 set(EXTERNAL_RES nlohmann googletest benchmark cpp-httplib)
-set(PRECOMPILED_EXTERNAL_RES curl)
 
 foreach(loop_var ${EXTERNAL_RES})
     check_and_download_dep(${loop_var} ${RESOURCES_URL})
@@ -61,32 +60,41 @@ endforeach(loop_var)
 
 set(BENCHMARK_ENABLE_TESTING "OFF")
 
+
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/../../vcpkg/scripts/buildsystems/vcpkg.cmake)
+set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/../../vcpkg/installed/x64-linux/include")
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${CMAKE_SOURCE_DIR}/../../vcpkg/installed/x64-linux/lib")
+
 include_directories(src/)
 include_directories(include/)
-include_directories(${SRC_FOLDER}/external/curl/include/curl/)
 include_directories(${SRC_FOLDER}/external/nlohmann/)
 include_directories(BEFORE PRIVATE shared/)
-
-link_directories(${SRC_FOLDER}/external/curl/lib/.libs/)
 
 file(GLOB URL_REQUEST_SRC src/*.cpp)
 
 add_library(urlrequest ${URL_REQUEST_SRC})
 
-if(NOT DEFINED CURL_DEP)
-    set(CURL_DEP curl)
-endif(NOT DEFINED CURL_DEP)
+find_package(CURL REQUIRED)
+if(CURL_FOUND)
+    include_directories(${CURL_INCLUDE_DIRS})
+    link_directories(${CURL_LIBRARY_DIRS})
+endif()
 
-target_link_libraries(urlrequest ${CURL_DEP})
+# Find zlib
+find_package(ZLIB REQUIRED)
+if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    link_directories(${ZLIB_LIBRARY_DIRS})
+endif()
 
-if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
-    # Enable testing only if compiling this repository.
-    # Always set enable_testing() before add_subdirectory.
-    enable_testing()
+find_package(OpenSSL REQUIRED)
 
-    add_subdirectory(external/googletest)
-    add_subdirectory(external/benchmark)
 
-    add_subdirectory(test_tool)
-    add_subdirectory(test)
-endif (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
+target_link_libraries(urlrequest ${ZLIB_LIBRARIES} ${CURL_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+
+# Add include directories for urlrequest
+target_include_directories(urlrequest PUBLIC
+    ${CURL_LIBRARIES}
+    ${SRC_FOLDER}/external/nlohmann/
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)

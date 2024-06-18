@@ -12,7 +12,7 @@
 #ifndef _CURL_HANDLER_HPP
 #define _CURL_HANDLER_HPP
 
-#include "curl.h"
+#include <curl/curl.h>
 #include <memory>
 
 //! ICURLHandler abstract class
