@@ -124,53 +124,90 @@ public:
 };
 
 /**
+ * @struct RequestParameters
  * @brief The structure groups all the parameters required for the request, like the URL, the data to be sent, the
  * headers, etc. They can be thought of as "what" to do.
- *
- * @param url URL to send the request.
- * @param data Data to send (string or nlohmann::json).
- * @param secureCommunication Secure communication object.
- * @param httpHeaders Headers to be added to the query.
  */
 
 struct RequestParameters
 {
+    /**
+     * @brief URL to send the request.
+     *
+     */
     const URL& url;
+
+    /**
+     * @brief Data to send (string or nlohmann::json).
+     *
+     */
     const std::variant<std::string, nlohmann::json> data = {};
+
+    /**
+     * @brief Secure communication object.
+     *
+     */
     const SecureCommunication& secureCommunication = {};
+
+    /**
+     * @brief Headers to be added to the query.
+     *
+     */
     const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS;
 };
 
 /**
+ * @struct ConfigurationParameters
  * @brief The structure groups all the parameters that modify the behavior of the request, like the timeout, library
  * parameters configuration, etc; and everything that changes the way the request is performed.
  * They can be thought of as "how" to do.
- *
- * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
- * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
- * @param userAgent User agent to be used in the request.
  */
 struct ConfigurationParameters
 {
+    /**
+     * @brief Type of the cURL handler. Default is 'SINGLE'.
+     *
+     */
     const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE;
+
+    /**
+     * @brief Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     *
+     */
     const std::atomic<bool>& shouldRun = true;
+
+    /**
+     * @brief User agent to be used in the request.
+     *
+     */
     const std::string& userAgent = {};
 };
 
 /**
+ * @struct PostRequestParameters
  * @brief The structure groups all the parameters related to the actions to be performed after the request is made, like
  * error handling, results processing, etc. They can be thought of as "what to do after".
- *
- * @param onSuccess Callback to be called when the request is successful.
- * @param onError Callback to be called when an error occurs.
- * @param outputFile File name of to store the output data.
  */
 struct PostRequestParameters
 {
+    /**
+     * @brief Callback to be called when the request is successful.
+     *
+     */
     std::function<void(const std::string&)> onSuccess = [](auto) {
     };
+
+    /**
+     * @brief Callback to be called when an error occurs.
+     *
+     */
     std::function<void(const std::string&, const long)> onError = [](auto, auto) {
     };
+
+    /**
+     * @brief File name of to store the output data.
+     *
+     */
     const std::string& outputFile = "";
 };
 

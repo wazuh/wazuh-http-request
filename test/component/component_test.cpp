@@ -487,8 +487,6 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFile)
  */
 TEST_F(ComponentTestInterface, DeleteRandomIDFileEmptyURL)
 {
-    auto random {std::to_string(std::rand())};
-
     HTTPRequest::instance().delete_(
         RequestParameters {.url = HttpURL("")},
         PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },

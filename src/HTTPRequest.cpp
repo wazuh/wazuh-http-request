@@ -61,7 +61,6 @@ void HTTPRequest::post(RequestParameters requestParameters,
 {
     // Request parameters
     const auto& url {requestParameters.url};
-    std::string data;
     const auto& secureCommunication {requestParameters.secureCommunication};
     const auto& httpHeaders {requestParameters.httpHeaders};
     // Post request parameters
@@ -75,9 +74,9 @@ void HTTPRequest::post(RequestParameters requestParameters,
 
     try
     {
-        data = std::holds_alternative<std::string>(requestParameters.data)
-                   ? std::get<std::string>(requestParameters.data)
-                   : std::get<nlohmann::json>(requestParameters.data).dump();
+        std::string data = std::holds_alternative<std::string>(requestParameters.data)
+                               ? std::get<std::string>(requestParameters.data)
+                               : std::get<nlohmann::json>(requestParameters.data).dump();
 
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
@@ -143,7 +142,6 @@ void HTTPRequest::put(RequestParameters requestParameters,
 {
     // Request parameters
     const auto& url {requestParameters.url};
-    std::string data;
     const auto& secureCommunication {requestParameters.secureCommunication};
     const auto& httpHeaders {requestParameters.httpHeaders};
     // Post request parameters
@@ -157,9 +155,9 @@ void HTTPRequest::put(RequestParameters requestParameters,
 
     try
     {
-        data = std::holds_alternative<std::string>(requestParameters.data)
-                   ? std::get<std::string>(requestParameters.data)
-                   : std::get<nlohmann::json>(requestParameters.data).dump();
+        std::string data = std::holds_alternative<std::string>(requestParameters.data)
+                               ? std::get<std::string>(requestParameters.data)
+                               : std::get<nlohmann::json>(requestParameters.data).dump();
 
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
@@ -187,7 +185,6 @@ void HTTPRequest::patch(RequestParameters requestParameters,
 {
     // Request parameters
     const auto& url {requestParameters.url};
-    std::string data;
     const auto& secureCommunication {requestParameters.secureCommunication};
     const auto& httpHeaders {requestParameters.httpHeaders};
     // Post request parameters
@@ -201,9 +198,9 @@ void HTTPRequest::patch(RequestParameters requestParameters,
 
     try
     {
-        data = std::holds_alternative<std::string>(requestParameters.data)
-                   ? std::get<std::string>(requestParameters.data)
-                   : std::get<nlohmann::json>(requestParameters.data).dump();
+        std::string data = std::holds_alternative<std::string>(requestParameters.data)
+                               ? std::get<std::string>(requestParameters.data)
+                               : std::get<nlohmann::json>(requestParameters.data).dump();
 
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
