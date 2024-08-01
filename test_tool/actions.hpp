@@ -64,15 +64,15 @@ public:
     void execute() override
     {
         HTTPRequest::instance().download(
-            HttpURL(m_url),
-            m_outputFile,
-            [](const std::string& msg, const long responseCode)
-            {
-                std::cerr << msg << ": " << responseCode << std::endl;
-                throw std::runtime_error(msg);
-            },
-            m_headers,
-            m_secureCommunication);
+            RequestParameters {
+                .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
+            PostRequestParameters {.onError =
+                                       [](const std::string& msg, const long responseCode)
+                                   {
+                                       std::cerr << msg << ": " << responseCode << std::endl;
+                                       throw std::runtime_error(msg);
+                                   },
+                                   .outputFile = m_outputFile});
     }
 };
 
@@ -108,16 +108,15 @@ public:
     void execute() override
     {
         HTTPRequest::instance().get(
-            HttpURL(m_url),
-            [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg, const long responseCode)
-            {
-                std::cerr << msg << ": " << responseCode << std::endl;
-                throw std::runtime_error(msg);
-            },
-            "",
-            m_headers,
-            m_secureCommunication);
+            RequestParameters {
+                .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
+            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                                   .onError =
+                                       [](const std::string& msg, const long responseCode)
+                                   {
+                                       std::cerr << msg << ": " << responseCode << std::endl;
+                                       throw std::runtime_error(msg);
+                                   }});
     }
 };
 
@@ -156,18 +155,18 @@ public:
      */
     void execute() override
     {
-        HTTPRequest::instance().post(
-            HttpURL(m_url),
-            m_data,
-            [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg, const long responseCode)
-            {
-                std::cerr << msg << ": " << responseCode << std::endl;
-                throw std::runtime_error(msg);
-            },
-            "",
-            m_headers,
-            m_secureCommunication);
+        HTTPRequest::instance().post(RequestParameters {.url = HttpURL(m_url),
+                                                        .secureCommunication = m_secureCommunication,
+                                                        .httpHeaders = m_headers},
+                                     PostRequestParameters {
+                                         .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                                         .onError =
+                                             [](const std::string& msg, const long responseCode)
+                                         {
+                                             std::cerr << msg << ": " << responseCode << std::endl;
+                                             throw std::runtime_error(msg);
+                                         },
+                                     });
     }
 };
 
@@ -207,17 +206,17 @@ public:
     void execute() override
     {
         HTTPRequest::instance().put(
-            HttpURL(m_url),
-            m_data,
-            [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg, const long responseCode)
-            {
-                std::cerr << msg << ": " << responseCode << std::endl;
-                throw std::runtime_error(msg);
-            },
-            "",
-            m_headers,
-            m_secureCommunication);
+            RequestParameters {.url = HttpURL(m_url),
+                               .data = m_data,
+                               .secureCommunication = m_secureCommunication,
+                               .httpHeaders = m_headers},
+            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                                   .onError =
+                                       [](const std::string& msg, const long responseCode)
+                                   {
+                                       std::cerr << msg << ": " << responseCode << std::endl;
+                                       throw std::runtime_error(msg);
+                                   }});
     }
 };
 
@@ -260,17 +259,17 @@ public:
     void execute() override
     {
         HTTPRequest::instance().patch(
-            HttpURL(m_url),
-            m_data,
-            [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg, const long responseCode)
-            {
-                std::cerr << msg << ": " << responseCode << std::endl;
-                throw std::runtime_error(msg);
-            },
-            "",
-            m_headers,
-            m_secureCommunication);
+            RequestParameters {.url = HttpURL(m_url),
+                               .data = m_data,
+                               .secureCommunication = m_secureCommunication,
+                               .httpHeaders = m_headers},
+            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                                   .onError =
+                                       [](const std::string& msg, const long responseCode)
+                                   {
+                                       std::cerr << msg << ": " << responseCode << std::endl;
+                                       throw std::runtime_error(msg);
+                                   }});
     }
 };
 
@@ -306,16 +305,15 @@ public:
     void execute() override
     {
         HTTPRequest::instance().delete_(
-            HttpURL(m_url),
-            [](const std::string& msg) { std::cout << msg << std::endl; },
-            [](const std::string& msg, const long responseCode)
-            {
-                std::cerr << msg << ": " << responseCode << std::endl;
-                throw std::runtime_error(msg);
-            },
-            "",
-            m_headers,
-            m_secureCommunication);
+            RequestParameters {
+                .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
+            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                                   .onError =
+                                       [](const std::string& msg, const long responseCode)
+                                   {
+                                       std::cerr << msg << ": " << responseCode << std::endl;
+                                       throw std::runtime_error(msg);
+                                   }});
     }
 };
 
