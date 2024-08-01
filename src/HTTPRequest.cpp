@@ -25,16 +25,11 @@ void HTTPRequest::download(RequestParameters requestParameters,
                            ConfigurationParameters configurationParameters)
 {
     // Request parameters
-    const auto& url {requestParameters.url};
-    const auto& secureCommunication {requestParameters.secureCommunication};
-    const auto& httpHeaders {requestParameters.httpHeaders};
+    const auto& [url, _, secureCommunication, httpHeaders] = requestParameters;
     // Post request parameters
-    const auto& onError {postRequestParameters.onError};
-    const auto& outputFile {postRequestParameters.outputFile};
-    // Configuration parameters
-    const auto& userAgent {configurationParameters.userAgent};
-    const auto& handlerType {configurationParameters.handlerType};
-    const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& [__, onError, outputFile] = postRequestParameters;
+    // Request parameters
+    const auto& [handlerType, shouldRun, userAgent] = configurationParameters;
 
     try
     {
@@ -60,27 +55,20 @@ void HTTPRequest::post(RequestParameters requestParameters,
                        ConfigurationParameters configurationParameters)
 {
     // Request parameters
-    const auto& url {requestParameters.url};
-    const auto& secureCommunication {requestParameters.secureCommunication};
-    const auto& httpHeaders {requestParameters.httpHeaders};
+    const auto& [url, data, secureCommunication, httpHeaders] = requestParameters;
     // Post request parameters
-    const auto& onError {postRequestParameters.onError};
-    const auto& onSuccess {postRequestParameters.onSuccess};
-    const auto& outputFile {postRequestParameters.outputFile};
-    // Configuration parameters
-    const auto& userAgent {configurationParameters.userAgent};
-    const auto& handlerType {configurationParameters.handlerType};
-    const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& [onSuccess, onError, outputFile] = postRequestParameters;
+    // Request parameters
+    const auto& [handlerType, shouldRun, userAgent] = configurationParameters;
 
     try
     {
-        std::string data = std::holds_alternative<std::string>(requestParameters.data)
-                               ? std::get<std::string>(requestParameters.data)
-                               : std::get<nlohmann::json>(requestParameters.data).dump();
+        std::string dataString = std::holds_alternative<std::string>(data) ? std::get<std::string>(data)
+                                                                           : std::get<nlohmann::json>(data).dump();
 
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
-            .postData(data)
+            .postData(dataString)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
             .outputFile(outputFile)
@@ -103,17 +91,11 @@ void HTTPRequest::get(RequestParameters requestParameters,
                       ConfigurationParameters configurationParameters)
 {
     // Request parameters
-    const auto& url {requestParameters.url};
-    const auto& secureCommunication {requestParameters.secureCommunication};
-    const auto& httpHeaders {requestParameters.httpHeaders};
+    const auto& [url, _, secureCommunication, httpHeaders] = requestParameters;
     // Post request parameters
-    const auto& onError {postRequestParameters.onError};
-    const auto& onSuccess {postRequestParameters.onSuccess};
-    const auto& outputFile {postRequestParameters.outputFile};
-    // Configuration parameters
-    const auto& userAgent {configurationParameters.userAgent};
-    const auto& handlerType {configurationParameters.handlerType};
-    const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& [onSuccess, onError, outputFile] = postRequestParameters;
+    // Request parameters
+    const auto& [handlerType, shouldRun, userAgent] = configurationParameters;
 
     try
     {
@@ -141,23 +123,16 @@ void HTTPRequest::put(RequestParameters requestParameters,
                       ConfigurationParameters configurationParameters)
 {
     // Request parameters
-    const auto& url {requestParameters.url};
-    const auto& secureCommunication {requestParameters.secureCommunication};
-    const auto& httpHeaders {requestParameters.httpHeaders};
+    const auto& [url, data, secureCommunication, httpHeaders] = requestParameters;
     // Post request parameters
-    const auto& onError {postRequestParameters.onError};
-    const auto& onSuccess {postRequestParameters.onSuccess};
-    const auto& outputFile {postRequestParameters.outputFile};
-    // Configuration parameters
-    const auto& userAgent {configurationParameters.userAgent};
-    const auto& handlerType {configurationParameters.handlerType};
-    const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& [onSuccess, onError, outputFile] = postRequestParameters;
+    // Request parameters
+    const auto& [handlerType, shouldRun, userAgent] = configurationParameters;
 
     try
     {
-        std::string data = std::holds_alternative<std::string>(requestParameters.data)
-                               ? std::get<std::string>(requestParameters.data)
-                               : std::get<nlohmann::json>(requestParameters.data).dump();
+        std::string dataString = std::holds_alternative<std::string>(data) ? std::get<std::string>(data)
+                                                                           : std::get<nlohmann::json>(data).dump();
 
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
@@ -184,27 +159,20 @@ void HTTPRequest::patch(RequestParameters requestParameters,
                         ConfigurationParameters configurationParameters)
 {
     // Request parameters
-    const auto& url {requestParameters.url};
-    const auto& secureCommunication {requestParameters.secureCommunication};
-    const auto& httpHeaders {requestParameters.httpHeaders};
+    const auto& [url, data, secureCommunication, httpHeaders] = requestParameters;
     // Post request parameters
-    const auto& onError {postRequestParameters.onError};
-    const auto& onSuccess {postRequestParameters.onSuccess};
-    const auto& outputFile {postRequestParameters.outputFile};
-    // Configuration parameters
-    const auto& userAgent {configurationParameters.userAgent};
-    const auto& handlerType {configurationParameters.handlerType};
-    const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& [onSuccess, onError, outputFile] = postRequestParameters;
+    // Request parameters
+    const auto& [handlerType, shouldRun, userAgent] = configurationParameters;
 
     try
     {
-        std::string data = std::holds_alternative<std::string>(requestParameters.data)
-                               ? std::get<std::string>(requestParameters.data)
-                               : std::get<nlohmann::json>(requestParameters.data).dump();
+        std::string dataString = std::holds_alternative<std::string>(data) ? std::get<std::string>(data)
+                                                                           : std::get<nlohmann::json>(data).dump();
 
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
-            .postData(data)
+            .postData(dataString)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
             .outputFile(outputFile)
@@ -227,15 +195,11 @@ void HTTPRequest::delete_(RequestParameters requestParameters,
                           ConfigurationParameters configurationParameters)
 {
     // Request parameters
-    const auto& url {requestParameters.url};
-    const auto& secureCommunication {requestParameters.secureCommunication};
-    const auto& httpHeaders {requestParameters.httpHeaders};
+    const auto& [url, _, secureCommunication, httpHeaders] = requestParameters;
     // Post request parameters
-    const auto& onError {postRequestParameters.onError};
-    const auto& onSuccess {postRequestParameters.onSuccess};
-    const auto& outputFile {postRequestParameters.outputFile};
-    // Configuration parameters
-    const auto& userAgent {configurationParameters.userAgent};
+    const auto& [onSuccess, onError, outputFile] = postRequestParameters;
+    // Request parameters
+    const auto& [handlerType, shouldRun, userAgent] = configurationParameters;
 
     try
     {
