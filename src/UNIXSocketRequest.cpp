@@ -18,15 +18,23 @@
 
 using wrapperType = cURLWrapper;
 
-void UNIXSocketRequest::download(const URL& url,
-                                 const std::string& outputFile,
-                                 std::function<void(const std::string&, const long)> onError,
-                                 const std::unordered_set<std::string>& httpHeaders,
-                                 const SecureCommunication& secureCommunication,
-                                 const std::string& userAgent,
-                                 const CurlHandlerTypeEnum& handlerType,
-                                 const std::atomic<bool>& shouldRun)
+void UNIXSocketRequest::download(RequestParameters requestParameters,
+                                 PostRequestParameters postRequestParameters = {},
+                                 ConfigurationParameters configurationParameters = {})
 {
+    // Request parameters
+    const auto& url {requestParameters.url};
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))
@@ -46,49 +54,36 @@ void UNIXSocketRequest::download(const URL& url,
     }
 }
 
-void UNIXSocketRequest::post(const URL& url,
-                             const nlohmann::json& data,
-                             std::function<void(const std::string&)> onSuccess,
-                             std::function<void(const std::string&, const long)> onError,
-                             const std::string& fileName,
-                             const std::unordered_set<std::string>& httpHeaders,
-                             const SecureCommunication& secureCommunication,
-                             const std::string& userAgent,
-                             const CurlHandlerTypeEnum& handlerType,
-                             const std::atomic<bool>& shouldRun)
+void UNIXSocketRequest::post(RequestParameters requestParameters,
+                             PostRequestParameters postRequestParameters = {},
+                             ConfigurationParameters configurationParameters = {})
 {
-    std::string dataStr;
-    try
-    {
-        dataStr = data.dump();
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-        return;
-    }
-    post(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
-}
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
 
-void UNIXSocketRequest::post(const URL& url,
-                             const std::string& data,
-                             std::function<void(const std::string&)> onSuccess,
-                             std::function<void(const std::string&, const long)> onError,
-                             const std::string& fileName,
-                             const std::unordered_set<std::string>& httpHeaders,
-                             const SecureCommunication& secureCommunication,
-                             const std::string& userAgent,
-                             const CurlHandlerTypeEnum& handlerType,
-                             const std::atomic<bool>& shouldRun)
-{
     try
     {
+        data = std::holds_alternative<std::string>(requestParameters.data)
+                   ? std::get<std::string>(requestParameters.data)
+                   : std::get<nlohmann::json>(requestParameters.data).dump();
+
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .userAgent(userAgent)
             .postData(data)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -103,23 +98,30 @@ void UNIXSocketRequest::post(const URL& url,
     }
 }
 
-void UNIXSocketRequest::get(const URL& url,
-                            std::function<void(const std::string&)> onSuccess,
-                            std::function<void(const std::string&, const long)> onError,
-                            const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders,
-                            const SecureCommunication& secureCommunication,
-                            const std::string& userAgent,
-                            const CurlHandlerTypeEnum& handlerType,
-                            const std::atomic<bool>& shouldRun)
+void UNIXSocketRequest::get(RequestParameters requestParameters,
+                            PostRequestParameters postRequestParameters = {},
+                            ConfigurationParameters configurationParameters = {})
 {
+    // Request parameters
+    const auto& url {requestParameters.url};
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -134,49 +136,36 @@ void UNIXSocketRequest::get(const URL& url,
     }
 }
 
-void UNIXSocketRequest::put(const URL& url,
-                            const nlohmann::json& data,
-                            std::function<void(const std::string&)> onSuccess,
-                            std::function<void(const std::string&, const long)> onError,
-                            const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders,
-                            const SecureCommunication& secureCommunication,
-                            const std::string& userAgent,
-                            const CurlHandlerTypeEnum& handlerType,
-                            const std::atomic<bool>& shouldRun)
+void UNIXSocketRequest::put(RequestParameters requestParameters,
+                            PostRequestParameters postRequestParameters = {},
+                            ConfigurationParameters configurationParameters = {})
 {
-    std::string dataStr;
-    try
-    {
-        dataStr = data.dump();
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-        return;
-    }
-    put(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
-}
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
 
-void UNIXSocketRequest::put(const URL& url,
-                            const std::string& data,
-                            std::function<void(const std::string&)> onSuccess,
-                            std::function<void(const std::string&, const long)> onError,
-                            const std::string& fileName,
-                            const std::unordered_set<std::string>& httpHeaders,
-                            const SecureCommunication& secureCommunication,
-                            const std::string& userAgent,
-                            const CurlHandlerTypeEnum& handlerType,
-                            const std::atomic<bool>& shouldRun)
-{
     try
     {
+        data = std::holds_alternative<std::string>(requestParameters.data)
+                   ? std::get<std::string>(requestParameters.data)
+                   : std::get<nlohmann::json>(requestParameters.data).dump();
+
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .userAgent(userAgent)
             .postData(data)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -191,50 +180,36 @@ void UNIXSocketRequest::put(const URL& url,
     }
 }
 
-void UNIXSocketRequest::patch(const URL& url,
-                              const nlohmann::json& data,
-                              std::function<void(const std::string&)> onSuccess,
-                              std::function<void(const std::string&, const long)> onError,
-                              const std::string& fileName,
-                              const std::unordered_set<std::string>& httpHeaders,
-                              const SecureCommunication& secureCommunication,
-                              const std::string& userAgent,
-                              const CurlHandlerTypeEnum& handlerType,
-                              const std::atomic<bool>& shouldRun)
+void UNIXSocketRequest::patch(RequestParameters requestParameters,
+                              PostRequestParameters postRequestParameters = {},
+                              ConfigurationParameters configurationParameters = {})
 {
-    std::string dataStr;
-    try
-    {
-        dataStr = data.dump();
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-        return;
-    }
-    patch(
-        url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
-}
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
 
-void UNIXSocketRequest::patch(const URL& url,
-                              const std::string& data,
-                              std::function<void(const std::string&)> onSuccess,
-                              std::function<void(const std::string&, const long)> onError,
-                              const std::string& fileName,
-                              const std::unordered_set<std::string>& httpHeaders,
-                              const SecureCommunication& secureCommunication,
-                              const std::string& userAgent,
-                              const CurlHandlerTypeEnum& handlerType,
-                              const std::atomic<bool>& shouldRun)
-{
     try
     {
+        data = std::holds_alternative<std::string>(requestParameters.data)
+                   ? std::get<std::string>(requestParameters.data)
+                   : std::get<nlohmann::json>(requestParameters.data).dump();
+
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .userAgent(userAgent)
             .postData(data)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -249,23 +224,31 @@ void UNIXSocketRequest::patch(const URL& url,
     }
 }
 
-void UNIXSocketRequest::delete_(const URL& url,
-                                std::function<void(const std::string&)> onSuccess,
-                                std::function<void(const std::string&, const long)> onError,
-                                const std::string& fileName,
-                                const std::unordered_set<std::string>& httpHeaders,
-                                const SecureCommunication& secureCommunication,
-                                const std::string& userAgent,
-                                const CurlHandlerTypeEnum& handlerType,
-                                const std::atomic<bool>& shouldRun)
+void UNIXSocketRequest::delete_(RequestParameters requestParameters,
+                                PostRequestParameters postRequestParameters = {},
+                                ConfigurationParameters configurationParameters = {})
 {
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());

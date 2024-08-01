@@ -20,15 +20,22 @@
 
 using wrapperType = cURLWrapper;
 
-void HTTPRequest::download(const URL& url,
-                           const std::string& outputFile,
-                           std::function<void(const std::string&, const long)> onError,
-                           const std::unordered_set<std::string>& httpHeaders,
-                           const SecureCommunication& secureCommunication,
-                           const std::string& userAgent,
-                           const CurlHandlerTypeEnum& handlerType,
-                           const std::atomic<bool>& shouldRun)
+void HTTPRequest::download(RequestParameters requestParameters,
+                           PostRequestParameters postRequestParameters,
+                           ConfigurationParameters configurationParameters)
 {
+    // Request parameters
+    const auto& url {requestParameters.url};
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))
@@ -48,50 +55,36 @@ void HTTPRequest::download(const URL& url,
     }
 }
 
-void HTTPRequest::post(const URL& url,
-                       const nlohmann::json& data,
-                       std::function<void(const std::string&)> onSuccess,
-                       std::function<void(const std::string&, const long)> onError,
-                       const std::string& fileName,
-                       const std::unordered_set<std::string>& httpHeaders,
-                       const SecureCommunication& secureCommunication,
-                       const std::string& userAgent,
-                       const CurlHandlerTypeEnum& handlerType,
-                       const std::atomic<bool>& shouldRun)
+void HTTPRequest::post(RequestParameters requestParameters,
+                       PostRequestParameters postRequestParameters,
+                       ConfigurationParameters configurationParameters)
 {
-    std::string dataStr;
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
-        dataStr = data.dump();
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-        return;
-    }
+        data = std::holds_alternative<std::string>(requestParameters.data)
+                   ? std::get<std::string>(requestParameters.data)
+                   : std::get<nlohmann::json>(requestParameters.data).dump();
 
-    post(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
-}
-
-void HTTPRequest::post(const URL& url,
-                       const std::string& data,
-                       std::function<void(const std::string&)> onSuccess,
-                       std::function<void(const std::string&, const long)> onError,
-                       const std::string& fileName,
-                       const std::unordered_set<std::string>& httpHeaders,
-                       const SecureCommunication& secureCommunication,
-                       const std::string& userAgent,
-                       const CurlHandlerTypeEnum& handlerType,
-                       const std::atomic<bool>& shouldRun)
-{
-    try
-    {
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -106,23 +99,30 @@ void HTTPRequest::post(const URL& url,
     }
 }
 
-void HTTPRequest::get(const URL& url,
-                      std::function<void(const std::string&)> onSuccess,
-                      std::function<void(const std::string&, const long)> onError,
-                      const std::string& fileName,
-                      const std::unordered_set<std::string>& httpHeaders,
-                      const SecureCommunication& secureCommunication,
-                      const std::string& userAgent,
-                      const CurlHandlerTypeEnum& handlerType,
-                      const std::atomic<bool>& shouldRun)
+void HTTPRequest::get(RequestParameters requestParameters,
+                      PostRequestParameters postRequestParameters,
+                      ConfigurationParameters configurationParameters)
 {
+    // Request parameters
+    const auto& url {requestParameters.url};
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -137,50 +137,36 @@ void HTTPRequest::get(const URL& url,
     }
 }
 
-void HTTPRequest::put(const URL& url,
-                      const nlohmann::json& data,
-                      std::function<void(const std::string&)> onSuccess,
-                      std::function<void(const std::string&, const long)> onError,
-                      const std::string& fileName,
-                      const std::unordered_set<std::string>& httpHeaders,
-                      const SecureCommunication& secureCommunication,
-                      const std::string& userAgent,
-                      const CurlHandlerTypeEnum& handlerType,
-                      const std::atomic<bool>& shouldRun)
+void HTTPRequest::put(RequestParameters requestParameters,
+                      PostRequestParameters postRequestParameters,
+                      ConfigurationParameters configurationParameters)
 {
-    std::string dataStr;
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
+
     try
     {
-        dataStr = data.dump();
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-        return;
-    }
+        data = std::holds_alternative<std::string>(requestParameters.data)
+                   ? std::get<std::string>(requestParameters.data)
+                   : std::get<nlohmann::json>(requestParameters.data).dump();
 
-    put(url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
-}
-
-void HTTPRequest::put(const URL& url,
-                      const std::string& data,
-                      std::function<void(const std::string&)> onSuccess,
-                      std::function<void(const std::string&, const long)> onError,
-                      const std::string& fileName,
-                      const std::unordered_set<std::string>& httpHeaders,
-                      const SecureCommunication& secureCommunication,
-                      const std::string& userAgent,
-                      const CurlHandlerTypeEnum& handlerType,
-                      const std::atomic<bool>& shouldRun)
-{
-    try
-    {
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -195,50 +181,36 @@ void HTTPRequest::put(const URL& url,
     }
 }
 
-void HTTPRequest::patch(const URL& url,
-                        const nlohmann::json& data,
-                        std::function<void(const std::string&)> onSuccess,
-                        std::function<void(const std::string&, const long)> onError,
-                        const std::string& fileName,
-                        const std::unordered_set<std::string>& httpHeaders,
-                        const SecureCommunication& secureCommunication,
-                        const std::string& userAgent,
-                        const CurlHandlerTypeEnum& handlerType,
-                        const std::atomic<bool>& shouldRun)
+void HTTPRequest::patch(RequestParameters requestParameters,
+                        PostRequestParameters postRequestParameters,
+                        ConfigurationParameters configurationParameters)
 {
-    std::string dataStr;
-    try
-    {
-        dataStr = data.dump();
-    }
-    catch (const std::exception& ex)
-    {
-        onError(ex.what(), NOT_USED);
-        return;
-    }
-    patch(
-        url, dataStr, std::move(onSuccess), std::move(onError), fileName, httpHeaders, secureCommunication, userAgent);
-}
+    // Request parameters
+    const auto& url {requestParameters.url};
+    std::string data;
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
 
-void HTTPRequest::patch(const URL& url,
-                        const std::string& data,
-                        std::function<void(const std::string&)> onSuccess,
-                        std::function<void(const std::string&, const long)> onError,
-                        const std::string& fileName,
-                        const std::unordered_set<std::string>& httpHeaders,
-                        const SecureCommunication& secureCommunication,
-                        const std::string& userAgent,
-                        const CurlHandlerTypeEnum& handlerType,
-                        const std::atomic<bool>& shouldRun)
-{
     try
     {
+        data = std::holds_alternative<std::string>(requestParameters.data)
+                   ? std::get<std::string>(requestParameters.data)
+                   : std::get<nlohmann::json>(requestParameters.data).dump();
+
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());
@@ -253,23 +225,28 @@ void HTTPRequest::patch(const URL& url,
     }
 }
 
-void HTTPRequest::delete_(const URL& url,
-                          std::function<void(const std::string&)> onSuccess,
-                          std::function<void(const std::string&, const long)> onError,
-                          const std::string& fileName,
-                          const std::unordered_set<std::string>& httpHeaders,
-                          const SecureCommunication& secureCommunication,
-                          const std::string& userAgent,
-                          const CurlHandlerTypeEnum& handlerType,
-                          const std::atomic<bool>& shouldRun)
+void HTTPRequest::delete_(RequestParameters requestParameters,
+                          PostRequestParameters postRequestParameters,
+                          ConfigurationParameters configurationParameters)
 {
+    // Request parameters
+    const auto& url {requestParameters.url};
+    const auto& secureCommunication {requestParameters.secureCommunication};
+    const auto& httpHeaders {requestParameters.httpHeaders};
+    // Post request parameters
+    const auto& onError {postRequestParameters.onError};
+    const auto& onSuccess {postRequestParameters.onSuccess};
+    const auto& outputFile {postRequestParameters.outputFile};
+    // Configuration parameters
+    const auto& userAgent {configurationParameters.userAgent};
+
     try
     {
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
         req.url(url.url(), secureCommunication)
             .appendHeaders(httpHeaders)
             .userAgent(userAgent)
-            .outputFile(fileName)
+            .outputFile(outputFile)
             .execute();
 
         onSuccess(req.response());

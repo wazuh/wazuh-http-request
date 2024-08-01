@@ -18,6 +18,7 @@
 #include <functional>
 #include <string>
 #include <unordered_set>
+#include <variant>
 
 enum SOCKET_TYPE
 {
@@ -123,6 +124,57 @@ public:
 };
 
 /**
+ * @brief The structure groups all the parameters required for the request, like the URL, the data to be sent, the
+ * headers, etc. They can be thought of as "what" to do.
+ *
+ * @param url URL to send the request.
+ * @param data Data to send (string or nlohmann::json).
+ * @param secureCommunication Secure communication object.
+ * @param httpHeaders Headers to be added to the query.
+ */
+
+struct RequestParameters
+{
+    const URL& url;
+    const std::variant<std::string, nlohmann::json> data = {};
+    const SecureCommunication& secureCommunication = {};
+    const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS;
+};
+
+/**
+ * @brief The structure groups all the parameters that modify the behavior of the request, like the timeout, library
+ * parameters configuration, etc; and everything that changes the way the request is performed.
+ * They can be thought of as "how" to do.
+ *
+ * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
+ * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+ * @param userAgent User agent to be used in the request.
+ */
+struct ConfigurationParameters
+{
+    const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE;
+    const std::atomic<bool>& shouldRun = true;
+    const std::string& userAgent = {};
+};
+
+/**
+ * @brief The structure groups all the parameters related to the actions to be performed after the request is made, like
+ * error handling, results processing, etc. They can be thought of as "what to do after".
+ *
+ * @param onSuccess Callback to be called when the request is successful.
+ * @param onError Callback to be called when an error occurs.
+ * @param outputFile File name of to store the output data.
+ */
+struct PostRequestParameters
+{
+    std::function<void(const std::string&)> onSuccess = [](auto) {
+    };
+    std::function<void(const std::string&, const long)> onError = [](auto, auto) {
+    };
+    const std::string& outputFile = "";
+};
+
+/**
  * @brief This class is an interface to perform URL requests.
  * It provides a simple interface to send HTTP requests.
  */
@@ -132,222 +184,69 @@ public:
     virtual ~IURLRequest() = default;
     /**
      * @brief Virtual method to download a file from a URL.
-     * @param url URL to send the request.
-     * @param fileName File name to save the response.
-     * @param onError Callback to be called when an error occurs.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     *
+     * @param requestParameters Parameters to be used in the request. Mandatory.
+     * @param postRequestParameters Parameters that define the behavior after the request is made.
+     * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    virtual void download(
-        const URL& url,
-        const std::string& fileName,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::unordered_set<std::string>& httpHeaders = {},
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
+    virtual void download(RequestParameters requestParameters,
+                          PostRequestParameters postRequestParameters,
+                          ConfigurationParameters configurationParameters) = 0;
 
     /**
      * @brief Virtual method to send a POST request to a URL.
-     * @param url URL to send the request.
-     * @param data Data to send (nlohmann::json).
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     *
+     * @param requestParameters Parameters to be used in the request. Mandatory.
+     * @param postRequestParameters Parameters that define the behavior after the request is made.
+     * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    virtual void post(
-        const URL& url,
-        const nlohmann::json& data,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
-
-    /**
-     * @brief Virtual method to send a POST request to a URL.
-     * @param url URL to send the request.
-     * @param data Data to send (string).
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
-     */
-    virtual void post(
-        const URL& url,
-        const std::string& data,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
+    virtual void post(RequestParameters requestParameters,
+                      PostRequestParameters postRequestParameters,
+                      ConfigurationParameters configurationParameters) = 0;
 
     /**
      * @brief Virtual method to send a GET request to a URL.
-     * @param url URL to send the request.
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     *
+     * @param requestParameters Parameters to be used in the request. Mandatory.
+     * @param postRequestParameters Parameters that define the behavior after the request is made.
+     * @param configurationParameters Parameters to configure the behavior of the request..
      */
-    virtual void get(
-        const URL& url,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
+    virtual void get(RequestParameters requestParameters,
+                     PostRequestParameters postRequestParameters,
+                     ConfigurationParameters configurationParameters) = 0;
 
     /**
      * @brief Virtual method to send a UPDATE request to a URL.
-     * @param url URL to send the request.
-     * @param data Data to sendi (nlohmann::json).
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     *
+     * @param requestParameters Parameters to be used in the request. Mandatory.
+     * @param postRequestParameters Parameters that define the behavior after the request is made.
+     * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    virtual void put(
-        const URL& url,
-        const nlohmann::json& data,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
-
-    /**
-     * @brief Virtual method to send a UPDATE request to a URL.
-     * @param url URL to send the request.
-     * @param data Data to send (string).
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
-     */
-    virtual void put(
-        const URL& url,
-        const std::string& data,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
+    virtual void put(RequestParameters requestParameters,
+                     PostRequestParameters postRequestParameters,
+                     ConfigurationParameters configurationParameters) = 0;
 
     /**
      * @brief Virtual method to send a PATCH request to a URL.
      *
-     * @param url URL to send the request.
-     * @param data Data to send (nlohmann::json).
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     * @param requestParameters Parameters to be used in the request. Mandatory.
+     * @param postRequestParameters Parameters that define the behavior after the request is made.
+     * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    virtual void patch(
-        const URL& url,
-        const nlohmann::json& data,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
-
-    /**
-     * @brief Virtual method to send a PATCH request to a URL.
-     *
-     * @param url URL to send the request.
-     * @param data Data to send (string).
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
-     */
-    virtual void patch(
-        const URL& url,
-        const std::string& data,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
+    virtual void patch(RequestParameters requestParameters,
+                       PostRequestParameters postRequestParameters,
+                       ConfigurationParameters configurationParameters) = 0;
 
     /**
      * @brief Virtual method to send a DELETE request to a URL.
-     * @param url URL to send the request.
-     * @param onSuccess Callback to be called when the request is successful.
-     * @param onError Callback to be called when an error occurs.
-     * @param fileName File name of output file.
-     * @param httpHeaders Headers to be added to the query.
-     * @param secureCommunication Secure communication object.
-     * @param userAgent User agent to be used in the request.
-     * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
-     * @param shouldRun Flag used to interrupt the handler when the 'handlerType' is set to 'MULTI'.
+     *
+     * @param requestParameters Parameters to be used in the request. Mandatory.
+     * @param postRequestParameters Parameters that define the behavior after the request is made.
+     * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    virtual void delete_(
-        const URL& url,
-        std::function<void(const std::string&)> onSuccess,
-        std::function<void(const std::string&, const long)> onError = [](auto, auto) {},
-        const std::string& fileName = "",
-        const std::unordered_set<std::string>& httpHeaders = DEFAULT_HEADERS,
-        const SecureCommunication& secureCommunication = {},
-        const std::string& userAgent = {},
-        const CurlHandlerTypeEnum& handlerType = CurlHandlerTypeEnum::SINGLE,
-        const std::atomic<bool>& shouldRun = true) = 0;
+    virtual void delete_(RequestParameters requestParameters,
+                         PostRequestParameters postRequestParameters,
+                         ConfigurationParameters configurationParameters) = 0;
 };
 
 #endif // _URL_REQUEST_HPP
