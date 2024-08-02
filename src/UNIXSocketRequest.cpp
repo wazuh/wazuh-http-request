@@ -73,9 +73,9 @@ void UNIXSocketRequest::post(RequestParameters requestParameters,
 
     try
     {
-        std::string data = std::holds_alternative<std::string>(requestParameters.data)
-                               ? std::get<std::string>(requestParameters.data)
-                               : std::get<nlohmann::json>(requestParameters.data).dump();
+        const std::string data = std::holds_alternative<std::string>(requestParameters.data)
+                                     ? std::get<std::string>(requestParameters.data)
+                                     : std::get<nlohmann::json>(requestParameters.data).dump();
 
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
@@ -154,9 +154,9 @@ void UNIXSocketRequest::put(RequestParameters requestParameters,
 
     try
     {
-        std::string data = std::holds_alternative<std::string>(requestParameters.data)
-                               ? std::get<std::string>(requestParameters.data)
-                               : std::get<nlohmann::json>(requestParameters.data).dump();
+        const std::string data = std::holds_alternative<std::string>(requestParameters.data)
+                                     ? std::get<std::string>(requestParameters.data)
+                                     : std::get<nlohmann::json>(requestParameters.data).dump();
 
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
@@ -197,9 +197,9 @@ void UNIXSocketRequest::patch(RequestParameters requestParameters,
 
     try
     {
-        std::string data = std::holds_alternative<std::string>(requestParameters.data)
-                               ? std::get<std::string>(requestParameters.data)
-                               : std::get<nlohmann::json>(requestParameters.data).dump();
+        const std::string data = std::holds_alternative<std::string>(requestParameters.data)
+                                     ? std::get<std::string>(requestParameters.data)
+                                     : std::get<nlohmann::json>(requestParameters.data).dump();
 
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
@@ -227,7 +227,6 @@ void UNIXSocketRequest::delete_(RequestParameters requestParameters,
 {
     // Request parameters
     const auto& url {requestParameters.url};
-    std::string data;
     const auto& secureCommunication {requestParameters.secureCommunication};
     const auto& httpHeaders {requestParameters.httpHeaders};
     // Post request parameters

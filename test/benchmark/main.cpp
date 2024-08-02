@@ -130,7 +130,7 @@ static void BM_Patch(benchmark::State& state)
     for (auto _ : state)
     {
         HTTPRequest::instance().patch(
-            RequestParameters {.url = HttpURL("http://localhost:44441/12345"), .data = R"({"foo": "bar"})"_json});
+            RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"foo": "bar"})"_json});
     }
 }
 BENCHMARK(BM_Patch);
