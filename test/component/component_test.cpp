@@ -18,6 +18,20 @@
 #include <map>
 #include <string>
 
+auto constexpr TEST_NET_IP {"192.0.2.1"};
+
+#define EXPECT_THROW_MESSAGE(statement, expectedMessage)                                                               \
+    try                                                                                                                \
+    {                                                                                                                  \
+        statement;                                                                                                     \
+        FAIL() << "Expected exception, but no exception was thrown.";                                                  \
+    }                                                                                                                  \
+    catch (const std::exception& e)                                                                                    \
+    {                                                                                                                  \
+        EXPECT_NE(std::string::npos, std::string(e.what()).find(expectedMessage))                                      \
+            << std::string("A different exception was thrown: ") + e.what();                                           \
+    }
+
 /**
  * @brief Test the get request.
  */
@@ -994,4 +1008,299 @@ TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
                                     ConfigurationParameters {.userAgent = userAgentValue});
 
     EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the DOWNLOAD request with timeout for SINGLE handler.
+ *
+ */
+TEST_F(ComponentTestInterface, DownloadTestTimeoutSingleHandler)
+{
+
+    EXPECT_THROW_MESSAGE(HTTPRequest::instance().download(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                                          PostRequestParameters {.outputFile = "./test1.txt"},
+                                                          ConfigurationParameters {.timeout = 10}),
+                         "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().download(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.onError = [](const std::string& result, const long _)
+                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+                                   .outputFile = "./test1.txt"},
+            ConfigurationParameters {.timeout = 10});
+    });
+}
+
+/**
+ * @brief Test the DOWNLOAD request with timeout for MULTI handler.
+ *
+ */
+TEST_F(ComponentTestInterface, DownloadTestTimeoutMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().download(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.outputFile = "./test1.txt"},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().download(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.onError = [](const std::string& result, const long _)
+                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+                                   .outputFile = "./test1.txt"},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+    });
+}
+
+/**
+ * @brief Test the GET request with timeout for SINGLE handler.
+ *
+ */
+TEST_F(ComponentTestInterface, GetTestTimeoutSingleHandler)
+{
+    EXPECT_THROW_MESSAGE(HTTPRequest::instance().get(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                                     PostRequestParameters {.outputFile = "./test1.txt"},
+                                                     ConfigurationParameters {.timeout = 10}),
+                         "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().get(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.onError = [](const std::string& result, const long _)
+                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+                                   .outputFile = "./test1.txt"},
+            ConfigurationParameters {.timeout = 10});
+    });
+}
+
+/**
+ * @brief Test the GET request with timeout for MULTI handler.
+ *
+ */
+TEST_F(ComponentTestInterface, GetTestTimeoutMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().get(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.outputFile = "./test1.txt"},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().get(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.onError = [](const std::string& result, const long _)
+                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+                                   .outputFile = "./test1.txt"},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+    });
+}
+
+/**
+ * @brief Test the PUT request with timeout for SINGLE handler.
+ *
+ */
+TEST_F(ComponentTestInterface, PutTestTimeoutSingleHandler)
+{
+    EXPECT_THROW_MESSAGE(HTTPRequest::instance().put(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                                     PostRequestParameters {},
+                                                     ConfigurationParameters {.timeout = 10}),
+                         "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().put(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10});
+    });
+}
+
+/**
+ * @brief Test the PUT request with timeout for MULTI handler.
+ *
+ */
+TEST_F(ComponentTestInterface, PutTestTimeoutMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().put(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().put(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+    });
+}
+
+/**
+ * @brief Test the PATCH request with timeout for SINGLE handler.
+ *
+ */
+TEST_F(ComponentTestInterface, PatchTestTimeoutSingleHandler)
+{
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().patch(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                      PostRequestParameters {},
+                                      ConfigurationParameters {.timeout = 10}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().patch(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10});
+    });
+}
+
+/**
+ * @brief Test the PATCH request with timeout for MULTI handler.
+ *
+ */
+TEST_F(ComponentTestInterface, PatchTestTimeoutMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().patch(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().patch(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+    });
+}
+
+/**
+ * @brief Test the DELETE request with timeout for SINGLE handler.
+ *
+ */
+TEST_F(ComponentTestInterface, DeleteTestTimeoutSingleHandler)
+{
+    EXPECT_THROW_MESSAGE(HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                                         PostRequestParameters {},
+                                                         ConfigurationParameters {.timeout = 10}),
+                         "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().delete_(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10});
+    });
+}
+
+/**
+ * @brief Test the DELETE request with timeout for MULTI handler.
+ *
+ */
+TEST_F(ComponentTestInterface, DeleteTestTimeoutMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().delete_(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().delete_(
+            RequestParameters {.url = HttpURL(TEST_NET_IP)},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+    });
+}
+
+/**
+ * @brief Test the POST request with timeout for SINGLE handler.
+ *
+ */
+TEST_F(ComponentTestInterface, PostTestTimeoutSingleHandler)
+{
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().post(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                     PostRequestParameters {},
+                                     ConfigurationParameters {.timeout = 10});
+        , "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().post(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10});
+    });
+}
+
+/**
+ * @brief Test the POST request with timeout for MULTI handler.
+ *
+ */
+TEST_F(ComponentTestInterface, PostTestTimeoutMultiHandler)
+{
+    std::atomic<bool> shouldRun {true};
+
+    EXPECT_THROW_MESSAGE(
+        HTTPRequest::instance().post(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
+        "Timeout was reached");
+
+    EXPECT_NO_THROW({
+        HTTPRequest::instance().post(
+            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+            PostRequestParameters {.onError =
+                                       [](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                   }},
+            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+    });
 }

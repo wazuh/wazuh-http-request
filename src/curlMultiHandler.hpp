@@ -13,6 +13,8 @@
 #define _CURL_MULTI_HANDLER_HPP
 
 #include "ICURLHandler.hpp"
+#include "curl.h"
+#include "curlException.hpp"
 #include "customDeleter.hpp"
 #include <atomic>
 #include <memory>
@@ -72,7 +74,8 @@ public:
 
         if (multiCode != CURLM_OK)
         {
-            throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_add_handle");
+            throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_add_handle: " +
+                                     std::string(curl_multi_strerror(multiCode)));
         }
 
         do
@@ -82,7 +85,8 @@ public:
 
             if (multiCode != CURLM_OK)
             {
-                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_perform");
+                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_perform: " +
+                                         std::string(curl_multi_strerror(multiCode)));
             }
 
             int fileDescriptors;
@@ -95,17 +99,26 @@ public:
                                         &fileDescriptors);
             if (multiCode != CURLM_OK)
             {
-                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_wait");
+                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_wait: " +
+                                         std::string(curl_multi_strerror(multiCode)));
             }
         } while (stillRunning && m_shouldRun.load());
 
-        long responseCode;
-        const auto resGetInfo {curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode)};
-
-        if (resGetInfo != CURLE_OK)
+        struct CURLMsg* multiHandleMessages;
+        do
         {
-            throw std::runtime_error("cURLMultiHandler::execute() failed: Couldn't get HTTP response code");
-        }
+            int messagesQueueIndex = 0;
+            multiHandleMessages = curl_multi_info_read(m_curlMultiHandler.get(), &messagesQueueIndex);
+            if (multiHandleMessages && (multiHandleMessages->msg == CURLMSG_DONE))
+            {
+                auto errorCode = multiHandleMessages->data.result;
+                if (errorCode != CURLE_OK)
+                {
+                    throw Curl::CurlException(
+                        "cURLMultiHandler::execute() failed: " + std::string(curl_easy_strerror(errorCode)), errorCode);
+                }
+            }
+        } while (multiHandleMessages);
     }
 };
 

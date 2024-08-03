@@ -38,6 +38,7 @@ public:
         , m_key {paramValueOf(argc, argv, "--key", {false, ""})}
         , m_username {paramValueOf(argc, argv, "--username", {false, ""})}
         , m_password {paramValueOf(argc, argv, "--password", {false, ""})}
+        , m_timeout {std::stol(paramValueOf(argc, argv, "--timeout", {false, "0"}))}
     {
         auto postArgumentsFile {paramValueOf(argc, argv, "-p", {false, ""})};
 
@@ -135,12 +136,20 @@ public:
     }
 
     /**
+     * @brief Returns the timeout.
+     */
+    const long& timeout() const
+    {
+        return m_timeout;
+    }
+
+    /**
      * @brief Shows the help to the user.
      */
     static void showHelp()
     {
         std::cout
-            << "\nUsage: urlrequester_testtool <option(s)> SOURCES \n"
+            << "\nUsage: urlrequest_testtool <option(s)> SOURCES \n"
             << "Options:\n"
             << "\t-h \t\t\tShow this help message\n"
             << "\t-u URL_ADDRESS\t\tSpecifies the URL of the file to download or the RESTful address.\n"
@@ -154,15 +163,17 @@ public:
             << "\t--key KEY\t\tSpecifies the key file to use in the request.\n"
             << "\t--username USERNAME\tSpecifies the username to use in the request.\n"
             << "\t--password PASSWORD\tSpecifies the password to use in the request.\n"
+            << "\t--timeout TIMEOUT\tSpecifies the timeout in miliseconds for the request.\n"
             << "\nExample:"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t download -o out \n"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get\n"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/post -t post -p input.json\n"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/put -t put -p input.json\n"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/delete -t delete\n"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get -H \"Authorization: Bearer token\"\n"
-            << "\n\t./urlrequester_testtool -u https://httpbin.org/get -t get --cacert cacert.pem --cert cert.pem "
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t download -o out \n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t get\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/post -t post -p input.json\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/put -t put -p input.json\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/delete -t delete\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t get -H \"Authorization: Bearer token\"\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t get --cacert cacert.pem --cert cert.pem "
                "--key key.pem --username admin --password admin\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/delay/10 -t get --timeout 1000\n"
             << std::endl;
     }
 
@@ -201,6 +212,7 @@ private:
     const std::string m_key;
     const std::string m_username;
     const std::string m_password;
+    const long m_timeout;
 };
 
 #endif // _CMD_ARGS_PARSER_HPP_

@@ -165,6 +165,12 @@ struct RequestParameters
 struct ConfigurationParameters
 {
     /**
+     * @brief Maximum time in miliseconds that the request is allowed to take.
+     *
+     */
+    const long timeout = 0;
+
+    /**
      * @brief Type of the cURL handler. Default is 'SINGLE'.
      *
      */
@@ -201,8 +207,7 @@ struct PostRequestParameters
      * @brief Callback to be called when an error occurs.
      *
      */
-    std::function<void(const std::string&, const long)> onError = [](auto, auto) {
-    };
+    std::function<void(const std::string&, const long)> onError = {};
 
     /**
      * @brief File name of to store the output data.
