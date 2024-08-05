@@ -16,8 +16,12 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
+#include <filesystem>
 #include <memory>
 #include <string>
+
+auto constexpr TEST_FILE_1 {"test1.txt"};
+auto constexpr TEST_FILE_2 {"test2.txt"};
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -155,6 +159,16 @@ protected:
     void SetUp() override
     {
         m_callbackComplete = false;
+    }
+
+    /**
+     * @brief This method removes the testing files after each test execution.
+     *
+     */
+    void TearDown() override
+    {
+        std::filesystem::remove(TEST_FILE_1);
+        std::filesystem::remove(TEST_FILE_2);
     }
 
     /**
