@@ -47,6 +47,7 @@ public:
      * @param outputFile Output file.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit DownloadAction(const std::string& url,
                             const std::string& outputFile,
@@ -97,6 +98,7 @@ public:
      * @param url URL to perform the GET request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit GetAction(const std::string& url,
                        const std::unordered_set<std::string>& headers,
@@ -147,6 +149,7 @@ public:
      * @param data Data to send in the POST request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit PostAction(const std::string& url,
                         const nlohmann::json& data,
@@ -201,6 +204,7 @@ public:
      * @param data Data to send in the PUT request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit PutAction(const std::string& url,
                        const nlohmann::json& data,
@@ -257,6 +261,7 @@ public:
      * @param data Data to send in the PATCH request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit PatchAction(const std::string& url,
                          const nlohmann::json& data,
@@ -310,6 +315,7 @@ public:
      * @param url URL to perform the DELETE request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit DeleteAction(const std::string& url,
                           const std::unordered_set<std::string>& headers,
