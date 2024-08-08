@@ -4,6 +4,8 @@ project(urlrequest_unit_test)
 file(GLOB URL_REQUEST_UNIT_TEST_SRC *.cpp)
 
 add_executable(urlrequest_unit_test ${URL_REQUEST_UNIT_TEST_SRC})
+target_compile_options(urlrequest_unit_test PUBLIC "-fsanitize=address")
+target_link_options(urlrequest_unit_test PUBLIC "-fsanitize=address")
 target_link_libraries(urlrequest_unit_test urlrequest
     gtest
     gmock
@@ -11,4 +13,4 @@ target_link_libraries(urlrequest_unit_test urlrequest
     gmock_main)
 
 add_test(NAME urlrequest_unit_test
-         COMMAND urlrequest_unit_test)
+    COMMAND urlrequest_unit_test)
