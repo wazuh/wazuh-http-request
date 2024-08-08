@@ -321,7 +321,7 @@ void UNIXSocketRequest::delete_(RequestParameters requestParameters,
 
     try
     {
-        auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
+        auto req {DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
             .timeout(timeout)
