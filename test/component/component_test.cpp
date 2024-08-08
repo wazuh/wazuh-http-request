@@ -20,18 +20,6 @@
 
 auto constexpr TEST_NET_IP {"192.0.2.1"};
 
-#define EXPECT_THROW_MESSAGE(statement, expectedMessage)                                                               \
-    try                                                                                                                \
-    {                                                                                                                  \
-        statement;                                                                                                     \
-        FAIL() << "Expected exception, but no exception was thrown.";                                                  \
-    }                                                                                                                  \
-    catch (const std::exception& e)                                                                                    \
-    {                                                                                                                  \
-        EXPECT_NE(std::string::npos, std::string(e.what()).find(expectedMessage))                                      \
-            << std::string("A different exception was thrown: ") + e.what();                                           \
-    }
-
 /* Helpers */
 
 void checkFileContent(const std::string& file, const std::string& expectedContent)
@@ -60,6 +48,10 @@ void checkEmptyFile(const std::string& file)
 
     std::ifstream fileStream;
     fileStream.open(file, std::ios::binary);
+    if (!fileStream.is_open())
+    {
+        FAIL() << "Error opening file: " << file;
+    }
     fileStream.seekg(0, std::ios::end);
     auto fileSize = fileStream.tellg();
     fileStream.close();
@@ -196,6 +188,7 @@ TEST_F(ComponentTestInterface, DownloadFileError)
                                                             .outputFile = TEST_FILE_1});
 
     EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -250,6 +243,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
                                      ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
     EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -257,13 +251,10 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("http://localhost:44441/")},
         PostRequestParameters {.outputFile = TEST_FILE_1},
-        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
 
     checkFileContent(TEST_FILE_1, "Hello World!");
 }
@@ -273,13 +264,12 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
  */
 TEST_F(ComponentTestInterface, InterruptMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {false};
+    m_shouldRun.store(false);
 
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("http://localhost:44441/")},
         PostRequestParameters {.outputFile = TEST_FILE_1},
-        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
 
     checkEmptyFile(TEST_FILE_1);
 }
@@ -290,33 +280,31 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
  */
 TEST_F(ComponentTestInterface, InterruptDownload)
 {
-    std::atomic<bool> shouldRun {true};
-
     auto sleepFirstHandler {std::to_string(10)};
     auto sleepSecondHandler {std::to_string(40)};
     auto intervalToInterruptTheHandler {20};
 
     std::thread thread1(
-        [&shouldRun, &sleepFirstHandler]()
+        [&]()
         {
             HTTPRequest::instance().download(
                 RequestParameters {.url = HttpURL("http://localhost:44441/sleep/" + sleepFirstHandler)},
                 PostRequestParameters {.outputFile = TEST_FILE_1},
-                ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+                ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
         });
 
     std::thread thread2(
-        [&shouldRun, &sleepSecondHandler]()
+        [&]()
         {
             HTTPRequest::instance().download(
                 RequestParameters {.url = HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler)},
                 PostRequestParameters {.outputFile = TEST_FILE_2},
-                ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+                ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
         });
 
     // Sleep interval to interrupt the second handler.
     std::this_thread::sleep_for(std::chrono::milliseconds(intervalToInterruptTheHandler));
-    shouldRun.store(false);
+    m_shouldRun.store(false);
 
     thread1.join();
     thread2.join();
@@ -331,23 +319,22 @@ TEST_F(ComponentTestInterface, InterruptDownload)
  */
 TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("")},
-        PostRequestParameters {.onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onError =
+                [&](const std::string& result, const long responseCode)
+            {
+                EXPECT_EQ(result, "cURLMultiHandler::execute() failed: URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, 3);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1},
-        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
 
     checkEmptyFile(TEST_FILE_1);
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -355,23 +342,22 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
         PostRequestParameters {.onError =
                                    [&](const std::string& result, const long responseCode)
                                {
-                                   EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
-                                   EXPECT_EQ(responseCode, -1);
+                                   EXPECT_EQ(result,
+                                             "cURLMultiHandler::execute() failed: HTTP response code said error");
+                                   EXPECT_EQ(responseCode, 22);
 
                                    m_callbackComplete = true;
                                },
                                .outputFile = TEST_FILE_1},
-        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
 
     EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -438,6 +424,7 @@ TEST_F(ComponentTestInterface, PostHelloWorldFileEmptyURL)
                                .outputFile = TEST_FILE_1});
 
     checkEmptyFile(TEST_FILE_1);
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -472,6 +459,7 @@ TEST_F(ComponentTestInterface, PutHelloWorldFileEmptyURL)
                                .outputFile = TEST_FILE_1});
 
     checkEmptyFile(TEST_FILE_1);
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -520,7 +508,7 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create()).url("").outputFile("test.txt").execute();
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create()).url("").outputFile(TEST_FILE_1).execute();
     }
     catch (const std::exception& ex)
     {
@@ -703,20 +691,30 @@ TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
  */
 TEST_F(ComponentTestInternalParameters, MultipleThreads)
 {
+    const auto testTime {2};
+    std::atomic<bool> stopTest {false};
     std::vector<std::thread> threads;
     for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
     {
         threads.emplace_back(
-            []()
+            [&]()
             {
-                EXPECT_NO_THROW(GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
-                                    .url("http://localhost:44441/")
-                                    .execute());
+                do
+                {
+                    EXPECT_NO_THROW({
+                        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+                        req.url("http://localhost:44441/").execute();
+
+                        EXPECT_STREQ(req.response().c_str(), "Hello World!");
+                    });
+                } while (!stopTest.load());
             });
 
         EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);
     }
 
+    std::this_thread::sleep_for(std::chrono::seconds(testTime));
+    stopTest.store(true);
     for (auto& thread : threads)
     {
         EXPECT_NO_THROW(thread.join());
@@ -728,24 +726,34 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
  * This test create multiple threads that exceed the size of the queue where each thread will create a cURLWrapper
  * object.
  */
-TEST_F(ComponentTestInternalParameters, MultipleThreadsWithMultHandlers)
+TEST_F(ComponentTestInternalParameters, MultipleThreadsWithMultiHandlers)
 {
+    const auto testTime {2};
+    std::atomic<bool> stopTest {false};
     std::vector<std::thread> threads;
-    std::atomic<bool> shouldRun {true};
 
     for (int i = 0; i < QUEUE_MAX_SIZE * 2; ++i)
     {
         threads.emplace_back(
-            [&shouldRun]()
+            [&]()
             {
-                EXPECT_NO_THROW(GetRequest::builder(
-                                    FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI, shouldRun))
-                                    .url("http://localhost:44441/")
-                                    .execute());
+                do
+                {
+                    EXPECT_NO_THROW({
+                        auto req {GetRequest::builder(
+                            FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI, m_shouldRun))};
+                        req.url("http://localhost:44441/").execute();
+
+                        EXPECT_STREQ(req.response().c_str(), "Hello World!");
+                    });
+                } while (!stopTest.load());
             });
 
         EXPECT_LE(cURLHandlerCache::instance().size(), QUEUE_MAX_SIZE);
     }
+
+    std::this_thread::sleep_for(std::chrono::seconds(testTime));
+    stopTest.store(true);
     for (auto& thread : threads)
     {
         EXPECT_NO_THROW(thread.join());
@@ -1004,20 +1012,34 @@ TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
  */
 TEST_F(ComponentTestInterface, DownloadTestTimeoutSingleHandler)
 {
-
-    EXPECT_THROW_MESSAGE(HTTPRequest::instance().download(RequestParameters {.url = HttpURL(TEST_NET_IP)},
-                                                          PostRequestParameters {.outputFile = TEST_FILE_1},
-                                                          ConfigurationParameters {.timeout = 10}),
-                         "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().download(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                         PostRequestParameters {.outputFile = TEST_FILE_1},
+                                         ConfigurationParameters {.timeout = 10});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().download(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {.onError = [](const std::string& result, const long _)
-                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+            PostRequestParameters {.onError =
+                                       [&](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
+                                   },
                                    .outputFile = TEST_FILE_1},
             ConfigurationParameters {.timeout = 10});
     });
+
+    EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -1026,24 +1048,36 @@ TEST_F(ComponentTestInterface, DownloadTestTimeoutSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadTestTimeoutMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
-    EXPECT_THROW_MESSAGE(
-        HTTPRequest::instance().download(
-            RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {.outputFile = TEST_FILE_1},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
-        "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().download(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                         PostRequestParameters {.outputFile = TEST_FILE_1},
+                                         ConfigurationParameters {.timeout = 10,
+                                                                  .handlerType = CurlHandlerTypeEnum::MULTI,
+                                                                  .shouldRun = m_shouldRun});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().download(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {.onError = [](const std::string& result, const long _)
-                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+            PostRequestParameters {.onError =
+                                       [&](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
+                                   },
                                    .outputFile = TEST_FILE_1},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+            ConfigurationParameters {
+                .timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
     });
+    EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -1052,19 +1086,33 @@ TEST_F(ComponentTestInterface, DownloadTestTimeoutMultiHandler)
  */
 TEST_F(ComponentTestInterface, GetTestTimeoutSingleHandler)
 {
-    EXPECT_THROW_MESSAGE(HTTPRequest::instance().get(RequestParameters {.url = HttpURL(TEST_NET_IP)},
-                                                     PostRequestParameters {.outputFile = TEST_FILE_1},
-                                                     ConfigurationParameters {.timeout = 10}),
-                         "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().get(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                    PostRequestParameters {.outputFile = TEST_FILE_1},
+                                    ConfigurationParameters {.timeout = 10});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().get(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {.onError = [](const std::string& result, const long _)
-                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+            PostRequestParameters {.onError =
+                                       [&](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
+                                   },
                                    .outputFile = TEST_FILE_1},
             ConfigurationParameters {.timeout = 10});
     });
+    EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -1073,24 +1121,36 @@ TEST_F(ComponentTestInterface, GetTestTimeoutSingleHandler)
  */
 TEST_F(ComponentTestInterface, GetTestTimeoutMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
-    EXPECT_THROW_MESSAGE(
-        HTTPRequest::instance().get(
-            RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {.outputFile = TEST_FILE_1},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
-        "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().get(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                    PostRequestParameters {.outputFile = TEST_FILE_1},
+                                    ConfigurationParameters {.timeout = 10,
+                                                             .handlerType = CurlHandlerTypeEnum::MULTI,
+                                                             .shouldRun = m_shouldRun});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().get(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {.onError = [](const std::string& result, const long _)
-                                   { EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result; },
+            PostRequestParameters {.onError =
+                                       [&](const std::string& result, const long _)
+                                   {
+                                       EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
+                                   },
                                    .outputFile = TEST_FILE_1},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+            ConfigurationParameters {
+                .timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
     });
+    EXPECT_TRUE(m_callbackComplete);
+    checkEmptyFile(TEST_FILE_1);
 }
 
 /**
@@ -1099,21 +1159,31 @@ TEST_F(ComponentTestInterface, GetTestTimeoutMultiHandler)
  */
 TEST_F(ComponentTestInterface, PutTestTimeoutSingleHandler)
 {
-    EXPECT_THROW_MESSAGE(HTTPRequest::instance().put(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
-                                                     PostRequestParameters {},
-                                                     ConfigurationParameters {.timeout = 10}),
-                         "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().put(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                    PostRequestParameters {},
+                                    ConfigurationParameters {.timeout = 10});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().put(
             RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
             ConfigurationParameters {.timeout = 10});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1122,26 +1192,34 @@ TEST_F(ComponentTestInterface, PutTestTimeoutSingleHandler)
  */
 TEST_F(ComponentTestInterface, PutTestTimeoutMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
-    EXPECT_THROW_MESSAGE(
-        HTTPRequest::instance().put(
-            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
-            PostRequestParameters {},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
-        "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().put(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                    PostRequestParameters {},
+                                    ConfigurationParameters {.timeout = 10,
+                                                             .handlerType = CurlHandlerTypeEnum::MULTI,
+                                                             .shouldRun = m_shouldRun});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().put(
             RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+            ConfigurationParameters {
+                .timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1150,22 +1228,31 @@ TEST_F(ComponentTestInterface, PutTestTimeoutMultiHandler)
  */
 TEST_F(ComponentTestInterface, PatchTestTimeoutSingleHandler)
 {
-    EXPECT_THROW_MESSAGE(
+    try
+    {
         HTTPRequest::instance().patch(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
                                       PostRequestParameters {},
-                                      ConfigurationParameters {.timeout = 10}),
-        "Timeout was reached");
+                                      ConfigurationParameters {.timeout = 10});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().patch(
             RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
             ConfigurationParameters {.timeout = 10});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1174,26 +1261,34 @@ TEST_F(ComponentTestInterface, PatchTestTimeoutSingleHandler)
  */
 TEST_F(ComponentTestInterface, PatchTestTimeoutMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
-    EXPECT_THROW_MESSAGE(
-        HTTPRequest::instance().patch(
-            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
-            PostRequestParameters {},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
-        "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().patch(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                      PostRequestParameters {},
+                                      ConfigurationParameters {.timeout = 10,
+                                                               .handlerType = CurlHandlerTypeEnum::MULTI,
+                                                               .shouldRun = m_shouldRun});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().patch(
             RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+            ConfigurationParameters {
+                .timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1202,21 +1297,31 @@ TEST_F(ComponentTestInterface, PatchTestTimeoutMultiHandler)
  */
 TEST_F(ComponentTestInterface, DeleteTestTimeoutSingleHandler)
 {
-    EXPECT_THROW_MESSAGE(HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL(TEST_NET_IP)},
-                                                         PostRequestParameters {},
-                                                         ConfigurationParameters {.timeout = 10}),
-                         "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                        PostRequestParameters {},
+                                        ConfigurationParameters {.timeout = 10});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().delete_(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
             ConfigurationParameters {.timeout = 10});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1225,26 +1330,34 @@ TEST_F(ComponentTestInterface, DeleteTestTimeoutSingleHandler)
  */
 TEST_F(ComponentTestInterface, DeleteTestTimeoutMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
-    EXPECT_THROW_MESSAGE(
-        HTTPRequest::instance().delete_(
-            RequestParameters {.url = HttpURL(TEST_NET_IP)},
-            PostRequestParameters {},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
-        "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL(TEST_NET_IP)},
+                                        PostRequestParameters {},
+                                        ConfigurationParameters {.timeout = 10,
+                                                                 .handlerType = CurlHandlerTypeEnum::MULTI,
+                                                                 .shouldRun = m_shouldRun});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().delete_(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+            ConfigurationParameters {
+                .timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1253,22 +1366,31 @@ TEST_F(ComponentTestInterface, DeleteTestTimeoutMultiHandler)
  */
 TEST_F(ComponentTestInterface, PostTestTimeoutSingleHandler)
 {
-    EXPECT_THROW_MESSAGE(
+    try
+    {
         HTTPRequest::instance().post(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
                                      PostRequestParameters {},
                                      ConfigurationParameters {.timeout = 10});
-        , "Timeout was reached");
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().post(
             RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
             ConfigurationParameters {.timeout = 10});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1277,24 +1399,32 @@ TEST_F(ComponentTestInterface, PostTestTimeoutSingleHandler)
  */
 TEST_F(ComponentTestInterface, PostTestTimeoutMultiHandler)
 {
-    GTEST_SKIP() << "This test will wait until #63 is fixed";
-    std::atomic<bool> shouldRun {true};
-
-    EXPECT_THROW_MESSAGE(
-        HTTPRequest::instance().post(
-            RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
-            PostRequestParameters {},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun}),
-        "Timeout was reached");
+    try
+    {
+        HTTPRequest::instance().post(RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
+                                     PostRequestParameters {},
+                                     ConfigurationParameters {.timeout = 10,
+                                                              .handlerType = CurlHandlerTypeEnum::MULTI,
+                                                              .shouldRun = m_shouldRun});
+        FAIL() << "Expected exception, but no exception was thrown.";
+    }
+    catch (const std::exception& e)
+    {
+        EXPECT_NE(std::string::npos, std::string(e.what()).find("Timeout was reached"))
+            << std::string("A different exception was thrown: ") + e.what();
+    }
 
     EXPECT_NO_THROW({
         HTTPRequest::instance().post(
             RequestParameters {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
+                                       m_callbackComplete = true;
                                    }},
-            ConfigurationParameters {.timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
+            ConfigurationParameters {
+                .timeout = 10, .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
     });
+    EXPECT_TRUE(m_callbackComplete);
 }
