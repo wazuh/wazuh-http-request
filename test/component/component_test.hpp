@@ -154,6 +154,10 @@ protected:
      * @brief This variable is used as a flag to indicate if all the callbacks have been called.
      */
     bool m_callbackComplete = false;
+
+    /**
+     * @brief This variable is used as a flag to indicate if the test should run.
+     */
     std::atomic<bool> m_shouldRun {true};
 
     virtual ~ComponentTest() = default;
