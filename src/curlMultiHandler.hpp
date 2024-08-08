@@ -53,11 +53,7 @@ public:
     }
 
     // LCOV_EXCL_START
-    ~cURLMultiHandler() override
-    {
-        curl_multi_remove_handle(m_curlMultiHandler.get(), m_curlHandler.get());
-        curl_global_cleanup();
-    }
+    ~cURLMultiHandler() override = default;
     // LCOV_EXCL_STOP
 
     /**
@@ -67,58 +63,79 @@ public:
      */
     void execute() override
     {
-        int stillRunning {1};
-
-        // Adds the single-handler to the multi-handler
-        auto multiCode {curl_multi_add_handle(m_curlMultiHandler.get(), m_curlHandler.get())};
-
-        if (multiCode != CURLM_OK)
+        try
         {
-            throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_add_handle: " +
-                                     std::string(curl_multi_strerror(multiCode)));
+            int stillRunning {1};
+
+            // Adds the single-handler to the multi-handler
+            auto multiCode {curl_multi_add_handle(m_curlMultiHandler.get(), m_curlHandler.get())};
+
+            if (multiCode != CURLM_OK)
+            {
+                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_add_handle: " +
+                                         std::string(curl_multi_strerror(multiCode)));
+            }
+
+            do
+            {
+                // Performs transfers on the added single-handler
+                multiCode = curl_multi_perform(m_curlMultiHandler.get(), &stillRunning);
+
+                if (multiCode != CURLM_OK)
+                {
+                    throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_perform: " +
+                                             std::string(curl_multi_strerror(multiCode)));
+                }
+
+                int fileDescriptors;
+
+                // Waits until activity is detected or `CURL_MULTI_HANDLER_TIMEOUT_MS` has passed
+                multiCode = curl_multi_wait(m_curlMultiHandler.get(),
+                                            nullptr,
+                                            CURL_MULTI_HANDLER_EXTRA_FDS,
+                                            CURL_MULTI_HANDLER_TIMEOUT_MS,
+                                            &fileDescriptors);
+                if (multiCode != CURLM_OK)
+                {
+                    throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_wait: " +
+                                             std::string(curl_multi_strerror(multiCode)));
+                }
+            } while (stillRunning && m_shouldRun.load());
+
+            struct CURLMsg* multiHandleMessages = nullptr;
+            do
+            {
+                int messagesQueueIndex = 0;
+                multiHandleMessages = curl_multi_info_read(m_curlMultiHandler.get(), &messagesQueueIndex);
+
+                if (multiHandleMessages && (multiHandleMessages->msg == CURLMSG_DONE))
+                {
+                    auto errorCode = multiHandleMessages->data.result;
+                    if (errorCode != CURLE_OK)
+                    {
+                        throw Curl::CurlException("cURLMultiHandler::execute() failed: " +
+                                                      std::string(curl_easy_strerror(errorCode)),
+                                                  errorCode);
+                    }
+                }
+            } while (multiHandleMessages);
+        }
+        catch (const std::exception& e)
+        {
+            curl_multi_remove_handle(m_curlMultiHandler.get(), m_curlHandler.get());
+            curl_easy_reset(m_curlHandler.get());
+            throw;
         }
 
-        do
+        // Resets the single-handler. Removing it first is required.
+        auto multiRemoveCode {curl_multi_remove_handle(m_curlMultiHandler.get(), m_curlHandler.get())};
+        if (multiRemoveCode != CURLM_OK)
         {
-            // Performs transfers on the added single-handler
-            multiCode = curl_multi_perform(m_curlMultiHandler.get(), &stillRunning);
+            throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_remove_handle: " +
+                                     std::string(curl_multi_strerror(multiRemoveCode)));
+        }
 
-            if (multiCode != CURLM_OK)
-            {
-                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_perform: " +
-                                         std::string(curl_multi_strerror(multiCode)));
-            }
-
-            int fileDescriptors;
-
-            // Waits until activity is detected or `CURL_MULTI_HANDLER_TIMEOUT_MS` has passed
-            multiCode = curl_multi_wait(m_curlMultiHandler.get(),
-                                        nullptr,
-                                        CURL_MULTI_HANDLER_EXTRA_FDS,
-                                        CURL_MULTI_HANDLER_TIMEOUT_MS,
-                                        &fileDescriptors);
-            if (multiCode != CURLM_OK)
-            {
-                throw std::runtime_error("cURLMultiHandler::execute() failed: curl_multi_wait: " +
-                                         std::string(curl_multi_strerror(multiCode)));
-            }
-        } while (stillRunning && m_shouldRun.load());
-
-        struct CURLMsg* multiHandleMessages;
-        do
-        {
-            int messagesQueueIndex = 0;
-            multiHandleMessages = curl_multi_info_read(m_curlMultiHandler.get(), &messagesQueueIndex);
-            if (multiHandleMessages && (multiHandleMessages->msg == CURLMSG_DONE))
-            {
-                auto errorCode = multiHandleMessages->data.result;
-                if (errorCode != CURLE_OK)
-                {
-                    throw Curl::CurlException(
-                        "cURLMultiHandler::execute() failed: " + std::string(curl_easy_strerror(errorCode)), errorCode);
-                }
-            }
-        } while (multiHandleMessages);
+        curl_easy_reset(m_curlHandler.get());
     }
 };
 
