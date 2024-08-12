@@ -23,12 +23,12 @@
  */
 TEST_F(ComponentTestInterface, GetHelloWorld)
 {
-    HTTPRequest::instance().get(HttpURL("http://localhost:44441/"),
-                                [&](const std::string& result)
-                                {
-                                    EXPECT_EQ(result, "Hello World!");
-                                    m_callbackComplete = true;
-                                });
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                       {
+                                                           EXPECT_EQ(result, "Hello World!");
+                                                           m_callbackComplete = true;
+                                                       }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -38,12 +38,12 @@ TEST_F(ComponentTestInterface, GetHelloWorld)
  */
 TEST_F(ComponentTestInterface, GetHelloWorldRedirection)
 {
-    HTTPRequest::instance().get(HttpURL("http://localhost:44441/redirect"),
-                                [&](const std::string& result)
-                                {
-                                    EXPECT_EQ(result, "Hello World!");
-                                    m_callbackComplete = true;
-                                });
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/redirect")},
+                                PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                       {
+                                                           EXPECT_EQ(result, "Hello World!");
+                                                           m_callbackComplete = true;
+                                                       }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -53,13 +53,13 @@ TEST_F(ComponentTestInterface, GetHelloWorldRedirection)
  */
 TEST_F(ComponentTestInterface, PostHelloWorld)
 {
-    HTTPRequest::instance().post(HttpURL("http://localhost:44441/"),
-                                 R"({"hello":"world"})"_json,
-                                 [&](const std::string& result)
-                                 {
-                                     EXPECT_EQ(result, R"({"hello":"world"})");
-                                     m_callbackComplete = true;
-                                 });
+    HTTPRequest::instance().post(
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess = [&](const std::string& result)
+                               {
+                                   EXPECT_EQ(result, R"({"hello":"world"})");
+                                   m_callbackComplete = true;
+                               }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -69,13 +69,13 @@ TEST_F(ComponentTestInterface, PostHelloWorld)
  */
 TEST_F(ComponentTestInterface, PutHelloWorld)
 {
-    HTTPRequest::instance().put(HttpURL("http://localhost:44441/"),
-                                R"({"hello":"world"})"_json,
-                                [&](const std::string& result)
-                                {
-                                    EXPECT_EQ(result, R"({"hello":"world"})");
-                                    m_callbackComplete = true;
-                                });
+    HTTPRequest::instance().put(
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess = [&](const std::string& result)
+                               {
+                                   EXPECT_EQ(result, R"({"hello":"world"})");
+                                   m_callbackComplete = true;
+                               }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -87,12 +87,12 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
 {
     auto random {std::to_string(std::rand())};
 
-    HTTPRequest::instance().delete_(HttpURL("http://localhost:44441/" + random),
-                                    [&](const std::string& result)
-                                    {
-                                        EXPECT_EQ(result, random);
-                                        m_callbackComplete = true;
-                                    });
+    HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL("http://localhost:44441/" + random)},
+                                    PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                           {
+                                                               EXPECT_EQ(result, random);
+                                                               m_callbackComplete = true;
+                                                           }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -102,7 +102,8 @@ TEST_F(ComponentTestInterface, DeleteRandomID)
  */
 TEST_F(ComponentTestInterface, DownloadFile)
 {
-    HTTPRequest::instance().download(HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {});
+    HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                     PostRequestParameters {.outputFile = "./test.txt"});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -115,15 +116,17 @@ TEST_F(ComponentTestInterface, DownloadFile)
  */
 TEST_F(ComponentTestInterface, DownloadFileEmptyURL)
 {
-    HTTPRequest::instance().download(HttpURL(""),
-                                     "./test.txt",
-                                     [&](const std::string& result, const long responseCode)
-                                     {
-                                         EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                         EXPECT_EQ(responseCode, -1);
+    HTTPRequest::instance().download(
+        RequestParameters {.url = HttpURL("")},
+        PostRequestParameters {.onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                                   EXPECT_EQ(responseCode, -1);
 
-                                         m_callbackComplete = true;
-                                     });
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./test.txt"});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -136,15 +139,16 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURL)
  */
 TEST_F(ComponentTestInterface, DownloadFileError)
 {
-    HTTPRequest::instance().download(HttpURL("http://localhost:44441/invalid_file"),
-                                     "./test.txt",
-                                     [&](const std::string& result, const long responseCode)
-                                     {
-                                         EXPECT_EQ(result, "HTTP response code said error");
-                                         EXPECT_EQ(responseCode, 404);
+    HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
+                                     PostRequestParameters {.onError =
+                                                                [&](const std::string& result, const long responseCode)
+                                                            {
+                                                                EXPECT_EQ(result, "HTTP response code said error");
+                                                                EXPECT_EQ(responseCode, 404);
 
-                                         m_callbackComplete = true;
-                                     });
+                                                                m_callbackComplete = true;
+                                                            },
+                                                            .outputFile = "./test.txt"});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -154,8 +158,9 @@ TEST_F(ComponentTestInterface, DownloadFileError)
  */
 TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
 {
-    HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, {}, {}, {}, CurlHandlerTypeEnum::SINGLE);
+    HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                     PostRequestParameters {.outputFile = "./test.txt"},
+                                     ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -169,19 +174,17 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheSingleHandler)
 TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
 {
     HTTPRequest::instance().download(
-        HttpURL(""),
-        "./test.txt",
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL("")},
+        PostRequestParameters {.onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        {},
-        {},
-        {},
-        CurlHandlerTypeEnum::SINGLE);
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./test.txt"},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -194,20 +197,17 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
 {
-    HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/invalid_file"),
-        "./test.txt",
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "HTTP response code said error");
-            EXPECT_EQ(responseCode, 404);
+    HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
+                                     PostRequestParameters {.onError =
+                                                                [&](const std::string& result, const long responseCode)
+                                                            {
+                                                                EXPECT_EQ(result, "HTTP response code said error");
+                                                                EXPECT_EQ(responseCode, 404);
 
-            m_callbackComplete = true;
-        },
-        {},
-        {},
-        {},
-        CurlHandlerTypeEnum::SINGLE);
+                                                                m_callbackComplete = true;
+                                                            },
+                                                            .outputFile = "./test.txt"},
+                                     ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -220,14 +220,9 @@ TEST_F(ComponentTestInterface, DownloadFileUsingTheMultiHandler)
     std::atomic<bool> shouldRun {true};
 
     HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/"),
-        "./test.txt",
-        [](auto, auto) {},
-        {},
-        {},
-        {},
-        CurlHandlerTypeEnum::MULTI,
-        shouldRun);
+        RequestParameters {.url = HttpURL("http://localhost:44441/")},
+        PostRequestParameters {.outputFile = "./test.txt"},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -243,14 +238,9 @@ TEST_F(ComponentTestInterface, InterruptMultiHandler)
     std::atomic<bool> shouldRun {false};
 
     HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/"),
-        "./test.txt",
-        [](auto, auto) {},
-        {},
-        {},
-        {},
-        CurlHandlerTypeEnum::MULTI,
-        shouldRun);
+        RequestParameters {.url = HttpURL("http://localhost:44441/")},
+        PostRequestParameters {.outputFile = "./test.txt"},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -274,28 +264,18 @@ TEST_F(ComponentTestInterface, InterruptDownload)
         [&shouldRun, &sleepFirstHandler]()
         {
             HTTPRequest::instance().download(
-                HttpURL("http://localhost:44441/sleep/" + sleepFirstHandler),
-                "./test1.txt",
-                [](auto, auto) {},
-                {},
-                {},
-                {},
-                CurlHandlerTypeEnum::MULTI,
-                shouldRun);
+                RequestParameters {.url = HttpURL("http://localhost:44441/sleep/" + sleepFirstHandler)},
+                PostRequestParameters {.outputFile = "./test1.txt"},
+                ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
         });
 
     std::thread thread2(
         [&shouldRun, &sleepSecondHandler]()
         {
             HTTPRequest::instance().download(
-                HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler),
-                "./test2.txt",
-                [](auto, auto) {},
-                {},
-                {},
-                {},
-                CurlHandlerTypeEnum::MULTI,
-                shouldRun);
+                RequestParameters {.url = HttpURL("http://localhost:44441/sleep/" + sleepSecondHandler)},
+                PostRequestParameters {.outputFile = "./test2.txt"},
+                ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
         });
 
     // Sleep interval to interrupt the second handler.
@@ -325,20 +305,17 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
     std::atomic<bool> shouldRun {true};
 
     HTTPRequest::instance().download(
-        HttpURL(""),
-        "./test.txt",
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL("")},
+        PostRequestParameters {.onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        {},
-        {},
-        {},
-        CurlHandlerTypeEnum::MULTI,
-        shouldRun);
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./test.txt"},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -354,20 +331,17 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
     std::atomic<bool> shouldRun {true};
 
     HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/invalid_file"),
-        "./test.txt",
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
+        PostRequestParameters {.onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "cURLMultiHandler::execute() failed: curl_multi_add_handle");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        {},
-        {},
-        {},
-        CurlHandlerTypeEnum::MULTI,
-        shouldRun);
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./test.txt"},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = shouldRun});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -377,11 +351,8 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
  */
 TEST_F(ComponentTestInterface, GetHelloWorldFile)
 {
-    HTTPRequest::instance().get(
-        HttpURL("http://localhost:44441/"),
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto, auto) {},
-        "./testGetHelloWorld.txt");
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                PostRequestParameters {.outputFile = "./testGetHelloWorld.txt"});
 
     std::ifstream file("./testGetHelloWorld.txt");
     std::string line;
@@ -395,16 +366,17 @@ TEST_F(ComponentTestInterface, GetHelloWorldFile)
 TEST_F(ComponentTestInterface, GetHelloWorldFileEmptyURL)
 {
     HTTPRequest::instance().get(
-        HttpURL(""),
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL("")},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        "./testGetHelloWorld.txt");
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./testGetHelloWorld.txt"});
 
     std::ifstream file("./testGetHelloWorld.txt");
     std::string line;
@@ -418,11 +390,9 @@ TEST_F(ComponentTestInterface, GetHelloWorldFileEmptyURL)
 TEST_F(ComponentTestInterface, PostHelloWorldFile)
 {
     HTTPRequest::instance().post(
-        HttpURL("http://localhost:44441/"),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto, auto) {},
-        "./testPostHelloWorld.txt");
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .outputFile = "./testPostHelloWorld.txt"});
 
     std::ifstream file("./testPostHelloWorld.txt");
     std::string line;
@@ -436,17 +406,17 @@ TEST_F(ComponentTestInterface, PostHelloWorldFile)
 TEST_F(ComponentTestInterface, PostHelloWorldFileEmptyURL)
 {
     HTTPRequest::instance().post(
-        HttpURL(""),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL(""), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        "./testPostHelloWorld.txt");
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./testPostHelloWorld.txt"});
 
     std::ifstream file("./testPostHelloWorld.txt");
     std::string line;
@@ -460,11 +430,9 @@ TEST_F(ComponentTestInterface, PostHelloWorldFileEmptyURL)
 TEST_F(ComponentTestInterface, PutHelloWorldFile)
 {
     HTTPRequest::instance().put(
-        HttpURL("http://localhost:44441/"),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto, auto) {},
-        "./testPutHelloWorld.txt");
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .outputFile = "./testPutHelloWorld.txt"});
 
     std::ifstream file("./testPutHelloWorld.txt");
     std::string line;
@@ -478,17 +446,17 @@ TEST_F(ComponentTestInterface, PutHelloWorldFile)
 TEST_F(ComponentTestInterface, PutHelloWorldFileEmptyURL)
 {
     HTTPRequest::instance().put(
-        HttpURL(""),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL(""), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        "./testPutHelloWorld.txt");
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./testPutHelloWorld.txt"});
 
     std::ifstream file("./testPutHelloWorld.txt");
     std::string line;
@@ -504,10 +472,9 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFile)
     auto random {std::to_string(std::rand())};
 
     HTTPRequest::instance().delete_(
-        HttpURL("http://localhost:44441/" + random),
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [](auto, auto) {},
-        "./testDeleteRandomID.txt");
+        RequestParameters {.url = HttpURL("http://localhost:44441/" + random)},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .outputFile = "./testDeleteRandomID.txt"});
 
     std::ifstream file("./testDeleteRandomID.txt");
     std::string line;
@@ -520,19 +487,18 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFile)
  */
 TEST_F(ComponentTestInterface, DeleteRandomIDFileEmptyURL)
 {
-    auto random {std::to_string(std::rand())};
-
     HTTPRequest::instance().delete_(
-        HttpURL(""),
-        [&](const std::string& result) { std::cout << result << std::endl; },
-        [&](const std::string& result, const long responseCode)
-        {
-            EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-            EXPECT_EQ(responseCode, -1);
+        RequestParameters {.url = HttpURL("")},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .onError =
+                                   [&](const std::string& result, const long responseCode)
+                               {
+                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                                   EXPECT_EQ(responseCode, -1);
 
-            m_callbackComplete = true;
-        },
-        "./testDeleteRandomID.txt");
+                                   m_callbackComplete = true;
+                               },
+                               .outputFile = "./testDeleteRandomID.txt"});
 
     std::ifstream file("./testDeleteRandomID.txt");
     std::string line;
@@ -790,16 +756,14 @@ TEST_F(ComponentTestInterface, GetWithCustomHeader)
     const std::string headerKey {"Custom-Key"};
     const std::string headerValue {"Custom-Value"};
 
-    HTTPRequest::instance().get(
-        HttpURL("http://localhost:44441/check-headers"),
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), headerValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {headerKey + ": " + headerValue});
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers"),
+                                                   .httpHeaders = {headerKey + ":" + headerValue}},
+                                PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                       {
+                                                           ASSERT_EQ(nlohmann::json::parse(result).at(headerKey),
+                                                                     headerValue);
+                                                           m_callbackComplete = true;
+                                                       }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -810,22 +774,23 @@ TEST_F(ComponentTestInterface, GetWithCustomHeader)
  */
 TEST_F(ComponentTestInterface, GetWithDefaultHeaders)
 {
-    HTTPRequest::instance().get(
-        HttpURL("http://localhost:44441/check-headers"),
-        [&](const std::string& result)
-        {
-            const std::map<std::string, std::string> defaultHeaders = {
-                {"Content-Type", "application/json"}, {"Accept", "application/json"}, {"Accept-Charset", "utf-8"}};
-            const auto response = nlohmann::json::parse(result);
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                       {
+                                                           const std::map<std::string, std::string> defaultHeaders = {
+                                                               {"Content-Type", "application/json"},
+                                                               {"Accept", "application/json"},
+                                                               {"Accept-Charset", "utf-8"}};
+                                                           const auto response = nlohmann::json::parse(result);
 
-            ASSERT_FALSE(response.empty());
-            for (const auto& [headerKey, headerValue] : defaultHeaders)
-            {
-                ASSERT_EQ(response.at(headerKey), headerValue);
-            }
+                                                           ASSERT_FALSE(response.empty());
+                                                           for (const auto& [headerKey, headerValue] : defaultHeaders)
+                                                           {
+                                                               ASSERT_EQ(response.at(headerKey), headerValue);
+                                                           }
 
-            m_callbackComplete = true;
-        });
+                                                           m_callbackComplete = true;
+                                                       }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -843,19 +808,16 @@ TEST_F(ComponentTestInterface, PostWithCustomHeaders)
     const std::string headerValueB {"Custom-Value-B"};
 
     HTTPRequest::instance().post(
-        HttpURL("http://localhost:44441/check-headers"),
-        std::string(),
-        [&](const std::string& result)
-        {
-            const auto response = nlohmann::json::parse(result);
+        RequestParameters {.url = HttpURL("http://localhost:44441/check-headers"),
+                           .httpHeaders = {headerKeyA + ":" + headerValueA, headerKeyB + ":" + headerValueB}},
+        PostRequestParameters {.onSuccess = [&](const std::string& result)
+                               {
+                                   const auto response = nlohmann::json::parse(result);
 
-            ASSERT_EQ(response.at(headerKeyA), headerValueA);
-            ASSERT_EQ(response.at(headerKeyB), headerValueB);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {headerKeyA + ":" + headerValueA, headerKeyB + ":" + headerValueB});
+                                   ASSERT_EQ(response.at(headerKeyA), headerValueA);
+                                   ASSERT_EQ(response.at(headerKeyB), headerValueB);
+                                   m_callbackComplete = true;
+                               }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -871,16 +833,13 @@ TEST_F(ComponentTestInterface, PutWithCustomHeaders)
     const std::string headerValue {"Custom-Value"};
 
     HTTPRequest::instance().put(
-        HttpURL("http://localhost:44441/check-headers"),
-        std::string(),
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), headerValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {headerKey + ":" + headerValue, headerKey + ":" + headerValue});
+        RequestParameters {.url = HttpURL("http://localhost:44441/check-headers"),
+                           .httpHeaders = {headerKey + ":" + headerValue, headerKey + ":" + headerValue}},
+        PostRequestParameters {.onSuccess = [&](const std::string& result)
+                               {
+                                   ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), headerValue);
+                                   m_callbackComplete = true;
+                               }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -900,13 +859,12 @@ TEST_F(ComponentTestInterface, PatchSimpleFunctionality)
     )"_json;
     expectedResponse["payload"] = postData;
 
-    HTTPRequest::instance().patch(HttpURL("http://localhost:44441/"),
-                                  postData,
-                                  [&](const std::string& response)
-                                  {
-                                      EXPECT_EQ(nlohmann::json::parse(response), expectedResponse);
-                                      m_callbackComplete = true;
-                                  });
+    HTTPRequest::instance().patch(RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = postData},
+                                  PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                         {
+                                                             EXPECT_EQ(nlohmann::json::parse(result), expectedResponse);
+                                                             m_callbackComplete = true;
+                                                         }});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -919,7 +877,9 @@ TEST_F(ComponentTestInterface, DownloadWithCustomUserAgent)
     const std::string userAgent {"Custom-User-Agent"};
 
     HTTPRequest::instance().download(
-        HttpURL("http://localhost:44441/"), "./test.txt", [](auto, auto) {}, DEFAULT_HEADERS, {}, userAgent);
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .httpHeaders = DEFAULT_HEADERS},
+        PostRequestParameters {.outputFile = "./test.txt"},
+        ConfigurationParameters {.userAgent = userAgent});
 
     std::ifstream file("./test.txt");
     std::string line;
@@ -936,18 +896,14 @@ TEST_F(ComponentTestInterface, PostWithCustomUserAgent)
     const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().post(
-        HttpURL("http://localhost:44441/check-headers"),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {},
-        {},
-        userAgentValue);
+        RequestParameters {.url = HttpURL("http://localhost:44441/check-headers"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {.userAgent = userAgentValue});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -961,18 +917,15 @@ TEST_F(ComponentTestInterface, GetWithCustomUserAgent)
     const std::string headerKey {"User-Agent"};
     const std::string userAgentValue {"Custom-User-Agent"};
 
-    HTTPRequest::instance().get(
-        HttpURL("http://localhost:44441/check-headers"),
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {},
-        {},
-        userAgentValue);
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           ASSERT_EQ(nlohmann::json::parse(result).at(headerKey),
+                                                                     userAgentValue);
+                                                           m_callbackComplete = true;
+                                                       }},
+                                ConfigurationParameters {.userAgent = userAgentValue});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -987,18 +940,14 @@ TEST_F(ComponentTestInterface, PutWithCustomUserAgent)
     const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().put(
-        HttpURL("http://localhost:44441/check-headers"),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {},
-        {},
-        userAgentValue);
+        RequestParameters {.url = HttpURL("http://localhost:44441/check-headers"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {.userAgent = userAgentValue});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -1013,18 +962,14 @@ TEST_F(ComponentTestInterface, PatchWithCustomUserAgent)
     const std::string userAgentValue {"Custom-User-Agent"};
 
     HTTPRequest::instance().patch(
-        HttpURL("http://localhost:44441/check-headers"),
-        R"({"hello":"world"})"_json,
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {},
-        {},
-        userAgentValue);
+        RequestParameters {.url = HttpURL("http://localhost:44441/check-headers"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {.userAgent = userAgentValue});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -1038,18 +983,15 @@ TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
     const std::string headerKey {"User-Agent"};
     const std::string userAgentValue {"Custom-User-Agent"};
 
-    HTTPRequest::instance().delete_(
-        HttpURL("http://localhost:44441/check-headers"),
-        [&](const std::string& result)
-        {
-            ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
-            m_callbackComplete = true;
-        },
-        [](auto, auto) {},
-        "",
-        {},
-        {},
-        userAgentValue);
+    HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                    PostRequestParameters {.onSuccess =
+                                                               [&](const std::string& result)
+                                                           {
+                                                               ASSERT_EQ(nlohmann::json::parse(result).at(headerKey),
+                                                                         userAgentValue);
+                                                               m_callbackComplete = true;
+                                                           }},
+                                    ConfigurationParameters {.userAgent = userAgentValue});
 
     EXPECT_TRUE(m_callbackComplete);
 }

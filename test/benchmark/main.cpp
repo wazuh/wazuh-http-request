@@ -85,7 +85,7 @@ static void BM_Get(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().get(HttpURL("http://localhost:44441/"), [&](const std::string& /*result*/) {});
+        HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/")});
     }
 }
 BENCHMARK(BM_Get);
@@ -100,7 +100,7 @@ static void BM_Post(benchmark::State& state)
     for (auto _ : state)
     {
         HTTPRequest::instance().post(
-            HttpURL("http://localhost:44441/"), R"({"foo": "bar"})"_json, [&](const std::string& /*result*/) {});
+            RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"foo": "bar"})"_json});
     }
 }
 BENCHMARK(BM_Post);
@@ -115,7 +115,7 @@ static void BM_Update(benchmark::State& state)
     for (auto _ : state)
     {
         HTTPRequest::instance().put(
-            HttpURL("http://localhost:44441/"), R"({"foo": "bar"})"_json, [&](const std::string& /*result*/) {});
+            RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"foo": "bar"})"_json});
     }
 }
 BENCHMARK(BM_Update);
@@ -130,7 +130,7 @@ static void BM_Patch(benchmark::State& state)
     for (auto _ : state)
     {
         HTTPRequest::instance().patch(
-            HttpURL("http://localhost:44441/"), R"({"foo": "bar"})"_json, [&](const std::string& /*result*/) {});
+            RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = R"({"foo": "bar"})"_json});
     }
 }
 BENCHMARK(BM_Patch);
@@ -144,7 +144,7 @@ static void BM_Delete(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().delete_(HttpURL("http://localhost:44441/12345"), [&](const std::string& /*result*/) {});
+        HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL("http://localhost:44441/12345")});
     }
 }
 
@@ -159,9 +159,8 @@ static void BM_Download(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().download(HttpURL("http://localhost:44441/"),
-                                         "out.txt",
-                                         [&](const std::string& /*result*/, const long /*responseCode*/) {});
+        HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                         PostRequestParameters {.outputFile = "out.txt"});
     }
 }
 BENCHMARK(BM_Download);
@@ -175,14 +174,9 @@ static void BM_DownloadUsingTheSingleHandler(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().download(
-            HttpURL("http://localhost:44441/"),
-            "out.txt",
-            [&](const std::string& /*result*/, const long /*responseCode*/) {},
-            {},
-            {},
-            {},
-            CurlHandlerTypeEnum::SINGLE);
+        HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                         PostRequestParameters {.outputFile = "out.txt"},
+                                         ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
     }
 }
 BENCHMARK(BM_DownloadUsingTheSingleHandler);
@@ -196,14 +190,9 @@ static void BM_CustomDownloadUsingTheMultiHandler(benchmark::State& state)
 {
     for (auto _ : state)
     {
-        HTTPRequest::instance().download(
-            HttpURL("http://localhost:44441/"),
-            "out.txt",
-            [&](const std::string& /*result*/, const long /*responseCode*/) {},
-            {},
-            {},
-            {},
-            CurlHandlerTypeEnum::MULTI);
+        HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/")},
+                                         PostRequestParameters {.outputFile = "out.txt"},
+                                         ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI});
     }
 }
 BENCHMARK(BM_CustomDownloadUsingTheMultiHandler);
