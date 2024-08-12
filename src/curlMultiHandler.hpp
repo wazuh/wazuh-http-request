@@ -78,7 +78,7 @@ public:
 
             do
             {
-                // Performs transfers on the added single-handler
+                // Performs transfers on the added multi-handler
                 multiCode = curl_multi_perform(m_curlMultiHandler.get(), &stillRunning);
 
                 if (multiCode != CURLM_OK)
