@@ -51,29 +51,34 @@ public:
             headers.emplace(args.headers());
         }
 
+        auto timeout {args.timeout()};
+
         if (0 == args.type().compare("download"))
         {
-            return std::make_unique<DownloadAction>(args.url(), args.outputFile(), headers, secureCommunication);
+            return std::make_unique<DownloadAction>(
+                args.url(), args.outputFile(), headers, secureCommunication, timeout);
         }
         else if (0 == args.type().compare("get"))
         {
-            return std::make_unique<GetAction>(args.url(), headers, secureCommunication);
+            return std::make_unique<GetAction>(args.url(), headers, secureCommunication, timeout);
         }
         else if (0 == args.type().compare("post"))
         {
-            return std::make_unique<PostAction>(args.url(), args.postArguments(), headers, secureCommunication);
+            return std::make_unique<PostAction>(
+                args.url(), args.postArguments(), headers, secureCommunication, timeout);
         }
         else if (0 == args.type().compare("put"))
         {
-            return std::make_unique<PutAction>(args.url(), args.postArguments(), headers, secureCommunication);
+            return std::make_unique<PutAction>(args.url(), args.postArguments(), headers, secureCommunication, timeout);
         }
         else if (0 == args.type().compare("patch"))
         {
-            return std::make_unique<PatchAction>(args.url(), args.postArguments(), headers, secureCommunication);
+            return std::make_unique<PatchAction>(
+                args.url(), args.postArguments(), headers, secureCommunication, timeout);
         }
         else if (0 == args.type().compare("delete"))
         {
-            return std::make_unique<DeleteAction>(args.url(), headers, secureCommunication);
+            return std::make_unique<DeleteAction>(args.url(), headers, secureCommunication, timeout);
         }
         else
         {

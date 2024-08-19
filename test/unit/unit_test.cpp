@@ -21,7 +21,7 @@ constexpr OPTION_REQUEST_TYPE optCustomRequest {OPT_CUSTOMREQUEST};
 constexpr OPTION_REQUEST_TYPE optUnixSocketPath {OPT_UNIX_SOCKET_PATH};
 constexpr OPTION_REQUEST_TYPE optUrl {OPT_URL};
 constexpr OPTION_REQUEST_TYPE optCainfo {OPT_CAINFO};
-constexpr OPTION_REQUEST_TYPE optTimeout {OPT_TIMEOUT};
+constexpr OPTION_REQUEST_TYPE optTimeout {OPT_TIMEOUT_MS};
 constexpr OPTION_REQUEST_TYPE optWriteData {OPT_WRITEDATA};
 constexpr OPTION_REQUEST_TYPE optUserAgent {OPT_USERAGENT};
 constexpr OPTION_REQUEST_TYPE optPostFields {OPT_POSTFIELDS};

@@ -32,6 +32,7 @@ void HTTPRequest::download(RequestParameters requestParameters,
     const auto& onError {postRequestParameters.onError};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -42,16 +43,31 @@ void HTTPRequest::download(RequestParameters requestParameters,
             .url(url.url(), secureCommunication)
             .outputFile(outputFile)
             .appendHeaders(httpHeaders)
+            .timeout(timeout)
             .userAgent(userAgent)
             .execute();
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -68,6 +84,7 @@ void HTTPRequest::post(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -82,6 +99,7 @@ void HTTPRequest::post(RequestParameters requestParameters,
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -90,11 +108,25 @@ void HTTPRequest::post(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -111,6 +143,7 @@ void HTTPRequest::get(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -120,6 +153,7 @@ void HTTPRequest::get(RequestParameters requestParameters,
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .appendHeaders(httpHeaders)
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -128,11 +162,25 @@ void HTTPRequest::get(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -149,6 +197,7 @@ void HTTPRequest::put(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -163,6 +212,7 @@ void HTTPRequest::put(RequestParameters requestParameters,
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -171,11 +221,25 @@ void HTTPRequest::put(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -192,6 +256,7 @@ void HTTPRequest::patch(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -206,6 +271,7 @@ void HTTPRequest::patch(RequestParameters requestParameters,
         req.url(url.url(), secureCommunication)
             .postData(data)
             .appendHeaders(httpHeaders)
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -214,11 +280,25 @@ void HTTPRequest::patch(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -235,6 +315,7 @@ void HTTPRequest::delete_(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
 
     try
@@ -242,6 +323,7 @@ void HTTPRequest::delete_(RequestParameters requestParameters,
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
         req.url(url.url(), secureCommunication)
             .appendHeaders(httpHeaders)
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -250,10 +332,24 @@ void HTTPRequest::delete_(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }

@@ -38,6 +38,7 @@ private:
     std::string m_outputFile;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
+    long m_timeout;
 
 public:
     /**
@@ -46,15 +47,18 @@ public:
      * @param outputFile Output file.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit DownloadAction(const std::string& url,
                             const std::string& outputFile,
                             const std::unordered_set<std::string>& headers,
-                            const SecureCommunication& secureCommunication)
+                            const SecureCommunication& secureCommunication,
+                            const long timeout)
         : m_url(url)
         , m_outputFile(outputFile)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
+        , m_timeout(timeout)
     {
     }
 
@@ -72,7 +76,8 @@ public:
                                        std::cerr << msg << ": " << responseCode << std::endl;
                                        throw std::runtime_error(msg);
                                    },
-                                   .outputFile = m_outputFile});
+                                   .outputFile = m_outputFile},
+            ConfigurationParameters {.timeout = m_timeout});
     }
 };
 
@@ -85,6 +90,7 @@ private:
     std::string m_url;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
+    long m_timeout;
 
 public:
     /**
@@ -92,13 +98,16 @@ public:
      * @param url URL to perform the GET request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit GetAction(const std::string& url,
                        const std::unordered_set<std::string>& headers,
-                       const SecureCommunication& secureCommunication)
+                       const SecureCommunication& secureCommunication,
+                       const long timeout)
         : m_url(url)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
+        , m_timeout(timeout)
     {
     }
 
@@ -116,7 +125,8 @@ public:
                                    {
                                        std::cerr << msg << ": " << responseCode << std::endl;
                                        throw std::runtime_error(msg);
-                                   }});
+                                   }},
+            ConfigurationParameters {.timeout = m_timeout});
     }
 };
 
@@ -130,6 +140,7 @@ private:
     nlohmann::json m_data;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
+    long m_timeout;
 
 public:
     /**
@@ -138,15 +149,18 @@ public:
      * @param data Data to send in the POST request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit PostAction(const std::string& url,
                         const nlohmann::json& data,
                         const std::unordered_set<std::string>& headers,
-                        const SecureCommunication& secureCommunication)
+                        const SecureCommunication& secureCommunication,
+                        const long timeout)
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
+        , m_timeout(timeout)
     {
     }
 
@@ -166,7 +180,8 @@ public:
                                              std::cerr << msg << ": " << responseCode << std::endl;
                                              throw std::runtime_error(msg);
                                          },
-                                     });
+                                     },
+                                     ConfigurationParameters {.timeout = m_timeout});
     }
 };
 
@@ -180,6 +195,7 @@ private:
     nlohmann::json m_data;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
+    long m_timeout;
 
 public:
     /**
@@ -188,15 +204,18 @@ public:
      * @param data Data to send in the PUT request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit PutAction(const std::string& url,
                        const nlohmann::json& data,
                        const std::unordered_set<std::string>& headers,
-                       const SecureCommunication& secureCommunication)
+                       const SecureCommunication& secureCommunication,
+                       const long timeout)
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
+        , m_timeout(timeout)
     {
     }
 
@@ -216,7 +235,8 @@ public:
                                    {
                                        std::cerr << msg << ": " << responseCode << std::endl;
                                        throw std::runtime_error(msg);
-                                   }});
+                                   }},
+            ConfigurationParameters {.timeout = m_timeout});
     }
 };
 
@@ -231,6 +251,7 @@ private:
     nlohmann::json m_data;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
+    long m_timeout;
 
 public:
     /**
@@ -240,15 +261,18 @@ public:
      * @param data Data to send in the PATCH request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit PatchAction(const std::string& url,
                          const nlohmann::json& data,
                          const std::unordered_set<std::string>& headers,
-                         const SecureCommunication& secureCommunication)
+                         const SecureCommunication& secureCommunication,
+                         const long timeout)
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
+        , m_timeout(timeout)
     {
     }
 
@@ -269,7 +293,8 @@ public:
                                    {
                                        std::cerr << msg << ": " << responseCode << std::endl;
                                        throw std::runtime_error(msg);
-                                   }});
+                                   }},
+            ConfigurationParameters {.timeout = m_timeout});
     }
 };
 
@@ -282,6 +307,7 @@ private:
     std::string m_url;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
+    long m_timeout;
 
 public:
     /**
@@ -289,13 +315,16 @@ public:
      * @param url URL to perform the DELETE request.
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
+     * @param timeout Timeout for the request.
      */
     explicit DeleteAction(const std::string& url,
                           const std::unordered_set<std::string>& headers,
-                          const SecureCommunication& secureCommunication)
+                          const SecureCommunication& secureCommunication,
+                          const long timeout)
         : m_url(url)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
+        , m_timeout(timeout)
     {
     }
 
@@ -313,7 +342,8 @@ public:
                                    {
                                        std::cerr << msg << ": " << responseCode << std::endl;
                                        throw std::runtime_error(msg);
-                                   }});
+                                   }},
+            ConfigurationParameters {.timeout = m_timeout});
     }
 };
 

@@ -246,13 +246,13 @@ public:
     }
 
     /**
-     * @brief This method sets the timeout and returns a reference to the object.
+     * @brief This method sets the timeout in miliseconds and returns a reference to the object.
      * @param timeout Timeout to set.
      * @return A reference to the object.
      */
-    T& timeout(const int timeout)
+    T& timeout(const long timeout)
     {
-        m_requestImplementator->setOption(OPT_TIMEOUT, timeout);
+        m_requestImplementator->setOption(OPT_TIMEOUT_MS, timeout);
 
         return static_cast<T&>(*this);
     }

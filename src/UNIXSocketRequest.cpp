@@ -31,6 +31,7 @@ void UNIXSocketRequest::download(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -40,17 +41,32 @@ void UNIXSocketRequest::download(RequestParameters requestParameters,
         GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))
             .url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -67,6 +83,7 @@ void UNIXSocketRequest::post(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -80,6 +97,7 @@ void UNIXSocketRequest::post(RequestParameters requestParameters,
         auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .timeout(timeout)
             .userAgent(userAgent)
             .postData(data)
             .outputFile(outputFile)
@@ -89,11 +107,25 @@ void UNIXSocketRequest::post(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -110,6 +142,7 @@ void UNIXSocketRequest::get(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -119,6 +152,7 @@ void UNIXSocketRequest::get(RequestParameters requestParameters,
         auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -127,11 +161,25 @@ void UNIXSocketRequest::get(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -148,6 +196,7 @@ void UNIXSocketRequest::put(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -161,6 +210,7 @@ void UNIXSocketRequest::put(RequestParameters requestParameters,
         auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .timeout(timeout)
             .userAgent(userAgent)
             .postData(data)
             .outputFile(outputFile)
@@ -170,11 +220,25 @@ void UNIXSocketRequest::put(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -191,6 +255,7 @@ void UNIXSocketRequest::patch(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -204,6 +269,7 @@ void UNIXSocketRequest::patch(RequestParameters requestParameters,
         auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .timeout(timeout)
             .userAgent(userAgent)
             .postData(data)
             .outputFile(outputFile)
@@ -213,11 +279,25 @@ void UNIXSocketRequest::patch(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -234,6 +314,7 @@ void UNIXSocketRequest::delete_(RequestParameters requestParameters,
     const auto& onSuccess {postRequestParameters.onSuccess};
     const auto& outputFile {postRequestParameters.outputFile};
     // Configuration parameters
+    const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
@@ -243,6 +324,7 @@ void UNIXSocketRequest::delete_(RequestParameters requestParameters,
         auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
         req.url(url.url(), secureCommunication)
             .unixSocketPath(url.unixSocketPath())
+            .timeout(timeout)
             .userAgent(userAgent)
             .outputFile(outputFile)
             .execute();
@@ -251,10 +333,24 @@ void UNIXSocketRequest::delete_(RequestParameters requestParameters,
     }
     catch (const Curl::CurlException& ex)
     {
-        onError(ex.what(), ex.responseCode());
+        if (onError)
+        {
+            onError(ex.what(), ex.responseCode());
+        }
+        else
+        {
+            throw;
+        }
     }
     catch (const std::exception& ex)
     {
-        onError(ex.what(), NOT_USED);
+        if (onError)
+        {
+            onError(ex.what(), NOT_USED);
+        }
+        else
+        {
+            throw;
+        }
     }
 }

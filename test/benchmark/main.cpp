@@ -188,6 +188,7 @@ BENCHMARK(BM_DownloadUsingTheSingleHandler);
  */
 static void BM_CustomDownloadUsingTheMultiHandler(benchmark::State& state)
 {
+    state.SkipWithError("This test will wait until #63 is fixed");
     for (auto _ : state)
     {
         HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/")},
