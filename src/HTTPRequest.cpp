@@ -317,10 +317,12 @@ void HTTPRequest::delete_(RequestParameters requestParameters,
     // Configuration parameters
     const auto& timeout {configurationParameters.timeout};
     const auto& userAgent {configurationParameters.userAgent};
+    const auto& handlerType {configurationParameters.handlerType};
+    const auto& shouldRun {configurationParameters.shouldRun};
 
     try
     {
-        auto req {DeleteRequest::builder(FactoryRequestWrapper<cURLWrapper>::create())};
+        auto req {DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
         req.url(url.url(), secureCommunication)
             .appendHeaders(httpHeaders)
             .timeout(timeout)

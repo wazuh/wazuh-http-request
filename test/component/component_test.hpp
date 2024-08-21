@@ -12,6 +12,8 @@
 #ifndef _COMPONENT_TEST_H
 #define _COMPONENT_TEST_H
 
+#include "IURLRequest.hpp"
+#include "curlHandlerCache.hpp"
 #include "json.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -152,6 +154,12 @@ protected:
      * @brief This variable is used as a flag to indicate if all the callbacks have been called.
      */
     bool m_callbackComplete = false;
+
+    /**
+     * @brief This variable is used as a flag to indicate if the test should run.
+     */
+    std::atomic<bool> m_shouldRun {true};
+
     virtual ~ComponentTest() = default;
     /**
      * @brief This method is called before each test to initialize the test environment.
@@ -159,6 +167,7 @@ protected:
     void SetUp() override
     {
         m_callbackComplete = false;
+        m_shouldRun.store(true);
     }
 
     /**
@@ -167,8 +176,10 @@ protected:
      */
     void TearDown() override
     {
+        m_shouldRun.store(false);
         std::filesystem::remove(TEST_FILE_1);
         std::filesystem::remove(TEST_FILE_2);
+        cURLHandlerCache::instance().clear();
     }
 
     /**
