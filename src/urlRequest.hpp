@@ -16,12 +16,12 @@
 #include "builder.hpp"
 #include "customDeleter.hpp"
 #include "fsWrapper.hpp"
-#include "json.hpp"
 #include "secureCommunication.hpp"
 #include <algorithm>
 #include <functional>
 #include <map>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_set>
 #include <utility>
@@ -168,9 +168,11 @@ public:
             // If the certificate is not set, we try to find it in the default paths.
             if (m_certificate.empty())
             {
-                const auto caRootCert = secureCommunication.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE);
-                const auto sslKey = secureCommunication.getParameter(AuthenticationParameter::SSL_KEY);
-                const auto sslCert = secureCommunication.getParameter(AuthenticationParameter::SSL_CERTIFICATE);
+                const auto caRootCert =
+                    secureCommunication.getParameter(urlrequest::AuthenticationParameter::CA_ROOT_CERTIFICATE);
+                const auto sslKey = secureCommunication.getParameter(urlrequest::AuthenticationParameter::SSL_KEY);
+                const auto sslCert =
+                    secureCommunication.getParameter(urlrequest::AuthenticationParameter::SSL_CERTIFICATE);
 
                 if (!caRootCert.empty())
                 {
@@ -200,7 +202,7 @@ public:
             }
         }
 
-        const auto authCreds = secureCommunication.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS);
+        const auto authCreds = secureCommunication.getParameter(urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS);
         if (!authCreds.empty())
         {
             basicAuth(authCreds);

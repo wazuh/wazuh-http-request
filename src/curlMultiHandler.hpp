@@ -13,10 +13,10 @@
 #define _CURL_MULTI_HANDLER_HPP
 
 #include "ICURLHandler.hpp"
-#include "curl.h"
 #include "curlException.hpp"
 #include "customDeleter.hpp"
 #include <atomic>
+#include <curl/curl.h>
 #include <memory>
 #include <stdexcept>
 

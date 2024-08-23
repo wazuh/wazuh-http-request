@@ -12,10 +12,10 @@
 #ifndef _URL_REQUEST_HPP
 #define _URL_REQUEST_HPP
 
-#include "json.hpp"
 #include "secureCommunication.hpp"
 #include <atomic>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_set>
 #include <variant>

@@ -12,9 +12,9 @@
 #ifndef _CMD_ARGS_PARSER_HPP_
 #define _CMD_ARGS_PARSER_HPP_
 
-#include "json.hpp"
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <string>
 
 /**

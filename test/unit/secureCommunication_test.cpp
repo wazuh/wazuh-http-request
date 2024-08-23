@@ -16,20 +16,20 @@ TEST_F(SecureCommunicationTest, CACertificate)
 {
     auto secureCom = SecureCommunication::builder().caRootCertificate("root-ca.pem");
 
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS), "");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_CERTIFICATE), "");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_KEY), "");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS), "");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_CERTIFICATE), "");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_KEY), "");
 }
 
 TEST_F(SecureCommunicationTest, BasicAuth)
 {
     auto secureCom = SecureCommunication::builder().basicAuth("user:pass").caRootCertificate("root-ca.pem");
 
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS), "user:pass");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_CERTIFICATE), "");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_KEY), "");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS), "user:pass");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_CERTIFICATE), "");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_KEY), "");
 }
 
 TEST_F(SecureCommunicationTest, ClientAuthentication)
@@ -39,10 +39,10 @@ TEST_F(SecureCommunicationTest, ClientAuthentication)
                          .sslKey("ssl_key.pem")
                          .caRootCertificate("root-ca.pem");
 
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS), "");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_CERTIFICATE), "ssl_cert.pem");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_KEY), "ssl_key.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS), "");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_CERTIFICATE), "ssl_cert.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_KEY), "ssl_key.pem");
 }
 
 TEST_F(SecureCommunicationTest, BasicAndClientAuth)
@@ -53,8 +53,8 @@ TEST_F(SecureCommunicationTest, BasicAndClientAuth)
                          .sslKey("ssl_key.pem")
                          .caRootCertificate("root-ca.pem");
 
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::BASIC_AUTH_CREDS), "user:pass");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_CERTIFICATE), "ssl_cert.pem");
-    EXPECT_EQ(secureCom.getParameter(AuthenticationParameter::SSL_KEY), "ssl_key.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::CA_ROOT_CERTIFICATE), "root-ca.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS), "user:pass");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_CERTIFICATE), "ssl_cert.pem");
+    EXPECT_EQ(secureCom.getParameter(urlrequest::AuthenticationParameter::SSL_KEY), "ssl_key.pem");
 }
