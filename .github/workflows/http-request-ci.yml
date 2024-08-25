@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
@@ -33,7 +33,7 @@ jobs:
             echo "---------------------------------"
           fi
       # Upload errors as an artifact, when failed
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: Clang-format errors
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check Coding style
         shell: bash
@@ -73,7 +73,7 @@ jobs:
           fi
 
       # Upload errors as an artifact, when failed
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: Clang-format errors
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup VCPKG
         uses: lukka/run-vcpkg@v11
         with:
@@ -102,7 +102,7 @@ jobs:
     needs: build
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup VCPKG
         uses: lukka/run-vcpkg@v11
         with:
@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Dependencies for testing:
       # - doxygen 
@@ -152,7 +152,7 @@ jobs:
           fi
 
       # Upload errors as an artifact, when failed
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: Doxygen errors
@@ -160,7 +160,7 @@ jobs:
           retention-days: 1
 
       # Upload the documentation as an artifact, when successful
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: success()
         with:
           name: Doxygen Documentation
