@@ -16,10 +16,29 @@ jobs:
           packages: cppcheck
           version: 1.0
       - name: Run cppcheck
+        shell: bash
         run: |
           cppcheck --error-exitcode=1 --force . \
                    --std=c++17 --enable=warning,style,performance,portability,unusedFunction \
-                   --suppress=constParameterCallback 
+                   --suppress=constParameterCallback 2> cppcheck_errors.txt
+      
+          if [ -s "cppcheck_errors.txt" ]; then
+            echo "---------------------------------"
+            echo "FAILED: cppcheck found some errors"
+            echo "---------------------------------"
+            exit 1
+          else
+            echo "---------------------------------"
+            echo "PASSED: cppcheck passed"
+            echo "---------------------------------"
+          fi
+      # Upload errors as an artifact, when failed
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Clang-format errors
+          path: clang_format_errors.txt
+          retention-days: 1
 
   clangformat:
     runs-on: ubuntu-latest
@@ -27,10 +46,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Run clang-format
+      - name: Check Coding style
+        shell: bash
         run: |
-          find . -type f \( -iname "*.cpp" -o -iname "*.hpp" \) \
-          -exec clang-format --dry-run -style=file {} +
+
+          # Don't apply changes, just check
+          arguments="--dry-run "
+
+          # Retrieve all the source files for the desired module
+          sourceFiles=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" \) | tr '\n' ' ')
+          arguments+="-i $sourceFiles "
+
+          ERRORS_FILE=clang_format_errors.txt
+          clang-format $arguments 2> ${ERRORS_FILE}
+
+          # Check if there are errors
+          if [ -s "${ERRORS_FILE}" ]; then
+            echo "---------------------------------"
+            echo "FAILED: Clang-format check failed"
+            echo "---------------------------------"
+            exit 1
+          else
+            echo "---------------------------------"
+            echo "PASSED: Clang-format check passed"
+            echo "---------------------------------"
+          fi
+
+      # Upload errors as an artifact, when failed
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Clang-format errors
+          path: clang_format_errors.txt
+          retention-days: 1
 
   build:
     runs-on: ubuntu-latest

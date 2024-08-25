@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.12.4)
 project(urlrequest_unit_test)
 
 file(GLOB URL_REQUEST_UNIT_TEST_SRC *.cpp)
