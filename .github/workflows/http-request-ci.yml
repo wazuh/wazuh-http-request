@@ -1,0 +1,168 @@
+name: C++ CI Pipeline
+
+on:
+    pull_request:
+        types: [synchronize, opened, reopened, ready_for_review]
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: cppcheck
+          version: 1.0
+      - name: Run cppcheck
+        shell: bash
+        run: |
+          cppcheck --error-exitcode=1 --force . \
+                   --std=c++17 --enable=warning,style,performance,portability,unusedFunction \
+                   --suppress=constParameterCallback 2> cppcheck_errors.txt
+      
+          if [ -s "cppcheck_errors.txt" ]; then
+            echo "---------------------------------"
+            echo "FAILED: cppcheck found some errors"
+            echo "---------------------------------"
+            exit 1
+          else
+            echo "---------------------------------"
+            echo "PASSED: cppcheck passed"
+            echo "---------------------------------"
+          fi
+      # Upload errors as an artifact, when failed
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Clang-format errors
+          path: clang_format_errors.txt
+          retention-days: 1
+
+  clangformat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Coding style
+        shell: bash
+        run: |
+
+          # Don't apply changes, just check
+          arguments="--dry-run "
+
+          # Retrieve all the source files for the desired module
+          sourceFiles=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" \) | tr '\n' ' ')
+          arguments+="-i $sourceFiles "
+
+          ERRORS_FILE=clang_format_errors.txt
+          clang-format $arguments 2> ${ERRORS_FILE}
+
+          # Check if there are errors
+          if [ -s "${ERRORS_FILE}" ]; then
+            echo "---------------------------------"
+            echo "FAILED: Clang-format check failed"
+            echo "---------------------------------"
+            exit 1
+          else
+            echo "---------------------------------"
+            echo "PASSED: Clang-format check passed"
+            echo "---------------------------------"
+          fi
+
+      # Upload errors as an artifact, when failed
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Clang-format errors
+          path: clang_format_errors.txt
+          retention-days: 1
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup VCPKG
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{github.workspace}}/vcpkg'
+          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
+          vcpkgJsonGlob: '${{github.workspace}}/vcpkg.json'
+      - name: Configure CMake
+        run: cmake --preset=release
+
+      - name: Build
+        run: cmake --build build -j$(nproc)
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup VCPKG
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{github.workspace}}/vcpkg'
+          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
+          vcpkgJsonGlob: '${{github.workspace}}/vcpkg.json'
+      - name: Configure CMake
+        run: cmake --preset=debug
+      - name: Build
+        run: cmake --build build -j$(nproc)
+      - name: Run tests
+        run: ctest --test-dir build
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Dependencies for testing:
+      # - doxygen 
+      # - graphviz
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: doxygen graphviz
+          version: 1.0
+
+      - name: Generate documentation
+        shell: bash
+        run: |
+          # Generate the documentation
+          sudo dot -c
+          ERRORS_FILE=doxygen_errors.txt
+          doxygen -s doxygen.cfg 2> ${ERRORS_FILE}
+
+          # Check if there are errors
+          if [ -s "${ERRORS_FILE}" ]; then
+            echo "-----------------------------------------------"
+            echo "FAILED: Doxygen documentation generation failed"
+            echo "-----------------------------------------------"
+            exit 1
+          else
+            echo "----------------------------------------------------"
+            echo "PASSED: Doxygen documentation generated successfully"
+            echo "----------------------------------------------------"
+          fi
+
+      # Upload errors as an artifact, when failed
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Doxygen errors
+          path: doxygen_errors.txt
+          retention-days: 1
+
+      # Upload the documentation as an artifact, when successful
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Doxygen Documentation
+          path: doc
+          retention-days: 1

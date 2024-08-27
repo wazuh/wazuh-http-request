@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.12.4)
 project(urlrequest_unit_test)
 
 file(GLOB URL_REQUEST_UNIT_TEST_SRC *.cpp)
@@ -9,10 +8,9 @@ target_compile_options(urlrequest_unit_test PUBLIC "-fsanitize=address,leak,unde
 target_link_options(urlrequest_unit_test PUBLIC "-fsanitize=address,leak,undefined")
 
 target_link_libraries(urlrequest_unit_test urlrequest
-    gtest
-    gmock
-    gtest_main
-    gmock_main)
+    GTest::gmock
+    GTest::gtest_main
+    urlrequest_test::test)
 
 add_test(NAME urlrequest_unit_test
     COMMAND urlrequest_unit_test)

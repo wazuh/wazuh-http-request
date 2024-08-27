@@ -14,12 +14,12 @@
 
 #include "IURLRequest.hpp"
 #include "curlHandlerCache.hpp"
-#include "json.hpp"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <algorithm>
 #include <filesystem>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 
 auto constexpr TEST_FILE_1 {"test1.txt"};

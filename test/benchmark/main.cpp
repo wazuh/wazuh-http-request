@@ -15,7 +15,7 @@
 #pragma GCC diagnostic pop
 
 #include "HTTPRequest.hpp"
-#include "benchmark.h"
+#include <benchmark/benchmark.h>
 #include <iostream>
 
 /**
@@ -204,7 +204,7 @@ static void BM_ReturnStringByValue(benchmark::State& state)
 
     for (auto _ : state)
     {
-        std::string result = secureComm.getParameter(AuthenticationParameter::SSL_CERTIFICATE);
+        std::string result = secureComm.getParameter(urlrequest::AuthenticationParameter::SSL_CERTIFICATE);
         benchmark::DoNotOptimize(result);
     }
 }

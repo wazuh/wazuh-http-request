@@ -13,10 +13,9 @@
 #define _HTTP_REQUEST_HPP
 
 #include "IURLRequest.hpp"
-#include "json.hpp"
-#include "singleton.hpp"
 #include <atomic>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_set>
 
@@ -24,11 +23,18 @@
  * @brief This class is an implementation of IURLRequest.
  * It provides a simple interface to perform HTTP requests.
  */
-class HTTPRequest final
-    : public IURLRequest
-    , public Singleton<HTTPRequest>
+class HTTPRequest final : public IURLRequest
 {
 public:
+    /**
+     * @brief Returns the instance of the singleton class.
+     * @return Instance of the singleton class.
+     */
+    static HTTPRequest& instance()
+    {
+        static HTTPRequest s_instance;
+        return s_instance;
+    }
     /**
      * @brief Performs a HTTP DOWNLOAD request.
      *

@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "benchmark",
+    "cpp-httplib",
+    "curl",
+    "nlohmann-json",
+    "gtest"
+  ]
+}

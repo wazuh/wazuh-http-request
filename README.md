@@ -7,11 +7,16 @@ It allows the download and invocation and calls to REST apis through the methods
 
 
 # Building
-This project use [CMake](https://cmake.org)
+This project use [CMake](https://cmake.org) and [VCPKG](https://vcpkg.io)
 ```bash
-mkdir build && cd build
-cmake .. -GNinja
-ninja
+cd ..
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg && ./bootstrap-vcpkg.sh
+export VCPKG_ROOT=$(pwd)
+export PATH=$VCPKG_ROOT:$PATH
+cd ../wazuh-http-request
+cmake --preset=debug
+cmake --build build -j$(nproc)
 ```
 Please see the CMake documentation and CMakeLists.txt for more advanced usage.
 
@@ -37,4 +42,3 @@ root@wazuh-dev:~/repos/wazuh-http-request# doxygen doxygen.cfg
 ```
 
 After executing this command, open the index.html file that is generated in the `doc/html` folder, to view this technical and implementation documentation.
-

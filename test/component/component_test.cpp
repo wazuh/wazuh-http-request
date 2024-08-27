@@ -13,9 +13,9 @@
 #include "curlHandlerCache.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
-#include "json.hpp"
 #include "urlRequest.hpp"
 #include <map>
+#include <nlohmann/json.hpp>
 #include <string>
 
 auto constexpr TEST_NET_IP {"192.0.2.1"};

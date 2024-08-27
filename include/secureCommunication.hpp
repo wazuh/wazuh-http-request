@@ -12,10 +12,11 @@
 #ifndef __SECURE_COMMUNICATION_HPP
 #define __SECURE_COMMUNICATION_HPP
 
-#include "builder.hpp"
 #include <map>
 #include <string>
 
+namespace urlrequest
+{
 enum class AuthenticationParameter
 {
     SSL_CERTIFICATE,
@@ -23,15 +24,46 @@ enum class AuthenticationParameter
     CA_ROOT_CERTIFICATE,
     BASIC_AUTH_CREDS
 };
+/**
+ * @brief This class provides a simple interface to construct an object using a Builder pattern.
+ *
+ * @tparam T Type of the object to be built.
+ * @tparam Ts Arguments.
+ */
+template<typename T, class... Ts>
+class Builder
+{
+public:
+    /**
+     * @brief This method is used to build an object.
+     *
+     * @param args Arguments.
+     * @return T Object built.
+     */
+    static T builder(Ts... args)
+    {
+        return T(std::move(args)...); // Default constructor
+    }
+
+    /**
+     * @brief This method returns a reference to the object.
+     * @return T Reference to the object.
+     */
+    T& build()
+    {
+        return static_cast<T&>(*this); // Return reference to self
+    }
+};
+} // namespace urlrequest
 
 /**
  * @brief SecureCommunication class.
  *
  */
-class SecureCommunication final : public Utils::Builder<SecureCommunication>
+class SecureCommunication final : public urlrequest::Builder<SecureCommunication>
 {
 private:
-    std::map<AuthenticationParameter, std::string> m_parameters;
+    std::map<urlrequest::AuthenticationParameter, std::string> m_parameters;
 
 public:
     /**
@@ -41,7 +73,7 @@ public:
      */
     SecureCommunication& sslCertificate(const std::string& sslCertificate)
     {
-        m_parameters[AuthenticationParameter::SSL_CERTIFICATE] = sslCertificate;
+        m_parameters[urlrequest::AuthenticationParameter::SSL_CERTIFICATE] = sslCertificate;
 
         return (*this);
     }
@@ -53,7 +85,7 @@ public:
      */
     SecureCommunication& sslKey(const std::string& sslKey)
     {
-        m_parameters[AuthenticationParameter::SSL_KEY] = sslKey;
+        m_parameters[urlrequest::AuthenticationParameter::SSL_KEY] = sslKey;
 
         return (*this);
     }
@@ -65,7 +97,7 @@ public:
      */
     SecureCommunication& caRootCertificate(const std::string& caRootCertificate)
     {
-        m_parameters[AuthenticationParameter::CA_ROOT_CERTIFICATE] = caRootCertificate;
+        m_parameters[urlrequest::AuthenticationParameter::CA_ROOT_CERTIFICATE] = caRootCertificate;
 
         return (*this);
     }
@@ -77,7 +109,7 @@ public:
      */
     SecureCommunication& basicAuth(const std::string& basicAuthCreds)
     {
-        m_parameters[AuthenticationParameter::BASIC_AUTH_CREDS] = basicAuthCreds;
+        m_parameters[urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS] = basicAuthCreds;
 
         return (*this);
     }
@@ -89,7 +121,7 @@ public:
      *
      * @return std::string Parameter value.
      */
-    std::string getParameter(const AuthenticationParameter parameter) const
+    std::string getParameter(const urlrequest::AuthenticationParameter parameter) const
     {
         auto it = m_parameters.find(parameter);
         if (it != m_parameters.end())
