@@ -27,6 +27,6 @@ if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
     target_include_directories(urlrequest_test INTERFACE ${CMAKE_CURRENT_LIST_DIR}/src ${CMAKE_CURRENT_LIST_DIR}/shared)
     add_library(urlrequest_test::test ALIAS urlrequest_test)
 
-    add_subdirectory(test_tool)
     add_subdirectory(test)
+    add_subdirectory(test_tool)
 endif (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
