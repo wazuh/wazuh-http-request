@@ -196,10 +196,10 @@ public:
                 }
             }
 
-            if (m_certificate.empty())
-            {
-                m_requestImplementator->setOption(OPT_VERIFYPEER, 0L);
-            }
+            const auto skipVerify =
+                secureCommunication.getParameter<bool>(urlrequest::AuthenticationParameter::SKIP_PEER_VERIFICATION);
+
+            m_requestImplementator->setOption(OPT_VERIFYPEER, skipVerify ? 0L : 1L);
         }
 
         const auto authCreds = secureCommunication.getParameter(urlrequest::AuthenticationParameter::BASIC_AUTH_CREDS);

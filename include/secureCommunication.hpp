@@ -14,6 +14,7 @@
 
 #include <map>
 #include <string>
+#include <variant>
 
 namespace urlrequest
 {
@@ -22,7 +23,8 @@ enum class AuthenticationParameter
     SSL_CERTIFICATE,
     SSL_KEY,
     CA_ROOT_CERTIFICATE,
-    BASIC_AUTH_CREDS
+    BASIC_AUTH_CREDS,
+    SKIP_PEER_VERIFICATION
 };
 /**
  * @brief This class provides a simple interface to construct an object using a Builder pattern.
@@ -63,7 +65,7 @@ public:
 class SecureCommunication final : public urlrequest::Builder<SecureCommunication>
 {
 private:
-    std::map<urlrequest::AuthenticationParameter, std::string> m_parameters;
+    std::map<urlrequest::AuthenticationParameter, std::variant<std::string, bool>> m_parameters;
 
 public:
     /**
@@ -115,18 +117,32 @@ public:
     }
 
     /**
+     * @brief Set the Skip Peer Verification.
+     *
+     * @param skipPeerVerification Skip peer verification.
+     */
+    SecureCommunication& skipPeerVerification(const bool skipPeerVerification)
+    {
+        m_parameters[urlrequest::AuthenticationParameter::SKIP_PEER_VERIFICATION] = skipPeerVerification;
+
+        return (*this);
+    }
+
+    /**
      * @brief Get parameters.
      *
+     * @tparam T Type of the parameter, std::string or bool.
      * @param parameter AuthenticationParameter Parameter to get.
      *
-     * @return std::string Parameter value.
+     * @return T Parameter value.
      */
-    std::string getParameter(const urlrequest::AuthenticationParameter parameter) const
+    template<typename T = std::string>
+    T getParameter(const urlrequest::AuthenticationParameter parameter) const
     {
         auto it = m_parameters.find(parameter);
         if (it != m_parameters.end())
         {
-            return it->second;
+            return std::get<T>(it->second);
         }
         return {};
     }
