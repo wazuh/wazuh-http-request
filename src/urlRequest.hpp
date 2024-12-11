@@ -268,7 +268,6 @@ public:
     {
         m_certificate = cert;
         m_requestImplementator->setOption(OPT_CAINFO, m_certificate);
-        m_requestImplementator->setOption(OPT_VERIFYPEER, 1L);
 
         return static_cast<T&>(*this);
     }
