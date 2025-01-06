@@ -34,12 +34,14 @@ public:
         std::string sslKey {args.key()};
         std::string username {args.username()};
         std::string password {args.password()};
+        bool skipVerifyPeer {args.skipVerifyPeer()};
 
         auto secureCommunication = SecureCommunication::builder();
         secureCommunication.basicAuth(username + ":" + password)
             .sslCertificate(sslCertificate)
             .sslKey(sslKey)
-            .caRootCertificate(caRootCertificate);
+            .caRootCertificate(caRootCertificate)
+            .skipPeerVerification(skipVerifyPeer);
 
         std::unordered_set<std::string> headers;
         if (args.headers().empty())

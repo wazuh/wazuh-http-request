@@ -154,7 +154,6 @@ TEST_F(UrlRequestUnitTest, GetApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request)
@@ -179,7 +178,6 @@ TEST_F(UrlRequestUnitTest, PostApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -206,7 +204,6 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
     EXPECT_CALL(*request, setOption(optPostFields, R"({"name":"wazuh"})")).Times(1);
     EXPECT_CALL(*request, setOption(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -235,7 +232,6 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
     EXPECT_CALL(*request, setOption(optPostFields, R"({"name":"wazuh"})")).Times(1);
     EXPECT_CALL(*request, setOption(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -262,7 +258,6 @@ TEST_F(UrlRequestUnitTest, PutApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PutRequest::builder(request)
@@ -287,7 +282,6 @@ TEST_F(UrlRequestUnitTest, DeleteApiRequest)
     EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
     EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
     EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     DeleteRequest::builder(request)
@@ -383,6 +377,27 @@ TEST_F(UrlRequestUnitTest, HttpsCertExists)
 }
 
 /**
+ * @brief This test checks the HTTPS GET request, ignoring the certificate verification.
+ */
+TEST_F(UrlRequestUnitTest, HttpsCertExistsNoVerify)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.skipPeerVerification(true);
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "/etc/ssl/certs/ca-certificates.crt")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, false)).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+    EXPECT_CALL(*request, appendHeader(_)).Times(0);
+
+    auto getRequest {cURLRequest<MockRequest<MockFsWrapper>, MockFsWrapper>::builder(request)};
+
+    EXPECT_CALL(getRequest, exists("/etc/ssl/certs/ca-certificates.crt")).Times(1).WillOnce(Return(true));
+    EXPECT_NO_THROW(getRequest.url("https://www.wazuh.com/", secureCommunication).execute());
+}
+
+/**
  * @brief This test checks the HTTPS GET request not using a certificate.
  */
 TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
@@ -390,7 +405,7 @@ TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
     auto request {std::make_shared<RequestWrapper>()};
 
     EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, false)).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
