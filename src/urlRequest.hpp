@@ -81,8 +81,8 @@ private:
      */
     void clientAuth(const std::string& sshCert, const std::string& sshKey)
     {
-        m_requestImplementator->setOption(OPT_SSL_CERT, sshCert);
-        m_requestImplementator->setOption(OPT_SSL_KEY, sshKey);
+        m_requestImplementator->setOptionString(OPT_SSL_CERT, sshCert);
+        m_requestImplementator->setOptionString(OPT_SSL_KEY, sshKey);
     }
 
     /**
@@ -92,7 +92,7 @@ private:
      */
     void basicAuth(const std::string& basicAuthCreds)
     {
-        m_requestImplementator->setOption(OPT_BASIC_AUTH, basicAuthCreds);
+        m_requestImplementator->setOptionString(OPT_BASIC_AUTH, basicAuthCreds);
     }
 
 protected:
@@ -145,7 +145,7 @@ public:
     T& unixSocketPath(const std::string& sock)
     {
         m_unixSocketPath = sock;
-        m_requestImplementator->setOption(OPT_UNIX_SOCKET_PATH, m_unixSocketPath);
+        m_requestImplementator->setOptionString(OPT_UNIX_SOCKET_PATH, m_unixSocketPath);
 
         return static_cast<T&>(*this);
     }
@@ -159,7 +159,7 @@ public:
     T& url(const std::string& url, const SecureCommunication& secureCommunication = {})
     {
         m_url = url;
-        m_requestImplementator->setOption(OPT_URL, m_url);
+        m_requestImplementator->setOptionString(OPT_URL, m_url);
 
         // If the URL starts with "https", we need set CAINFO option.
         // Otherwise, we need to set the SSL_VERIFYPEER option to false.
@@ -196,7 +196,7 @@ public:
 
             if (m_certificate.empty())
             {
-                m_requestImplementator->setOption(OPT_VERIFYPEER, 0L);
+                m_requestImplementator->setOptionLong(OPT_VERIFYPEER, 0L);
             }
         }
 
@@ -216,7 +216,7 @@ public:
     T& userAgent(const std::string& userAgent)
     {
         m_userAgent = userAgent;
-        m_requestImplementator->setOption(OPT_USERAGENT, m_userAgent);
+        m_requestImplementator->setOptionString(OPT_USERAGENT, m_userAgent);
 
         return static_cast<T&>(*this);
     }
@@ -252,7 +252,7 @@ public:
      */
     T& timeout(const long timeout)
     {
-        m_requestImplementator->setOption(OPT_TIMEOUT_MS, timeout);
+        m_requestImplementator->setOptionLong(OPT_TIMEOUT_MS, timeout);
 
         return static_cast<T&>(*this);
     }
@@ -265,8 +265,8 @@ public:
     T& certificate(const std::string& cert)
     {
         m_certificate = cert;
-        m_requestImplementator->setOption(OPT_CAINFO, m_certificate);
-        m_requestImplementator->setOption(OPT_VERIFYPEER, 1L);
+        m_requestImplementator->setOptionString(OPT_CAINFO, m_certificate);
+        m_requestImplementator->setOptionLong(OPT_VERIFYPEER, 1L);
 
         return static_cast<T&>(*this);
     }
@@ -287,9 +287,9 @@ public:
                 throw std::runtime_error("Failed to open output file");
             }
 
-            m_requestImplementator->setOption(OPT_WRITEDATA, m_fpHandle.get());
+            m_requestImplementator->setOptionPtr(OPT_WRITEDATA, m_fpHandle.get());
 
-            m_requestImplementator->setOption(OPT_WRITEFUNCTION, static_cast<long>(0));
+            m_requestImplementator->setOptionLong(OPT_WRITEFUNCTION, static_cast<long>(0));
         }
 
         return static_cast<T&>(*this);
@@ -323,11 +323,25 @@ public:
      * @param postData Post data to set.
      * @return A reference to the object.
      */
-    T& postData(const std::string& postData)
+    template<typename TPostData>
+    T& postData(TPostData postData)
     {
-        m_handleReference->setOption(OPT_POSTFIELDS, postData);
+        if constexpr (std::is_same_v<std::decay_t<TPostData>, std::string>)
+        {
+            m_handleReference->setOptionString(OPT_POSTFIELDS, postData);
+        }
+        else if constexpr (std::is_same_v<std::decay_t<TPostData>, std::string_view>)
+        {
+            m_handleReference->setOptionStringView(OPT_POSTFIELDS, postData);
+        }
+        else
+        {
+            static_assert(std::is_same_v<std::decay_t<TPostData>, std::string> ||
+                              std::is_same_v<std::decay_t<TPostData>, std::string_view>,
+                          "Invalid type");
+        }
 
-        m_handleReference->setOption(OPT_POSTFIELDSIZE, postData.size());
+        m_handleReference->setOptionLong(OPT_POSTFIELDSIZE, postData.size());
 
         return static_cast<T&>(*this);
     }
@@ -349,7 +363,8 @@ public:
         : cURLRequest<PostRequest>(requestImplementator)
         , PostData<PostRequest>(requestImplementator)
     {
-        cURLRequest<PostRequest>::m_requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_POST));
+        cURLRequest<PostRequest>::m_requestImplementator->setOptionString(OPT_CUSTOMREQUEST,
+                                                                          METHOD_TYPE_MAP.at(METHOD_POST));
     }
     // LCOV_EXCL_START
     virtual ~PostRequest() = default;
@@ -372,7 +387,8 @@ public:
         : cURLRequest<PutRequest>(requestImplementator)
         , PostData<PutRequest>(requestImplementator)
     {
-        cURLRequest<PutRequest>::m_requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_PUT));
+        cURLRequest<PutRequest>::m_requestImplementator->setOptionString(OPT_CUSTOMREQUEST,
+                                                                         METHOD_TYPE_MAP.at(METHOD_PUT));
     }
 
     // LCOV_EXCL_START
@@ -397,8 +413,8 @@ public:
         : cURLRequest<PatchRequest>(requestImplementator)
         , PostData<PatchRequest>(requestImplementator)
     {
-        cURLRequest<PatchRequest>::m_requestImplementator->setOption(OPT_CUSTOMREQUEST,
-                                                                     METHOD_TYPE_MAP.at(METHOD_PATCH));
+        cURLRequest<PatchRequest>::m_requestImplementator->setOptionString(OPT_CUSTOMREQUEST,
+                                                                           METHOD_TYPE_MAP.at(METHOD_PATCH));
     }
 
     // LCOV_EXCL_START
@@ -419,7 +435,7 @@ public:
     explicit GetRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<GetRequest>(requestImplementator)
     {
-        requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_GET).c_str());
+        requestImplementator->setOptionString(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_GET));
     }
 
     // LCOV_EXCL_START
@@ -440,7 +456,7 @@ public:
     explicit DeleteRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<DeleteRequest>(requestImplementator)
     {
-        requestImplementator->setOption(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_DELETE).c_str());
+        requestImplementator->setOptionString(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_DELETE));
     }
 
     // LCOV_EXCL_START

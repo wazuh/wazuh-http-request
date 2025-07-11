@@ -21,10 +21,11 @@
 
 using wrapperType = cURLWrapper;
 
-void HTTPRequest::download(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters,
-    ConfigurationParameters configurationParameters)
+void HTTPRequest::download(std::variant<TRequestParameters<std::string>,
+                                        TRequestParameters<nlohmann::json>,
+                                        TRequestParameters<std::string_view>> requestParameters,
+                           PostRequestParameters postRequestParameters,
+                           ConfigurationParameters configurationParameters)
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -74,10 +75,11 @@ void HTTPRequest::download(
     }
 }
 
-void HTTPRequest::post(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters,
-    ConfigurationParameters configurationParameters)
+void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
+                                    TRequestParameters<nlohmann::json>,
+                                    TRequestParameters<std::string_view>> requestParameters,
+                       PostRequestParameters postRequestParameters,
+                       ConfigurationParameters configurationParameters)
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -99,7 +101,20 @@ void HTTPRequest::post(
                 {
                     auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(arg.data)
+                        .template postData<const std::string&>(arg.data)
+                        .appendHeaders(arg.httpHeaders)
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    onSuccess(req.response());
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -113,7 +128,7 @@ void HTTPRequest::post(
                     const std::string data = arg.data.dump();
                     auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(data)
+                        .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -153,10 +168,11 @@ void HTTPRequest::post(
     }
 }
 
-void HTTPRequest::get(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters,
-    ConfigurationParameters configurationParameters)
+void HTTPRequest::get(std::variant<TRequestParameters<std::string>,
+                                   TRequestParameters<nlohmann::json>,
+                                   TRequestParameters<std::string_view>> requestParameters,
+                      PostRequestParameters postRequestParameters,
+                      ConfigurationParameters configurationParameters)
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -208,10 +224,11 @@ void HTTPRequest::get(
     }
 }
 
-void HTTPRequest::put(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters,
-    ConfigurationParameters configurationParameters)
+void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
+                                   TRequestParameters<nlohmann::json>,
+                                   TRequestParameters<std::string_view>> requestParameters,
+                      PostRequestParameters postRequestParameters,
+                      ConfigurationParameters configurationParameters)
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -233,7 +250,20 @@ void HTTPRequest::put(
                 {
                     auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(arg.data)
+                        .template postData<const std::string&>(arg.data)
+                        .appendHeaders(arg.httpHeaders)
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    onSuccess(req.response());
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -247,7 +277,7 @@ void HTTPRequest::put(
                     const std::string data = arg.data.dump();
                     auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(data)
+                        .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -287,10 +317,11 @@ void HTTPRequest::put(
     }
 }
 
-void HTTPRequest::patch(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters,
-    ConfigurationParameters configurationParameters)
+void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
+                                     TRequestParameters<nlohmann::json>,
+                                     TRequestParameters<std::string_view>> requestParameters,
+                        PostRequestParameters postRequestParameters,
+                        ConfigurationParameters configurationParameters)
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -310,11 +341,24 @@ void HTTPRequest::patch(
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
-
                     auto req {
                         PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(arg.data)
+                        .template postData<const std::string&>(arg.data)
+                        .appendHeaders(arg.httpHeaders)
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    onSuccess(req.response());
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {
+                        PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -329,7 +373,7 @@ void HTTPRequest::patch(
                     auto req {
                         PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(data)
+                        .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -369,10 +413,11 @@ void HTTPRequest::patch(
     }
 }
 
-void HTTPRequest::delete_(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters,
-    ConfigurationParameters configurationParameters)
+void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
+                                       TRequestParameters<nlohmann::json>,
+                                       TRequestParameters<std::string_view>> requestParameters,
+                          PostRequestParameters postRequestParameters,
+                          ConfigurationParameters configurationParameters)
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};

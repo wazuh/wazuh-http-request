@@ -40,10 +40,10 @@ TEST_F(UrlRequestUnitTest, GetFileHttp)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
-    EXPECT_CALL(*request, setOption(optWriteData, SafeMatcherCast<void*>(_))).Times(1);
-    EXPECT_CALL(*request, setOption(optWriteFunction, zero)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionPtr(optWriteData, SafeMatcherCast<void*>(_))).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optWriteFunction, zero)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
@@ -56,10 +56,10 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnection)
     auto secureCommunication = SecureCommunication::builder();
     secureCommunication.caRootCertificate("root-ca.pem");
 
-    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
@@ -71,11 +71,11 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAuth)
     auto secureCommunication = SecureCommunication::builder();
     secureCommunication.caRootCertificate("root-ca.pem").basicAuth("admin:admin");
 
-    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
-    EXPECT_CALL(*request, setOption(optBasicAuth, "admin:admin")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optBasicAuth, "admin:admin")).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
@@ -87,12 +87,12 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnectionClientAuth)
     auto secureCommunication = SecureCommunication::builder();
     secureCommunication.caRootCertificate("root-ca.pem").sslCertificate("ssl_cert.pem").sslKey("ssl_key.pem");
 
-    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
-    EXPECT_CALL(*request, setOption(optSslCert, "ssl_cert.pem")).Times(1);
-    EXPECT_CALL(*request, setOption(optSslKey, "ssl_key.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optSslCert, "ssl_cert.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optSslKey, "ssl_key.pem")).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
@@ -107,13 +107,13 @@ TEST_F(UrlRequestUnitTest, HttpSecureConnectionBasicAndClientAuth)
         .sslKey("ssl_key.pem")
         .basicAuth("admin:admin");
 
-    EXPECT_CALL(*request, setOption(optUrl, "https://localhost:9200/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "root-ca.pem")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, 1L)).Times(1);
-    EXPECT_CALL(*request, setOption(optBasicAuth, "admin:admin")).Times(1);
-    EXPECT_CALL(*request, setOption(optSslCert, "ssl_cert.pem")).Times(1);
-    EXPECT_CALL(*request, setOption(optSslKey, "ssl_key.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "https://localhost:9200/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "root-ca.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optBasicAuth, "admin:admin")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optSslCert, "ssl_cert.pem")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optSslKey, "ssl_key.pem")).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request).url("https://localhost:9200/", secureCommunication).execute();
@@ -126,11 +126,11 @@ TEST_F(UrlRequestUnitTest, GetFileWithUnixSocket)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUnixSocketPath, "/tmp/wazuh-agent.sock")).Times(1);
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
-    EXPECT_CALL(*request, setOption(optWriteData, SafeMatcherCast<void*>(_))).Times(1);
-    EXPECT_CALL(*request, setOption(optWriteFunction, zero)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUnixSocketPath, "/tmp/wazuh-agent.sock")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionPtr(optWriteData, SafeMatcherCast<void*>(_))).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optWriteFunction, zero)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
@@ -148,13 +148,13 @@ TEST_F(UrlRequestUnitTest, GetApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "GET")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
     EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
-    EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
-    EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     GetRequest::builder(request)
@@ -173,13 +173,13 @@ TEST_F(UrlRequestUnitTest, PostApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "POST")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "POST")).Times(1);
     EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
-    EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
-    EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -198,15 +198,15 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "POST")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "POST")).Times(1);
     EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
-    EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
-    EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optPostFields, R"({"name":"wazuh"})")).Times(1);
-    EXPECT_CALL(*request, setOption(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optPostFields, R"({"name":"wazuh"})")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -215,7 +215,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFields)
         .userAgent("Wazuh-Agent/1.0")
         .certificate("cert.ca")
         .timeout(10)
-        .postData(R"({"name":"wazuh"})")
+        .template postData<std::string>(R"({"name":"wazuh"})")
         .execute();
 }
 
@@ -226,16 +226,16 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUnixSocketPath, "/tmp/wazuh-agent.sock")).Times(1);
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "POST")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUnixSocketPath, "/tmp/wazuh-agent.sock")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "POST")).Times(1);
     EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
-    EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
-    EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optPostFields, R"({"name":"wazuh"})")).Times(1);
-    EXPECT_CALL(*request, setOption(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optPostFields, R"({"name":"wazuh"})")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optPostFieldSize, std::string(R"({"name":"wazuh"})").length())).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PostRequest::builder(request)
@@ -244,7 +244,7 @@ TEST_F(UrlRequestUnitTest, PostApiRequestWithPostFieldsAndUnixSocket)
         .userAgent("Wazuh-Agent/1.0")
         .certificate("cert.ca")
         .timeout(10)
-        .postData(R"({"name":"wazuh"})")
+        .template postData<std::string>(R"({"name":"wazuh"})")
         .unixSocketPath("/tmp/wazuh-agent.sock")
         .execute();
 }
@@ -256,13 +256,13 @@ TEST_F(UrlRequestUnitTest, PutApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "PUT")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "PUT")).Times(1);
     EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
-    EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
-    EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     PutRequest::builder(request)
@@ -281,13 +281,13 @@ TEST_F(UrlRequestUnitTest, DeleteApiRequest)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "http://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCustomRequest, "DELETE")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "DELETE")).Times(1);
     EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
-    EXPECT_CALL(*request, setOption(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "cert.ca")).Times(1);
-    EXPECT_CALL(*request, setOption(optTimeout, 10)).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
 
     DeleteRequest::builder(request)
@@ -370,9 +370,9 @@ TEST_F(UrlRequestUnitTest, HttpsCertExists)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optCainfo, "/etc/ssl/certs/ca-certificates.crt")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "https://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "/etc/ssl/certs/ca-certificates.crt")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
@@ -389,8 +389,8 @@ TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
-    EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, false)).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "https://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 0L)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 

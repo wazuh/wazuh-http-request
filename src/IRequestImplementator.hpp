@@ -48,21 +48,28 @@ public:
      * @param optIndex The option index.
      * @param ptr The option value.
      */
-    virtual void setOption(const OPTION_REQUEST_TYPE optIndex, void* ptr) = 0;
+    virtual void setOptionPtr(const OPTION_REQUEST_TYPE optIndex, void* ptr) = 0;
 
     /**
      * @brief Virtual method to set options to the handle.
      * @param optIndex The option index.
      * @param opt The option value.
      */
-    virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) = 0;
+    virtual void setOptionString(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) = 0;
 
     /**
      * @brief Virtual method to set options to the handle.
      * @param optIndex The option index.
      * @param opt The option value.
      */
-    virtual void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) = 0;
+    virtual void setOptionStringView(const OPTION_REQUEST_TYPE optIndex, std::string_view opt) = 0;
+
+    /**
+     * @brief Virtual method to set options to the handle.
+     * @param optIndex The option index.
+     * @param opt The option value.
+     */
+    virtual void setOptionLong(const OPTION_REQUEST_TYPE optIndex, const long opt) = 0;
 
     /**
      * @brief Virtual method to perform the request.

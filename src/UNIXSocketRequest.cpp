@@ -18,10 +18,11 @@
 
 using wrapperType = cURLWrapper;
 
-void UNIXSocketRequest::download(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters = {},
-    ConfigurationParameters configurationParameters = {})
+void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
+                                              TRequestParameters<nlohmann::json>,
+                                              TRequestParameters<std::string_view>> requestParameters,
+                                 PostRequestParameters postRequestParameters = {},
+                                 ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -72,10 +73,11 @@ void UNIXSocketRequest::download(
     }
 }
 
-void UNIXSocketRequest::post(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters = {},
-    ConfigurationParameters configurationParameters = {})
+void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
+                                          TRequestParameters<nlohmann::json>,
+                                          TRequestParameters<std::string_view>> requestParameters,
+                             PostRequestParameters postRequestParameters = {},
+                             ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -100,7 +102,20 @@ void UNIXSocketRequest::post(
                         .unixSocketPath(arg.url.unixSocketPath())
                         .timeout(timeout)
                         .userAgent(userAgent)
-                        .postData(arg.data)
+                        .template postData<const std::string&>(arg.data)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    onSuccess(req.response());
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .unixSocketPath(arg.url.unixSocketPath())
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .template postData<std::string_view>(arg.data)
                         .outputFile(outputFile)
                         .execute();
 
@@ -114,7 +129,7 @@ void UNIXSocketRequest::post(
                         .unixSocketPath(arg.url.unixSocketPath())
                         .timeout(timeout)
                         .userAgent(userAgent)
-                        .postData(data)
+                        .template postData<const std::string&>(data)
                         .outputFile(outputFile)
                         .execute();
 
@@ -151,10 +166,11 @@ void UNIXSocketRequest::post(
     }
 }
 
-void UNIXSocketRequest::get(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters = {},
-    ConfigurationParameters configurationParameters = {})
+void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
+                                         TRequestParameters<nlohmann::json>,
+                                         TRequestParameters<std::string_view>> requestParameters,
+                            PostRequestParameters postRequestParameters = {},
+                            ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -207,10 +223,11 @@ void UNIXSocketRequest::get(
     }
 }
 
-void UNIXSocketRequest::put(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters = {},
-    ConfigurationParameters configurationParameters = {})
+void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
+                                         TRequestParameters<nlohmann::json>,
+                                         TRequestParameters<std::string_view>> requestParameters,
+                            PostRequestParameters postRequestParameters = {},
+                            ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -235,7 +252,20 @@ void UNIXSocketRequest::put(
                         .unixSocketPath(arg.url.unixSocketPath())
                         .timeout(timeout)
                         .userAgent(userAgent)
-                        .postData(arg.data)
+                        .template postData<const std::string&>(arg.data)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    onSuccess(req.response());
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .unixSocketPath(arg.url.unixSocketPath())
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .template postData<std::string_view>(arg.data)
                         .outputFile(outputFile)
                         .execute();
 
@@ -246,7 +276,7 @@ void UNIXSocketRequest::put(
                     const auto data = arg.data.dump();
                     auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
-                        .postData(data)
+                        .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -286,10 +316,11 @@ void UNIXSocketRequest::put(
     }
 }
 
-void UNIXSocketRequest::patch(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters = {},
-    ConfigurationParameters configurationParameters = {})
+void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
+                                           TRequestParameters<nlohmann::json>,
+                                           TRequestParameters<std::string_view>> requestParameters,
+                              PostRequestParameters postRequestParameters = {},
+                              ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
@@ -315,7 +346,21 @@ void UNIXSocketRequest::patch(
                         .unixSocketPath(arg.url.unixSocketPath())
                         .timeout(timeout)
                         .userAgent(userAgent)
-                        .postData(arg.data)
+                        .template postData<const std::string&>(arg.data)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    onSuccess(req.response());
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {
+                        PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .unixSocketPath(arg.url.unixSocketPath())
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .template postData<std::string_view>(arg.data)
                         .outputFile(outputFile)
                         .execute();
 
@@ -330,7 +375,7 @@ void UNIXSocketRequest::patch(
                         .unixSocketPath(arg.url.unixSocketPath())
                         .timeout(timeout)
                         .userAgent(userAgent)
-                        .postData(data)
+                        .template postData<const std::string&>(data)
                         .outputFile(outputFile)
                         .execute();
 
@@ -367,10 +412,11 @@ void UNIXSocketRequest::patch(
     }
 }
 
-void UNIXSocketRequest::delete_(
-    std::variant<TRequestParameters<std::string>, TRequestParameters<nlohmann::json>> requestParameters,
-    PostRequestParameters postRequestParameters = {},
-    ConfigurationParameters configurationParameters = {})
+void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
+                                             TRequestParameters<nlohmann::json>,
+                                             TRequestParameters<std::string_view>> requestParameters,
+                                PostRequestParameters postRequestParameters = {},
+                                ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
     const auto& onError {postRequestParameters.onError};
