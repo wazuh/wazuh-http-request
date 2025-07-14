@@ -37,7 +37,9 @@ public:
      * @param postRequestParameters Parameters that define the behavior after the request is made.
      * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    void download(std::variant<TRequestParameters<std::string>,TRequestParameters<nlohmann::json>> requestParameters,
+    void download(std::variant<TRequestParameters<std::string>,
+                               TRequestParameters<nlohmann::json>,
+                               TRequestParameters<std::string_view>> requestParameters,
                   PostRequestParameters postRequestParameters,
                   ConfigurationParameters configurationParameters);
     /**
@@ -47,7 +49,9 @@ public:
      * @param postRequestParameters Parameters that define the behavior after the request is made.
      * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    void post(std::variant<TRequestParameters<std::string>,TRequestParameters<nlohmann::json>> requestParameters,
+    void post(std::variant<TRequestParameters<std::string>,
+                           TRequestParameters<nlohmann::json>,
+                           TRequestParameters<std::string_view>> requestParameters,
               PostRequestParameters postRequestParameters,
               ConfigurationParameters configurationParameters);
 
@@ -58,7 +62,9 @@ public:
      * @param postRequestParameters Parameters that define the behavior after the request is made.
      * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    void get(std::variant<TRequestParameters<std::string>,TRequestParameters<nlohmann::json>> requestParameters,
+    void get(std::variant<TRequestParameters<std::string>,
+                          TRequestParameters<nlohmann::json>,
+                          TRequestParameters<std::string_view>> requestParameters,
              PostRequestParameters postRequestParameters,
              ConfigurationParameters configurationParameters);
     /**
@@ -68,7 +74,9 @@ public:
      * @param postRequestParameters Parameters that define the behavior after the request is made.
      * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    void put(std::variant<TRequestParameters<std::string>,TRequestParameters<nlohmann::json>> requestParameters,
+    void put(std::variant<TRequestParameters<std::string>,
+                          TRequestParameters<nlohmann::json>,
+                          TRequestParameters<std::string_view>> requestParameters,
              PostRequestParameters postRequestParameters,
              ConfigurationParameters configurationParameters);
 
@@ -79,7 +87,9 @@ public:
      * @param postRequestParameters Parameters that define the behavior after the request is made.
      * @param configurationParameters Parameters to configure the behavior of the request..
      */
-    void patch(std::variant<TRequestParameters<std::string>,TRequestParameters<nlohmann::json>> requestParameters,
+    void patch(std::variant<TRequestParameters<std::string>,
+                            TRequestParameters<nlohmann::json>,
+                            TRequestParameters<std::string_view>> requestParameters,
                PostRequestParameters postRequestParameters,
                ConfigurationParameters configurationParameters);
 
@@ -90,7 +100,9 @@ public:
      * @param postRequestParameters Parameters that define the behavior after the request is made.
      * @param configurationParameters Parameters to configure the behavior of the request.
      */
-    void delete_(std::variant<TRequestParameters<std::string>,TRequestParameters<nlohmann::json>> requestParameters,
+    void delete_(std::variant<TRequestParameters<std::string>,
+                              TRequestParameters<nlohmann::json>,
+                              TRequestParameters<std::string_view>> requestParameters,
                  PostRequestParameters postRequestParameters,
                  ConfigurationParameters configurationParameters);
 };

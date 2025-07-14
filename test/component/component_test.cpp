@@ -630,7 +630,7 @@ TEST_F(ComponentTestInternalParameters, PostError)
     {
         PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())
             .url("http://localhost:44441/invalid_file")
-            .postData(R"({"hello":"world"})")
+            .postData<const std::string&>(R"({"hello":"world"})")
             .execute();
     }
     catch (const std::exception& ex)
@@ -650,7 +650,7 @@ TEST_F(ComponentTestInternalParameters, PutError)
     {
         PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())
             .url("http://localhost:44441/invalid_file")
-            .postData(R"({"hello":"world"})")
+            .postData<const std::string&>(R"({"hello":"world"})")
             .execute();
     }
     catch (const std::exception& ex)
@@ -1513,6 +1513,30 @@ TEST_F(ComponentTestInterface, Post100Mbs)
                                                             m_callbackComplete = true;
                                                         }});
     const auto postPost = getMemoryUsedByTheCurrentProcess();
+
+    EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);
+}
+
+/**
+ * @brief Test 100MBs post footprint
+ */
+TEST_F(ComponentTestInterface, Post100MbsStringView)
+{
+    constexpr uint64_t TEST_SIZE = {100 * 1024 * 1024};
+    // Simulate a server RSS usage of 3 times the size of the data
+    constexpr uint64_t SERVER_RSS_USAGE = {(TEST_SIZE * 3) / 1024};
+    const auto data = std::string(TEST_SIZE, 'a');
+    const auto prePost = getMemoryUsedByTheCurrentProcess();
+
+    HTTPRequest::instance().post(RequestParametersStringView {.url = HttpURL("http://localhost:44441/"), .data = data},
+                                 PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                        {
+                                                            m_callbackComplete = true;
+                                                        }});
+    const auto postPost = getMemoryUsedByTheCurrentProcess();
+    std::cout << " Post post: " << postPost << std::endl;
+    std::cout << " Pre post: " << prePost << std::endl;
+    std::cout << " Server RSS usage: " << SERVER_RSS_USAGE << std::endl;
 
     EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);
 }

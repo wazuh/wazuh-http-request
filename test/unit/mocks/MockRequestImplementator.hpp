@@ -26,15 +26,19 @@ public:
     /**
      * @brief Mock method to set request options.
      */
-    MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, void* ptr), (override));
+    MOCK_METHOD(void, setOptionPtr, (const OPTION_REQUEST_TYPE optIndex, void* ptr), (override));
     /**
      * @brief Mock method to set request options.
      */
-    MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, const std::string& opt), (override));
+    MOCK_METHOD(void, setOptionString, (const OPTION_REQUEST_TYPE optIndex, const std::string& opt), (override));
     /**
      * @brief Mock method to set request options.
      */
-    MOCK_METHOD(void, setOption, (const OPTION_REQUEST_TYPE optIndex, const long int opt), (override));
+    MOCK_METHOD(void, setOptionLong, (const OPTION_REQUEST_TYPE optIndex, const long int opt), (override));
+    /**
+     * @brief Mock method to set request options.
+     */
+    MOCK_METHOD(void, setOptionStringView, (const OPTION_REQUEST_TYPE optIndex, std::string_view opt), (override));
     /**
      * @brief Mock method to set execute the request.
      */

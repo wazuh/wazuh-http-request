@@ -96,15 +96,15 @@ public:
             throw std::runtime_error("cURL initialization failed");
         }
 
-        this->setOption(OPT_WRITEFUNCTION, reinterpret_cast<void*>(cURLWrapper::writeData));
+        this->setOptionPtr(OPT_WRITEFUNCTION, reinterpret_cast<void*>(cURLWrapper::writeData));
 
-        this->setOption(OPT_WRITEDATA, &m_returnValue);
+        this->setOptionPtr(OPT_WRITEDATA, &m_returnValue);
 
-        this->setOption(OPT_FAILONERROR, 1l);
+        this->setOptionLong(OPT_FAILONERROR, 1l);
 
-        this->setOption(OPT_FOLLOW_REDIRECT, 1l);
+        this->setOptionLong(OPT_FOLLOW_REDIRECT, 1l);
 
-        this->setOption(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
+        this->setOptionLong(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
     }
 
     virtual ~cURLWrapper() = default;
@@ -123,7 +123,7 @@ public:
      * @param optIndex The option index.
      * @param ptr The option value.
      */
-    void setOption(const OPTION_REQUEST_TYPE optIndex, void* ptr) override
+    void setOptionPtr(const OPTION_REQUEST_TYPE optIndex, void* ptr) override
     {
         auto ret = curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), ptr);
 
@@ -138,7 +138,7 @@ public:
      * @param optIndex The option index.
      * @param opt The option value.
      */
-    void setOption(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) override
+    void setOptionString(const OPTION_REQUEST_TYPE optIndex, const std::string& opt) override
     {
         auto ret =
             curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt.c_str());
@@ -154,7 +154,23 @@ public:
      * @param optIndex The option index.
      * @param opt The option value.
      */
-    void setOption(const OPTION_REQUEST_TYPE optIndex, const long opt) override
+    void setOptionStringView(const OPTION_REQUEST_TYPE optIndex, std::string_view opt) override
+    {
+        auto ret =
+            curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt.data());
+
+        if (ret != CURLE_OK)
+        {
+            throw std::runtime_error("cURLWrapper::setOption() failed");
+        }
+    }
+
+    /**
+     * @brief This method sets an option to the curl handler.
+     * @param optIndex The option index.
+     * @param opt The option value.
+     */
+    void setOptionLong(const OPTION_REQUEST_TYPE optIndex, const long opt) override
     {
         auto ret = curl_easy_setopt(m_curlHandler->getHandler().get(), OPTION_REQUEST_TYPE_MAP.at(optIndex), opt);
 
