@@ -198,13 +198,14 @@ struct ConfigurationParameters
  * @brief The structure groups all the parameters related to the actions to be performed after the request is made, like
  * error handling, results processing, etc. They can be thought of as "what to do after".
  */
-struct PostRequestParameters
+template<typename T = const std::string&>
+struct TPostRequestParameters
 {
     /**
      * @brief Callback to be called when the request is successful.
      *
      */
-    std::function<void(const std::string&)> onSuccess = [](auto) {
+    std::function<void(T)> onSuccess = [](auto) {
     };
 
     /**
@@ -219,6 +220,8 @@ struct PostRequestParameters
      */
     const std::string& outputFile = "";
 };
+using PostRequestParameters = TPostRequestParameters<>;
+using PostRequestParametersRValue = TPostRequestParameters<std::string&&>;
 
 /**
  * @brief This class is an interface to perform URL requests.
@@ -238,7 +241,8 @@ public:
     virtual void download(std::variant<TRequestParameters<std::string>,
                                        TRequestParameters<nlohmann::json>,
                                        TRequestParameters<std::string_view>> requestParameters,
-                          PostRequestParameters postRequestParameters,
+                          std::variant<TPostRequestParameters<const std::string&>,
+                                       TPostRequestParameters<std::string&&>> postRequestParameters,
                           ConfigurationParameters configurationParameters) = 0;
 
     /**
@@ -251,7 +255,8 @@ public:
     virtual void post(std::variant<TRequestParameters<std::string>,
                                    TRequestParameters<nlohmann::json>,
                                    TRequestParameters<std::string_view>> requestParameters,
-                      PostRequestParameters postRequestParameters,
+                      std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                          postRequestParameters,
                       ConfigurationParameters configurationParameters) = 0;
 
     /**
@@ -264,7 +269,8 @@ public:
     virtual void get(std::variant<TRequestParameters<std::string>,
                                   TRequestParameters<nlohmann::json>,
                                   TRequestParameters<std::string_view>> requestParameters,
-                     PostRequestParameters postRequestParameters,
+                     std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                         postRequestParameters,
                      ConfigurationParameters configurationParameters) = 0;
 
     /**
@@ -277,7 +283,8 @@ public:
     virtual void put(std::variant<TRequestParameters<std::string>,
                                   TRequestParameters<nlohmann::json>,
                                   TRequestParameters<std::string_view>> requestParameters,
-                     PostRequestParameters postRequestParameters,
+                     std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                         postRequestParameters,
                      ConfigurationParameters configurationParameters) = 0;
 
     /**
@@ -290,7 +297,8 @@ public:
     virtual void patch(std::variant<TRequestParameters<std::string>,
                                     TRequestParameters<nlohmann::json>,
                                     TRequestParameters<std::string_view>> requestParameters,
-                       PostRequestParameters postRequestParameters,
+                       std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                           postRequestParameters,
                        ConfigurationParameters configurationParameters) = 0;
 
     /**
@@ -303,7 +311,8 @@ public:
     virtual void delete_(std::variant<TRequestParameters<std::string>,
                                       TRequestParameters<nlohmann::json>,
                                       TRequestParameters<std::string_view>> requestParameters,
-                         PostRequestParameters postRequestParameters,
+                         std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                             postRequestParameters,
                          ConfigurationParameters configurationParameters) = 0;
 };
 

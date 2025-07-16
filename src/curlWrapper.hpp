@@ -56,7 +56,7 @@ class cURLWrapper final : public IRequestImplementator
 private:
     using deleterCurlStringList = CustomDeleter<decltype(&curl_slist_free_all), curl_slist_free_all>;
     std::unique_ptr<curl_slist, deleterCurlStringList> m_curlHeaders;
-    std::string m_returnValue;
+    std::string& m_returnValue;
     std::shared_ptr<ICURLHandler> m_curlHandler;
 
     static size_t writeData(char* data, size_t size, size_t nmemb, void* userdata)
@@ -86,8 +86,10 @@ public:
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler.
      */
-    cURLWrapper(CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
+    cURLWrapper(std::string& returnValue,
+                CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
                 const std::atomic<bool>& shouldRun = true)
+        : m_returnValue(returnValue)
     {
         m_curlHandler = curlHandlerInit(handlerType, shouldRun);
 
@@ -108,15 +110,6 @@ public:
     }
 
     virtual ~cURLWrapper() = default;
-
-    /**
-     * @brief This method returns the value of the last request.
-     * @return The value of the last request.
-     */
-    inline const std::string response() override
-    {
-        return m_returnValue;
-    }
 
     /**
      * @brief This method sets an option to the curl handler.

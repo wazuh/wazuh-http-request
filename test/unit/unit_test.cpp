@@ -31,7 +31,6 @@ constexpr OPTION_REQUEST_TYPE optVerifyPeer {OPT_VERIFYPEER};
 constexpr OPTION_REQUEST_TYPE optSslCert {OPT_SSL_CERT};
 constexpr OPTION_REQUEST_TYPE optSslKey {OPT_SSL_KEY};
 constexpr OPTION_REQUEST_TYPE optBasicAuth {OPT_BASIC_AUTH};
-constexpr long zero {0};
 
 /**
  * @brief This test checks the HTTP request.
@@ -43,7 +42,7 @@ TEST_F(UrlRequestUnitTest, GetFileHttp)
     EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
     EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
     EXPECT_CALL(*request, setOptionPtr(optWriteData, SafeMatcherCast<void*>(_))).Times(1);
-    EXPECT_CALL(*request, setOptionLong(optWriteFunction, zero)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optWriteFunction, 0)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
@@ -130,7 +129,7 @@ TEST_F(UrlRequestUnitTest, GetFileWithUnixSocket)
     EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
     EXPECT_CALL(*request, setOptionString(optCustomRequest, "GET")).Times(1);
     EXPECT_CALL(*request, setOptionPtr(optWriteData, SafeMatcherCast<void*>(_))).Times(1);
-    EXPECT_CALL(*request, setOptionLong(optWriteFunction, zero)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optWriteFunction, 0)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 

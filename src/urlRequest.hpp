@@ -130,14 +130,6 @@ public:
     }
 
     /**
-     * @brief This method returns the response.
-     */
-    inline const std::string response() const
-    {
-        return m_requestImplementator->response();
-    }
-
-    /**
      * @brief This method sets the unix socket path and returns a reference to the object.
      * @param sock Unix socket path.
      * @return A reference to the object.
