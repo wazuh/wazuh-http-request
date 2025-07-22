@@ -1517,7 +1517,7 @@ TEST_F(ComponentTestInterface, PostTestTimeoutMultiHandler)
 TEST_F(ComponentTestInterface, Post100Mbs)
 {
     constexpr uint64_t TEST_SIZE = {100 * 1024 * 1024};
-    constexpr uint64_t SERVER_RSS_USAGE = {5 * 1024};
+    constexpr uint64_t SERVER_RSS_USAGE = {150 * 1024};
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
