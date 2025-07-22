@@ -1517,8 +1517,7 @@ TEST_F(ComponentTestInterface, PostTestTimeoutMultiHandler)
 TEST_F(ComponentTestInterface, Post100Mbs)
 {
     constexpr uint64_t TEST_SIZE = {100 * 1024 * 1024};
-    // Simulate a server RSS usage of 3 times the size of the data
-    constexpr uint64_t SERVER_RSS_USAGE = {(TEST_SIZE * 3) / 1024};
+    constexpr uint64_t SERVER_RSS_USAGE = {5 * 1024};
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
@@ -1527,6 +1526,7 @@ TEST_F(ComponentTestInterface, Post100Mbs)
                                                         {
                                                             m_callbackComplete = true;
                                                         }});
+    fakeFileServer.reset();
     const auto postPost = getMemoryUsedByTheCurrentProcess();
 
     EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);
@@ -1538,8 +1538,7 @@ TEST_F(ComponentTestInterface, Post100Mbs)
 TEST_F(ComponentTestInterface, Post100MbsStringView)
 {
     constexpr uint64_t TEST_SIZE = {100 * 1024 * 1024};
-    // Simulate a server RSS usage of 3 times the size of the data
-    constexpr uint64_t SERVER_RSS_USAGE = {(TEST_SIZE * 3) / 1024};
+    constexpr uint64_t SERVER_RSS_USAGE = {5 * 1024};
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
@@ -1548,6 +1547,7 @@ TEST_F(ComponentTestInterface, Post100MbsStringView)
                                                         {
                                                             m_callbackComplete = true;
                                                         }});
+    fakeFileServer.reset();
     const auto postPost = getMemoryUsedByTheCurrentProcess();
 
     EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);

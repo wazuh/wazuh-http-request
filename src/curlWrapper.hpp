@@ -16,16 +16,11 @@
 #include "IRequestImplementator.hpp"
 #include "curl.h"
 #include "curlHandlerCache.hpp"
-#include "curlMultiHandler.hpp"
-#include "curlSingleHandler.hpp"
 #include "customDeleter.hpp"
-#include <algorithm>
 #include <atomic>
 #include <map>
 #include <memory>
-#include <ostream>
 #include <stdexcept>
-#include <thread>
 
 static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP = {
     {OPT_URL, CURLOPT_URL},
@@ -44,7 +39,8 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_VERIFYPEER, CURLOPT_SSL_VERIFYPEER},
     {OPT_SSL_CERT, CURLOPT_SSLCERT},
     {OPT_SSL_KEY, CURLOPT_SSLKEY},
-    {OPT_BASIC_AUTH, CURLOPT_USERPWD}};
+    {OPT_BASIC_AUTH, CURLOPT_USERPWD},
+};
 
 auto constexpr MAX_REDIRECTIONS {20l};
 
@@ -56,13 +52,30 @@ class cURLWrapper final : public IRequestImplementator
 private:
     using deleterCurlStringList = CustomDeleter<decltype(&curl_slist_free_all), curl_slist_free_all>;
     std::unique_ptr<curl_slist, deleterCurlStringList> m_curlHeaders;
-    std::string& m_returnValue;
     std::shared_ptr<ICURLHandler> m_curlHandler;
+
+    struct ResponseData
+    {
+        double contentLength = 0;
+        std::string& m_returnValue;
+        ICURLHandler* m_curlHandler;
+    };
+    ResponseData m_response;
 
     static size_t writeData(char* data, size_t size, size_t nmemb, void* userdata)
     {
-        const auto str {reinterpret_cast<std::string*>(userdata)};
-        str->append(data, size * nmemb);
+        const auto response {static_cast<ResponseData*>(userdata)};
+        if (response->contentLength == 0)
+        {
+            curl_easy_getinfo(response->m_curlHandler->getHandler().get(),
+                              CURLINFO_CONTENT_LENGTH_DOWNLOAD,
+                              &response->contentLength);
+            if (response->contentLength > 0)
+            {
+                response->m_returnValue.reserve(static_cast<size_t>(response->contentLength));
+            }
+        }
+        response->m_returnValue.append(data, size * nmemb);
         return size * nmemb;
     }
 
@@ -89,7 +102,7 @@ public:
     cURLWrapper(std::string& returnValue,
                 CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
                 const std::atomic<bool>& shouldRun = true)
-        : m_returnValue(returnValue)
+        : m_response {0, returnValue, nullptr}
     {
         m_curlHandler = curlHandlerInit(handlerType, shouldRun);
 
@@ -98,9 +111,11 @@ public:
             throw std::runtime_error("cURL initialization failed");
         }
 
+        m_response.m_curlHandler = m_curlHandler.get();
+
         this->setOptionPtr(OPT_WRITEFUNCTION, reinterpret_cast<void*>(cURLWrapper::writeData));
 
-        this->setOptionPtr(OPT_WRITEDATA, &m_returnValue);
+        this->setOptionPtr(OPT_WRITEDATA, &m_response);
 
         this->setOptionLong(OPT_FAILONERROR, 1l);
 

@@ -12,9 +12,7 @@
 #include "UNIXSocketRequest.hpp"
 #include "factoryRequestImplemetator.hpp"
 #include "urlRequest.hpp"
-#include <atomic>
 #include <string>
-#include <unordered_set>
 
 using wrapperType = cURLWrapper;
 
@@ -22,7 +20,7 @@ void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
                                               TRequestParameters<nlohmann::json>,
                                               TRequestParameters<std::string_view>> requestParameters,
                                  std::variant<TPostRequestParameters<const std::string&>,
-                                              TPostRequestParameters<std::string&&>> postRequestParameters = {},
+                                              TPostRequestParameters<std::string&&>> postRequestParameters,
                                  ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
@@ -78,7 +76,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                                           TRequestParameters<nlohmann::json>,
                                           TRequestParameters<std::string_view>> requestParameters,
                              std::variant<TPostRequestParameters<const std::string&>,
-                                          TPostRequestParameters<std::string&&>> postRequestParameters = {},
+                                          TPostRequestParameters<std::string&&>> postRequestParameters,
                              ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
@@ -213,7 +211,7 @@ void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
                                          TRequestParameters<nlohmann::json>,
                                          TRequestParameters<std::string_view>> requestParameters,
                             std::variant<TPostRequestParameters<const std::string&>,
-                                         TPostRequestParameters<std::string&&>> postRequestParameters = {},
+                                         TPostRequestParameters<std::string&&>> postRequestParameters,
                             ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
@@ -285,7 +283,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                                          TRequestParameters<nlohmann::json>,
                                          TRequestParameters<std::string_view>> requestParameters,
                             std::variant<TPostRequestParameters<const std::string&>,
-                                         TPostRequestParameters<std::string&&>> postRequestParameters = {},
+                                         TPostRequestParameters<std::string&&>> postRequestParameters,
                             ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
@@ -421,7 +419,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                                            TRequestParameters<nlohmann::json>,
                                            TRequestParameters<std::string_view>> requestParameters,
                               std::variant<TPostRequestParameters<const std::string&>,
-                                           TPostRequestParameters<std::string&&>> postRequestParameters = {},
+                                           TPostRequestParameters<std::string&&>> postRequestParameters,
                               ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters
@@ -557,7 +555,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                                              TRequestParameters<nlohmann::json>,
                                              TRequestParameters<std::string_view>> requestParameters,
                                 std::variant<TPostRequestParameters<const std::string&>,
-                                             TPostRequestParameters<std::string&&>> postRequestParameters = {},
+                                             TPostRequestParameters<std::string&&>> postRequestParameters,
                                 ConfigurationParameters configurationParameters = {})
 {
     // Post request parameters

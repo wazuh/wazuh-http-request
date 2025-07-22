@@ -14,9 +14,7 @@
 #include "factoryRequestImplemetator.hpp"
 #include "json.hpp"
 #include "urlRequest.hpp"
-#include <atomic>
 #include <string>
-#include <unordered_set>
 #include <variant>
 
 using wrapperType = cURLWrapper;
