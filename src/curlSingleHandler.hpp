@@ -18,7 +18,6 @@
 #include "customDeleter.hpp"
 #include <memory>
 #include <stdexcept>
-#include <utility>
 
 using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 

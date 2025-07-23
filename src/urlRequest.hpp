@@ -16,10 +16,8 @@
 #include "builder.hpp"
 #include "customDeleter.hpp"
 #include "fsWrapper.hpp"
-#include "json.hpp"
 #include "secureCommunication.hpp"
 #include <algorithm>
-#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -127,14 +125,6 @@ public:
     void execute()
     {
         m_requestImplementator->execute();
-    }
-
-    /**
-     * @brief This method returns the response.
-     */
-    inline const std::string response() const
-    {
-        return m_requestImplementator->response();
     }
 
     /**

@@ -39,7 +39,8 @@ public:
     void download(std::variant<TRequestParameters<std::string>,
                                TRequestParameters<nlohmann::json>,
                                TRequestParameters<std::string_view>> requestParameters,
-                  PostRequestParameters postRequestParameters = {},
+                  std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                      postRequestParameters = TPostRequestParameters<const std::string&> {},
                   ConfigurationParameters configurationParameters = {});
 
     /**
@@ -52,7 +53,8 @@ public:
     void post(std::variant<TRequestParameters<std::string>,
                            TRequestParameters<nlohmann::json>,
                            TRequestParameters<std::string_view>> requestParameters,
-              PostRequestParameters postRequestParameters = {},
+              std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                  postRequestParameters = TPostRequestParameters<const std::string&> {},
               ConfigurationParameters configurationParameters = {});
 
     /**
@@ -65,7 +67,8 @@ public:
     void get(std::variant<TRequestParameters<std::string>,
                           TRequestParameters<nlohmann::json>,
                           TRequestParameters<std::string_view>> requestParameters,
-             PostRequestParameters postRequestParameters = {},
+             std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                 postRequestParameters = TPostRequestParameters<const std::string&> {},
              ConfigurationParameters configurationParameters = {});
 
     /**
@@ -78,7 +81,8 @@ public:
     void put(std::variant<TRequestParameters<std::string>,
                           TRequestParameters<nlohmann::json>,
                           TRequestParameters<std::string_view>> requestParameters,
-             PostRequestParameters postRequestParameters = {},
+             std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                 postRequestParameters = TPostRequestParameters<const std::string&> {},
              ConfigurationParameters configurationParameters = {});
 
     /**
@@ -91,7 +95,8 @@ public:
     void patch(std::variant<TRequestParameters<std::string>,
                             TRequestParameters<nlohmann::json>,
                             TRequestParameters<std::string_view>> requestParameters,
-               PostRequestParameters postRequestParameters = {},
+               std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                   postRequestParameters = TPostRequestParameters<const std::string&> {},
                ConfigurationParameters configurationParameters = {});
 
     /**
@@ -104,7 +109,8 @@ public:
     void delete_(std::variant<TRequestParameters<std::string>,
                               TRequestParameters<nlohmann::json>,
                               TRequestParameters<std::string_view>> requestParameters,
-                 PostRequestParameters postRequestParameters = {},
+                 std::variant<TPostRequestParameters<const std::string&>, TPostRequestParameters<std::string&&>>
+                     postRequestParameters = TPostRequestParameters<const std::string&> {},
                  ConfigurationParameters configurationParameters = {});
 };
 

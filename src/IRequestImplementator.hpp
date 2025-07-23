@@ -77,12 +77,6 @@ public:
     virtual void execute() = 0;
 
     /**
-     * @brief Virtual method to get the value of the last request.
-     * @return The value of the last request.
-     */
-    virtual inline const std::string response() = 0;
-
-    /**
      * @brief Virtual method to add a header to the handle.
      * @param header The header to be added.
      */

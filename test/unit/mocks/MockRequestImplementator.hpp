@@ -44,10 +44,6 @@ public:
      */
     MOCK_METHOD(void, execute, (), (override));
     /**
-     * @brief Mock method to get the response.
-     */
-    MOCK_METHOD(const std::string, response, (), (override));
-    /**
      * @brief Mock method to append a header.
      */
     MOCK_METHOD(void, appendHeader, (const std::string& header), (override));

@@ -572,7 +572,11 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create()).url("").outputFile(TEST_FILE_1).execute();
+        std::string returnValue;
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))
+            .url("")
+            .outputFile(TEST_FILE_1)
+            .execute();
     }
     catch (const std::exception& ex)
     {
@@ -589,7 +593,8 @@ TEST_F(ComponentTestInternalParameters, DownloadFileEmptyInvalidUrl2)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+        std::string returnValue;
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))
             .url("http://")
             .outputFile(TEST_FILE_1)
             .execute();
@@ -609,7 +614,8 @@ TEST_F(ComponentTestInternalParameters, GetError)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+        std::string returnValue;
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))
             .url("http://localhost:44441/invalid_file")
             .execute();
     }
@@ -628,7 +634,8 @@ TEST_F(ComponentTestInternalParameters, PostError)
 {
     try
     {
-        PostRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+        std::string returnValue;
+        PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))
             .url("http://localhost:44441/invalid_file")
             .postData<const std::string&>(R"({"hello":"world"})")
             .execute();
@@ -648,7 +655,8 @@ TEST_F(ComponentTestInternalParameters, PutError)
 {
     try
     {
-        PutRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+        std::string returnValue;
+        PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))
             .url("http://localhost:44441/invalid_file")
             .postData<const std::string&>(R"({"hello":"world"})")
             .execute();
@@ -668,7 +676,8 @@ TEST_F(ComponentTestInternalParameters, DeleteError)
 {
     try
     {
-        DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create())
+        std::string returnValue;
+        DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))
             .url("http://localhost:44441/invalid_file")
             .execute();
     }
@@ -687,7 +696,8 @@ TEST_F(ComponentTestInternalParameters, ExecuteGetNoUrl)
 {
     try
     {
-        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create()).execute();
+        std::string returnValue;
+        GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue)).execute();
     }
     catch (const std::exception& ex)
     {
@@ -704,7 +714,8 @@ TEST_F(ComponentTestInternalParameters, ExecutePostNoUrl)
 {
     try
     {
-        PostRequest::builder(FactoryRequestWrapper<wrapperType>::create()).execute();
+        std::string returnValue;
+        PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue)).execute();
     }
     catch (const std::exception& ex)
     {
@@ -721,7 +732,8 @@ TEST_F(ComponentTestInternalParameters, ExecutePutNoUrl)
 {
     try
     {
-        PutRequest::builder(FactoryRequestWrapper<wrapperType>::create()).execute();
+        std::string returnValue;
+        PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue)).execute();
     }
     catch (const std::exception& ex)
     {
@@ -738,7 +750,8 @@ TEST_F(ComponentTestInternalParameters, ExecuteDeleteNoUrl)
 {
     try
     {
-        DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create()).execute();
+        std::string returnValue;
+        DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue)).execute();
     }
     catch (const std::exception& ex)
     {
@@ -765,11 +778,12 @@ TEST_F(ComponentTestInternalParameters, MultipleThreads)
             {
                 do
                 {
+                    std::string returnValue;
                     EXPECT_NO_THROW({
-                        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create())};
+                        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue))};
                         req.url("http://localhost:44441/").execute();
 
-                        EXPECT_STREQ(req.response().c_str(), "Hello World!");
+                        EXPECT_STREQ(returnValue.c_str(), "Hello World!");
                     });
                 } while (!stopTest.load());
             });
@@ -803,12 +817,13 @@ TEST_F(ComponentTestInternalParameters, MultipleThreadsWithMultiHandlers)
             {
                 do
                 {
+                    std::string response;
                     EXPECT_NO_THROW({
-                        auto req {GetRequest::builder(
-                            FactoryRequestWrapper<wrapperType>::create(CurlHandlerTypeEnum::MULTI, m_shouldRun))};
+                        auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                            response, CurlHandlerTypeEnum::MULTI, m_shouldRun))};
                         req.url("http://localhost:44441/").execute();
 
-                        EXPECT_STREQ(req.response().c_str(), "Hello World!");
+                        EXPECT_STREQ(response.c_str(), "Hello World!");
                     });
                 } while (!stopTest.load());
             });
@@ -1502,8 +1517,7 @@ TEST_F(ComponentTestInterface, PostTestTimeoutMultiHandler)
 TEST_F(ComponentTestInterface, Post100Mbs)
 {
     constexpr uint64_t TEST_SIZE = {100 * 1024 * 1024};
-    // Simulate a server RSS usage of 3 times the size of the data
-    constexpr uint64_t SERVER_RSS_USAGE = {(TEST_SIZE * 3) / 1024};
+    constexpr uint64_t SERVER_RSS_USAGE = {150 * 1024};
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
@@ -1512,6 +1526,7 @@ TEST_F(ComponentTestInterface, Post100Mbs)
                                                         {
                                                             m_callbackComplete = true;
                                                         }});
+    fakeFileServer.reset();
     const auto postPost = getMemoryUsedByTheCurrentProcess();
 
     EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);
@@ -1523,8 +1538,7 @@ TEST_F(ComponentTestInterface, Post100Mbs)
 TEST_F(ComponentTestInterface, Post100MbsStringView)
 {
     constexpr uint64_t TEST_SIZE = {100 * 1024 * 1024};
-    // Simulate a server RSS usage of 3 times the size of the data
-    constexpr uint64_t SERVER_RSS_USAGE = {(TEST_SIZE * 3) / 1024};
+    constexpr uint64_t SERVER_RSS_USAGE = {5 * 1024};
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
@@ -1533,10 +1547,8 @@ TEST_F(ComponentTestInterface, Post100MbsStringView)
                                                         {
                                                             m_callbackComplete = true;
                                                         }});
+    fakeFileServer.reset();
     const auto postPost = getMemoryUsedByTheCurrentProcess();
-    std::cout << " Post post: " << postPost << std::endl;
-    std::cout << " Pre post: " << prePost << std::endl;
-    std::cout << " Server RSS usage: " << SERVER_RSS_USAGE << std::endl;
 
     EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);
 }
