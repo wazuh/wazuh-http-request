@@ -53,7 +53,8 @@ public:
         long responseCode;
         const auto resGetInfo {curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode)};
 
-        curl_easy_reset(m_curlHandler.get());
+        // DON'T reset here anymore
+        // curl_easy_reset(m_curlHandler.get());
 
         if (resPerform != CURLE_OK)
         {
@@ -63,10 +64,14 @@ public:
                 {
                     throw std::runtime_error("cURLSingleHandler::execute() failed: Couldn't get HTTP response code");
                 }
+                // Throw exception WITHOUT resetting - response data is still available
                 throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
             }
             throw std::runtime_error(curl_easy_strerror(resPerform));
         }
+
+        // Only reset on success
+        curl_easy_reset(m_curlHandler.get());
     }
 };
 

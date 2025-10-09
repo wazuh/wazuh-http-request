@@ -117,7 +117,11 @@ public:
 
         this->setOptionPtr(OPT_WRITEDATA, &m_response);
 
-        this->setOptionLong(OPT_FAILONERROR, 1l);
+        // this->setOptionLong(OPT_FAILONERROR, 1l);
+
+        // Note: The OPT_FAILONERROR option makes cURL fail on HTTP response codes >= 400.
+        // However, in such cases we want to capture the response body, so we don't set it.
+        // Instead, we handle HTTP errors in the execute() method.
 
         this->setOptionLong(OPT_FOLLOW_REDIRECT, 1l);
 
@@ -216,7 +220,15 @@ public:
             throw std::runtime_error("cURLWrapper::execute() failed: Couldn't set HTTP headers");
         }
 
-        m_curlHandler->execute();
+        try
+        {
+            m_curlHandler->execute();
+        }
+        catch (Curl::CurlException& ex)
+        {
+            // Note: m_returnValue contains the response body, even for errors
+            throw Curl::CurlException(ex.what(), ex.responseCode(), m_response.m_returnValue);
+        }
     }
 };
 
