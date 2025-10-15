@@ -119,9 +119,10 @@ public:
 
         // this->setOptionLong(OPT_FAILONERROR, 1l);
 
-        // Note: The OPT_FAILONERROR option makes cURL fail on HTTP response codes >= 400.
-        // However, in such cases we want to capture the response body, so we don't set it.
-        // Instead, we handle HTTP errors in the execute() method.
+        // Note: OPT_FAILONERROR is intentionally NOT set. This option would cause cURL
+        // to fail automatically on HTTP response codes >= 400, preventing us from
+        // capturing the response body. We want to allow callers to handle HTTP errors
+        // with full access to the server's response.
 
         this->setOptionLong(OPT_FOLLOW_REDIRECT, 1l);
 
@@ -226,7 +227,8 @@ public:
         }
         catch (Curl::CurlException& ex)
         {
-            // Note: m_returnValue contains the response body, even for errors
+            // Note: m_returnValue contains the response body, even for errors. Could be empty if
+            // the server didn't send any body.
             throw Curl::CurlException(ex.what(), ex.responseCode(), m_response.m_returnValue);
         }
     }

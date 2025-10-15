@@ -19,6 +19,8 @@
 #include <memory>
 #include <stdexcept>
 
+constexpr auto NOT_USED {-1};
+
 using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 
 //! cURLSingleHandler class
@@ -50,11 +52,10 @@ public:
     {
         const auto resPerform {curl_easy_perform(m_curlHandler.get())};
 
-        long responseCode;
+        long responseCode = NOT_USED;
         const auto resGetInfo {curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode)};
 
-        // DON'T reset here anymore
-        // curl_easy_reset(m_curlHandler.get());
+        curl_easy_reset(m_curlHandler.get());
 
         if (resPerform != CURLE_OK)
         {
@@ -64,14 +65,10 @@ public:
                 {
                     throw std::runtime_error("cURLSingleHandler::execute() failed: Couldn't get HTTP response code");
                 }
-                // Throw exception WITHOUT resetting - response data is still available
                 throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
             }
             throw std::runtime_error(curl_easy_strerror(resPerform));
         }
-
-        // Only reset on success
-        curl_easy_reset(m_curlHandler.get());
     }
 };
 
