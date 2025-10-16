@@ -63,11 +63,11 @@ public:
             {
                 if (resGetInfo != CURLE_OK)
                 {
-                    throw std::runtime_error("cURLSingleHandler::execute() failed: Couldn't get HTTP response code");
+                    throw Curl::CurlException("cURLSingleHandler::execute() failed", NOT_USED);
                 }
                 throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
             }
-            throw std::runtime_error(curl_easy_strerror(resPerform));
+            throw Curl::CurlException(curl_easy_strerror(resPerform), NOT_USED);
         }
     }
 };
