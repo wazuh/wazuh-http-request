@@ -214,7 +214,7 @@ TEST_F(ComponentTestInterface, DownloadFileError)
                                                             },
                                                             .outputFile = TEST_FILE_1});
 
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
     checkEmptyFile(TEST_FILE_1);
 }
 
@@ -269,7 +269,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
                                                             .outputFile = TEST_FILE_1},
                                      ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
     checkEmptyFile(TEST_FILE_1);
 }
 
@@ -383,7 +383,7 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
                                .outputFile = TEST_FILE_1},
         ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
 
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
     checkEmptyFile(TEST_FILE_1);
 }
 
@@ -624,7 +624,7 @@ TEST_F(ComponentTestInternalParameters, GetError)
         EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
         m_callbackComplete = true;
     }
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
 }
 
 /**
@@ -645,7 +645,7 @@ TEST_F(ComponentTestInternalParameters, PostError)
         EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
         m_callbackComplete = true;
     }
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
 }
 
 /**
@@ -666,7 +666,7 @@ TEST_F(ComponentTestInternalParameters, PutError)
         EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
         m_callbackComplete = true;
     }
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
 }
 
 /**
@@ -686,7 +686,7 @@ TEST_F(ComponentTestInternalParameters, DeleteError)
         EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
         m_callbackComplete = true;
     }
-    EXPECT_TRUE(m_callbackComplete);
+    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
 }
 
 /**
