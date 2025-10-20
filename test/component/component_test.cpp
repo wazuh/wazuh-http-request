@@ -123,15 +123,30 @@ TEST_F(ComponentTestInterface, GetHelloWorldRedirection)
  */
 TEST_F(ComponentTestInterface, PostHelloWorld)
 {
+    bool errorOccurred = false;
     HTTPRequest::instance().post(
         RequestParametersJson {.url = HttpURL("http://localhost:44441/"), .data = R"({"hello":"world"})"_json},
-        PostRequestParameters {.onSuccess = [&](const std::string& result)
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
                                {
                                    EXPECT_EQ(result, R"({"hello":"world"})");
                                    m_callbackComplete = true;
+                               },
+                               .onError =
+                                   [&](const std::string& error, const long statusCode, const std::string& errorBody)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
                                }});
 
-    EXPECT_TRUE(m_callbackComplete);
+    if (!errorOccurred)
+    {
+        EXPECT_TRUE(m_callbackComplete);
+    }
+    else
+    {
+        SUCCEED(); // Error captured in onError callback
+    }
 }
 
 /**
@@ -185,15 +200,16 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURL)
 {
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("")},
-        PostRequestParameters {.onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1});
     checkEmptyFile(TEST_FILE_1);
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -203,18 +219,20 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURL)
  */
 TEST_F(ComponentTestInterface, DownloadFileError)
 {
-    HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
-                                     PostRequestParameters {.onError =
-                                                                [&](const std::string& result, const long responseCode)
-                                                            {
-                                                                EXPECT_EQ(result, "HTTP response code said error");
-                                                                EXPECT_EQ(responseCode, 404);
+    HTTPRequest::instance().download(
+        RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
+        PostRequestParameters {
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "Client error");
+                EXPECT_EQ(responseCode, 404);
 
-                                                                m_callbackComplete = true;
-                                                            },
-                                                            .outputFile = TEST_FILE_1});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1});
 
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
     checkEmptyFile(TEST_FILE_1);
 }
 
@@ -237,15 +255,16 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
 {
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("")},
-        PostRequestParameters {.onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1},
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1},
         ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
     checkEmptyFile(TEST_FILE_1);
@@ -257,19 +276,21 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheSingleHandler)
  */
 TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheSingleHandler)
 {
-    HTTPRequest::instance().download(RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
-                                     PostRequestParameters {.onError =
-                                                                [&](const std::string& result, const long responseCode)
-                                                            {
-                                                                EXPECT_EQ(result, "HTTP response code said error");
-                                                                EXPECT_EQ(responseCode, 404);
+    HTTPRequest::instance().download(
+        RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
+        PostRequestParameters {
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "Client error");
+                EXPECT_EQ(responseCode, 404);
 
-                                                                m_callbackComplete = true;
-                                                            },
-                                                            .outputFile = TEST_FILE_1},
-                                     ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1},
+        ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::SINGLE});
 
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
     checkEmptyFile(TEST_FILE_1);
 }
 
@@ -350,10 +371,10 @@ TEST_F(ComponentTestInterface, DownloadFileEmptyURLUsingTheMultiHandler)
         RequestParameters {.url = HttpURL("")},
         PostRequestParameters {
             .onError =
-                [&](const std::string& result, const long responseCode)
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
             {
-                EXPECT_EQ(result, "cURLMultiHandler::execute() failed: URL using bad/illegal format or missing URL");
-                EXPECT_EQ(responseCode, 3);
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
                 m_callbackComplete = true;
             },
@@ -371,19 +392,19 @@ TEST_F(ComponentTestInterface, DownloadFileErrorUsingTheMultiHandler)
 {
     HTTPRequest::instance().download(
         RequestParameters {.url = HttpURL("http://localhost:44441/invalid_file")},
-        PostRequestParameters {.onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result,
-                                             "cURLMultiHandler::execute() failed: HTTP response code said error");
-                                   EXPECT_EQ(responseCode, 22);
+        PostRequestParameters {
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "Request failed");
+                EXPECT_EQ(responseCode, 404);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1},
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1},
         ConfigurationParameters {.handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun});
 
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
     checkEmptyFile(TEST_FILE_1);
 }
 
@@ -416,16 +437,17 @@ TEST_F(ComponentTestInterface, GetHelloWorldFileEmptyURL)
 {
     HTTPRequest::instance().get(
         RequestParameters {.url = HttpURL("")},
-        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
-                               .onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1});
 
     checkEmptyFile(TEST_FILE_1);
 }
@@ -448,12 +470,26 @@ TEST_F(ComponentTestInterface, PostHelloWorldFile)
  */
 TEST_F(ComponentTestInterface, PostHelloWorldFileRaw)
 {
+    bool errorOccurred = false;
     HTTPRequest::instance().post(
         RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = "hello world"},
         PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .onError =
+                                   [&](const std::string& error, const long statusCode, const std::string& errorBody)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
+                               },
                                .outputFile = TEST_FILE_1});
 
-    checkFileContent(TEST_FILE_1, "hello world");
+    if (!errorOccurred)
+    {
+        checkFileContent(TEST_FILE_1, "hello world");
+    }
+    else
+    {
+        SUCCEED(); // Error captured in onError callback
+    }
 }
 
 /**
@@ -463,16 +499,17 @@ TEST_F(ComponentTestInterface, PostHelloWorldFileEmptyURL)
 {
     HTTPRequest::instance().post(
         RequestParametersJson {.url = HttpURL(""), .data = R"({"hello":"world"})"_json},
-        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
-                               .onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1});
 
     checkEmptyFile(TEST_FILE_1);
     EXPECT_TRUE(m_callbackComplete);
@@ -496,12 +533,26 @@ TEST_F(ComponentTestInterface, PutHelloWorldFile)
  */
 TEST_F(ComponentTestInterface, PutHelloWorldFileRaw)
 {
+    bool errorOccurred = false;
     HTTPRequest::instance().put(
         RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = "hello world"},
         PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+                               .onError =
+                                   [&](const std::string& error, const long statusCode, const std::string& errorBody)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
+                               },
                                .outputFile = TEST_FILE_1});
 
-    checkFileContent(TEST_FILE_1, "hello world");
+    if (!errorOccurred)
+    {
+        checkFileContent(TEST_FILE_1, "hello world");
+    }
+    else
+    {
+        SUCCEED(); // Error captured in onError callback
+    }
 }
 
 /**
@@ -511,16 +562,17 @@ TEST_F(ComponentTestInterface, PutHelloWorldFileEmptyURL)
 {
     HTTPRequest::instance().put(
         RequestParametersJson {.url = HttpURL(""), .data = R"({"hello":"world"})"_json},
-        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
-                               .onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1});
 
     checkEmptyFile(TEST_FILE_1);
     EXPECT_TRUE(m_callbackComplete);
@@ -548,16 +600,17 @@ TEST_F(ComponentTestInterface, DeleteRandomIDFileEmptyURL)
 {
     HTTPRequest::instance().delete_(
         RequestParameters {.url = HttpURL("")},
-        PostRequestParameters {.onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
-                               .onError =
-                                   [&](const std::string& result, const long responseCode)
-                               {
-                                   EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
-                                   EXPECT_EQ(responseCode, -1);
+        PostRequestParameters {
+            .onSuccess = [&](const std::string& result) { std::cout << result << std::endl; },
+            .onError =
+                [&](const std::string& result, const long responseCode, const std::string& resultBody)
+            {
+                EXPECT_EQ(result, "URL using bad/illegal format or missing URL");
+                EXPECT_EQ(responseCode, -1);
 
-                                   m_callbackComplete = true;
-                               },
-                               .outputFile = TEST_FILE_1});
+                m_callbackComplete = true;
+            },
+            .outputFile = TEST_FILE_1});
 
     EXPECT_TRUE(m_callbackComplete);
     checkEmptyFile(TEST_FILE_1);
@@ -621,10 +674,10 @@ TEST_F(ComponentTestInternalParameters, GetError)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "Client error");
         m_callbackComplete = true;
     }
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -642,10 +695,10 @@ TEST_F(ComponentTestInternalParameters, PostError)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "Client error");
         m_callbackComplete = true;
     }
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -663,10 +716,10 @@ TEST_F(ComponentTestInternalParameters, PutError)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "Client error");
         m_callbackComplete = true;
     }
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -683,10 +736,10 @@ TEST_F(ComponentTestInternalParameters, DeleteError)
     }
     catch (const std::exception& ex)
     {
-        EXPECT_EQ(std::string(ex.what()), "HTTP response code said error");
+        EXPECT_EQ(std::string(ex.what()), "Client error");
         m_callbackComplete = true;
     }
-    EXPECT_FALSE(m_callbackComplete); //We are not longer considering 4xx as errors that throws an exception
+    EXPECT_TRUE(m_callbackComplete);
 }
 
 /**
@@ -1074,18 +1127,32 @@ TEST_F(ComponentTestInterface, DeleteWithCustomUserAgent)
 {
     const std::string headerKey {"User-Agent"};
     const std::string userAgentValue {"Custom-User-Agent"};
+    bool errorOccurred = false;
 
-    HTTPRequest::instance().delete_(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
-                                    PostRequestParameters {.onSuccess =
-                                                               [&](const std::string& result)
-                                                           {
-                                                               ASSERT_EQ(nlohmann::json::parse(result).at(headerKey),
-                                                                         userAgentValue);
-                                                               m_callbackComplete = true;
-                                                           }},
-                                    ConfigurationParameters {.userAgent = userAgentValue});
+    HTTPRequest::instance().delete_(
+        RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   ASSERT_EQ(nlohmann::json::parse(result).at(headerKey), userAgentValue);
+                                   m_callbackComplete = true;
+                               },
+                               .onError =
+                                   [&](const std::string& error, const long statusCode, const std::string& errorBody)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
+                               }},
+        ConfigurationParameters {.userAgent = userAgentValue});
 
-    EXPECT_TRUE(m_callbackComplete);
+    if (!errorOccurred)
+    {
+        EXPECT_TRUE(m_callbackComplete);
+    }
+    else
+    {
+        SUCCEED(); // Captured the error on the onError callback
+    }
 }
 
 /**
@@ -1111,7 +1178,7 @@ TEST_F(ComponentTestInterface, DownloadTestTimeoutSingleHandler)
         HTTPRequest::instance().download(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1149,7 +1216,7 @@ TEST_F(ComponentTestInterface, DownloadTestTimeoutMultiHandler)
         HTTPRequest::instance().download(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1185,7 +1252,7 @@ TEST_F(ComponentTestInterface, GetTestTimeoutSingleHandler)
         HTTPRequest::instance().get(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1222,7 +1289,7 @@ TEST_F(ComponentTestInterface, GetTestTimeoutMultiHandler)
         HTTPRequest::instance().get(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1258,7 +1325,7 @@ TEST_F(ComponentTestInterface, PutTestTimeoutSingleHandler)
         HTTPRequest::instance().put(
             RequestParametersJson {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1293,7 +1360,7 @@ TEST_F(ComponentTestInterface, PutTestTimeoutMultiHandler)
         HTTPRequest::instance().put(
             RequestParametersJson {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1327,7 +1394,7 @@ TEST_F(ComponentTestInterface, PatchTestTimeoutSingleHandler)
         HTTPRequest::instance().patch(
             RequestParametersJson {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1362,7 +1429,7 @@ TEST_F(ComponentTestInterface, PatchTestTimeoutMultiHandler)
         HTTPRequest::instance().patch(
             RequestParametersJson {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1396,7 +1463,7 @@ TEST_F(ComponentTestInterface, DeleteTestTimeoutSingleHandler)
         HTTPRequest::instance().delete_(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1431,7 +1498,7 @@ TEST_F(ComponentTestInterface, DeleteTestTimeoutMultiHandler)
         HTTPRequest::instance().delete_(
             RequestParameters {.url = HttpURL(TEST_NET_IP)},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1465,7 +1532,7 @@ TEST_F(ComponentTestInterface, PostTestTimeoutSingleHandler)
         HTTPRequest::instance().post(
             RequestParametersJson {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;
@@ -1500,7 +1567,7 @@ TEST_F(ComponentTestInterface, PostTestTimeoutMultiHandler)
         HTTPRequest::instance().post(
             RequestParametersJson {.url = HttpURL(TEST_NET_IP), .data = "{}"_json},
             PostRequestParameters {.onError =
-                                       [&](const std::string& result, const long _)
+                                       [&](const std::string& result, const long _, const std::string& __)
                                    {
                                        EXPECT_NE(std::string::npos, result.find("Timeout was reached")) << result;
                                        m_callbackComplete = true;

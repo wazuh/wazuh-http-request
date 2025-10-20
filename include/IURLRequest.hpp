@@ -212,7 +212,7 @@ struct TPostRequestParameters
      * @brief Callback to be called when an error occurs.
      *
      */
-    std::function<void(const std::string&, const long)> onError = {};
+    std::function<void(const std::string&, const long, const std::string&)> onError = {};
 
     /**
      * @brief File name of to store the output data.
