@@ -84,10 +84,6 @@ public:
             {
                 errorMsg = "Server error";
             }
-            else
-            {
-                errorMsg = "HTTP error";
-            }
 
             throw Curl::CurlException(errorMsg, responseCode);
         }

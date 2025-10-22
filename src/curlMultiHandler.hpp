@@ -22,6 +22,7 @@
 
 static const int CURL_MULTI_HANDLER_TIMEOUT_MS = 1000;
 static const int CURL_MULTI_HANDLER_EXTRA_FDS = 0;
+auto constexpr NOT_USED_MULTI = -1;
 
 using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 using deleterCurlMultiHandler = CustomDeleter<decltype(&curl_multi_cleanup), curl_multi_cleanup>;
@@ -119,7 +120,7 @@ public:
                     // Check for cURL-level errors (network, DNS, timeout, etc.)
                     if (errorCode != CURLE_OK)
                     {
-                        throw Curl::CurlException(curl_easy_strerror(errorCode), -1); 
+                        throw Curl::CurlException(curl_easy_strerror(errorCode), NOT_USED_MULTI);
                     }
 
                     // Handle HTTP-level errors (4xx and 5xx)

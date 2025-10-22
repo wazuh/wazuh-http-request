@@ -74,7 +74,7 @@ public:
                 .onError =
                     [](const std::string& msg, const long responseCode, const std::string& resultBody)
                 {
-                    std::cerr << msg << ": " << responseCode << std::endl;
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
                     throw std::runtime_error(msg);
                 },
                 .outputFile = m_outputFile},
@@ -125,7 +125,7 @@ public:
                 .onError =
                     [](const std::string& msg, const long responseCode, const std::string& resultBody)
                 {
-                    std::cerr << msg << ": " << responseCode << std::endl;
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
             ConfigurationParameters {.timeout = m_timeout});
@@ -179,7 +179,7 @@ public:
                 .onError =
                     [](const std::string& msg, const long responseCode, const std::string& resultBody)
                 {
-                    std::cerr << msg << ": " << responseCode << std::endl;
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
                     throw std::runtime_error(msg);
                 },
             },
@@ -236,7 +236,7 @@ public:
                 .onError =
                     [](const std::string& msg, const long responseCode, const std::string& resultBody)
                 {
-                    std::cerr << msg << ": " << responseCode << std::endl;
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
             ConfigurationParameters {.timeout = m_timeout});
@@ -295,7 +295,7 @@ public:
                 .onError =
                     [](const std::string& msg, const long responseCode, const std::string& responseBody)
                 {
-                    std::cerr << msg << ": " << responseCode << std::endl;
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << responseBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
             ConfigurationParameters {.timeout = m_timeout});
@@ -345,7 +345,7 @@ public:
                 .onError =
                     [](const std::string& msg, const long responseCode, const std::string& responseBody)
                 {
-                    std::cerr << msg << ": " << responseCode << std::endl;
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << responseBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
             ConfigurationParameters {.timeout = m_timeout});
