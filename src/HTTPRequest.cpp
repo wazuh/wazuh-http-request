@@ -18,6 +18,7 @@
 #include <variant>
 
 using wrapperType = cURLWrapper;
+auto constexpr INTERNAL_ERROR_MESSAGE = "Internal error in HTTPRequest module.";
 
 void HTTPRequest::download(std::variant<TRequestParameters<std::string>,
                                         TRequestParameters<nlohmann::json>,
@@ -55,7 +56,7 @@ void HTTPRequest::download(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -66,7 +67,7 @@ void HTTPRequest::download(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -191,7 +192,7 @@ void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -202,7 +203,7 @@ void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -263,7 +264,7 @@ void HTTPRequest::get(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -274,7 +275,7 @@ void HTTPRequest::get(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -399,7 +400,7 @@ void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -410,7 +411,7 @@ void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -535,7 +536,7 @@ void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -546,7 +547,7 @@ void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -607,7 +608,7 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -618,7 +619,7 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {

@@ -70,13 +70,14 @@ public:
         HTTPRequest::instance().download(
             RequestParameters {
                 .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
-            PostRequestParameters {.onError =
-                                       [](const std::string& msg, const long responseCode)
-                                   {
-                                       std::cerr << msg << ": " << responseCode << std::endl;
-                                       throw std::runtime_error(msg);
-                                   },
-                                   .outputFile = m_outputFile},
+            PostRequestParameters {
+                .onError =
+                    [](const std::string& msg, const long responseCode, const std::string& resultBody)
+                {
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
+                    throw std::runtime_error(msg);
+                },
+                .outputFile = m_outputFile},
             ConfigurationParameters {.timeout = m_timeout});
     }
 };
@@ -119,13 +120,14 @@ public:
         HTTPRequest::instance().get(
             RequestParameters {
                 .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
-            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
-                                   .onError =
-                                       [](const std::string& msg, const long responseCode)
-                                   {
-                                       std::cerr << msg << ": " << responseCode << std::endl;
-                                       throw std::runtime_error(msg);
-                                   }},
+            PostRequestParameters {
+                .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                .onError =
+                    [](const std::string& msg, const long responseCode, const std::string& resultBody)
+                {
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
+                    throw std::runtime_error(msg);
+                }},
             ConfigurationParameters {.timeout = m_timeout});
     }
 };
@@ -169,19 +171,19 @@ public:
      */
     void execute() override
     {
-        HTTPRequest::instance().post(RequestParameters {.url = HttpURL(m_url),
-                                                        .secureCommunication = m_secureCommunication,
-                                                        .httpHeaders = m_headers},
-                                     PostRequestParameters {
-                                         .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
-                                         .onError =
-                                             [](const std::string& msg, const long responseCode)
-                                         {
-                                             std::cerr << msg << ": " << responseCode << std::endl;
-                                             throw std::runtime_error(msg);
-                                         },
-                                     },
-                                     ConfigurationParameters {.timeout = m_timeout});
+        HTTPRequest::instance().post(
+            RequestParameters {
+                .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
+            PostRequestParameters {
+                .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                .onError =
+                    [](const std::string& msg, const long responseCode, const std::string& resultBody)
+                {
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
+                    throw std::runtime_error(msg);
+                },
+            },
+            ConfigurationParameters {.timeout = m_timeout});
     }
 };
 
@@ -229,13 +231,14 @@ public:
                                .data = m_data,
                                .secureCommunication = m_secureCommunication,
                                .httpHeaders = m_headers},
-            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
-                                   .onError =
-                                       [](const std::string& msg, const long responseCode)
-                                   {
-                                       std::cerr << msg << ": " << responseCode << std::endl;
-                                       throw std::runtime_error(msg);
-                                   }},
+            PostRequestParameters {
+                .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                .onError =
+                    [](const std::string& msg, const long responseCode, const std::string& resultBody)
+                {
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
+                    throw std::runtime_error(msg);
+                }},
             ConfigurationParameters {.timeout = m_timeout});
     }
 };
@@ -287,13 +290,14 @@ public:
                                .data = m_data,
                                .secureCommunication = m_secureCommunication,
                                .httpHeaders = m_headers},
-            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
-                                   .onError =
-                                       [](const std::string& msg, const long responseCode)
-                                   {
-                                       std::cerr << msg << ": " << responseCode << std::endl;
-                                       throw std::runtime_error(msg);
-                                   }},
+            PostRequestParameters {
+                .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                .onError =
+                    [](const std::string& msg, const long responseCode, const std::string& responseBody)
+                {
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << responseBody << std::endl;
+                    throw std::runtime_error(msg);
+                }},
             ConfigurationParameters {.timeout = m_timeout});
     }
 };
@@ -336,13 +340,14 @@ public:
         HTTPRequest::instance().delete_(
             RequestParameters {
                 .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
-            PostRequestParameters {.onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
-                                   .onError =
-                                       [](const std::string& msg, const long responseCode)
-                                   {
-                                       std::cerr << msg << ": " << responseCode << std::endl;
-                                       throw std::runtime_error(msg);
-                                   }},
+            PostRequestParameters {
+                .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
+                .onError =
+                    [](const std::string& msg, const long responseCode, const std::string& responseBody)
+                {
+                    std::cerr << msg << ": " << responseCode << ". Response body: " << responseBody << std::endl;
+                    throw std::runtime_error(msg);
+                }},
             ConfigurationParameters {.timeout = m_timeout});
     }
 };

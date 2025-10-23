@@ -22,6 +22,7 @@
 
 static const int CURL_MULTI_HANDLER_TIMEOUT_MS = 1000;
 static const int CURL_MULTI_HANDLER_EXTRA_FDS = 0;
+auto constexpr NOT_USED_MULTI = -1;
 
 using deleterCurlHandler = CustomDeleter<decltype(&curl_easy_cleanup), curl_easy_cleanup>;
 using deleterCurlMultiHandler = CustomDeleter<decltype(&curl_multi_cleanup), curl_multi_cleanup>;
@@ -102,6 +103,10 @@ public:
                 }
             } while (stillRunning && m_shouldRun.load());
 
+            // Get HTTP status code before checking messages
+            long responseCode = 0;
+            curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode);
+
             struct CURLMsg* multiHandleMessages = nullptr;
             do
             {
@@ -111,11 +116,17 @@ public:
                 if (multiHandleMessages && (multiHandleMessages->msg == CURLMSG_DONE))
                 {
                     auto errorCode = multiHandleMessages->data.result;
+
+                    // Check for cURL-level errors (network, DNS, timeout, etc.)
                     if (errorCode != CURLE_OK)
                     {
-                        throw Curl::CurlException("cURLMultiHandler::execute() failed: " +
-                                                      std::string(curl_easy_strerror(errorCode)),
-                                                  errorCode);
+                        throw Curl::CurlException(curl_easy_strerror(errorCode), NOT_USED_MULTI);
+                    }
+
+                    // Handle HTTP-level errors (4xx and 5xx)
+                    if (responseCode >= 400)
+                    {
+                        throw Curl::CurlException("Request failed", responseCode);
                     }
                 }
             } while (multiHandleMessages);

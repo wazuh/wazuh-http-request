@@ -15,6 +15,7 @@
 #include <string>
 
 using wrapperType = cURLWrapper;
+auto constexpr INTERNAL_ERROR_MESSAGE = "Internal error in HTTPRequest module.";
 
 void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
                                               TRequestParameters<nlohmann::json>,
@@ -52,7 +53,7 @@ void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -63,7 +64,7 @@ void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -187,7 +188,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -198,7 +199,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -259,7 +260,7 @@ void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -270,7 +271,7 @@ void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -395,7 +396,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -406,7 +407,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -531,7 +532,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -542,7 +543,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {
@@ -603,7 +604,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), ex.responseCode());
+            onError(ex.what(), ex.responseCode(), ex.responseBody());
         }
         else
         {
@@ -614,7 +615,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
     {
         if (onError)
         {
-            onError(ex.what(), NOT_USED);
+            onError(ex.what(), NOT_USED, INTERNAL_ERROR_MESSAGE);
         }
         else
         {

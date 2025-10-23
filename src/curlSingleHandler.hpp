@@ -50,24 +50,42 @@ public:
      */
     void execute() override
     {
-        const auto resPerform {curl_easy_perform(m_curlHandler.get())};
+        // Perform the HTTP request
+        const CURLcode resPerform = curl_easy_perform(m_curlHandler.get());
 
-        long responseCode = NOT_USED;
-        const auto resGetInfo {curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode)};
+        // Get HTTP status code before reset
+        long responseCode = 0;
+        const CURLcode resGetInfo = curl_easy_getinfo(m_curlHandler.get(), CURLINFO_RESPONSE_CODE, &responseCode);
 
+        // Clean up cURL handle state
         curl_easy_reset(m_curlHandler.get());
 
+        // Check for cURL-level errors (network, DNS, timeout, etc.)
         if (resPerform != CURLE_OK)
         {
-            if (resPerform == CURLE_HTTP_RETURNED_ERROR)
-            {
-                if (resGetInfo != CURLE_OK)
-                {
-                    throw Curl::CurlException("cURLSingleHandler::execute() failed", NOT_USED);
-                }
-                throw Curl::CurlException(curl_easy_strerror(resPerform), responseCode);
-            }
             throw Curl::CurlException(curl_easy_strerror(resPerform), NOT_USED);
+        }
+
+        // Verify we got response code (should always succeed if resPerform OK)
+        if (resGetInfo != CURLE_OK)
+        {
+            throw Curl::CurlException("Failed to retrieve HTTP response code", NOT_USED);
+        }
+
+        // Handle HTTP-level errors (4xx and 5xx)
+        if (responseCode >= 400)
+        {
+            std::string errorMsg;
+            if (responseCode >= 400 && responseCode < 500)
+            {
+                errorMsg = "Client error";
+            }
+            else if (responseCode >= 500)
+            {
+                errorMsg = "Server error";
+            }
+
+            throw Curl::CurlException(errorMsg, responseCode);
         }
     }
 };
