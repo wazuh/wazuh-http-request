@@ -78,7 +78,8 @@ public:
         }
         else if (0 == args.type().compare("delete"))
         {
-            return std::make_unique<DeleteAction>(args.url(), headers, secureCommunication, timeout);
+            return std::make_unique<DeleteAction>(
+                args.url(), args.postArguments(), headers, secureCommunication, timeout);
         }
         else
         {

@@ -436,7 +436,7 @@ public:
 /**
  * @brief This class is a wrapper for curl library. It provides a simple interface to perform HTTP DELETE requests.
  */
-class DeleteRequest final : public cURLRequest<DeleteRequest>
+class DeleteRequest final : public cURLRequest<DeleteRequest>, public PostData<DeleteRequest>
 {
 public:
     /**
@@ -445,6 +445,7 @@ public:
      */
     explicit DeleteRequest(std::shared_ptr<IRequestImplementator> requestImplementator)
         : cURLRequest<DeleteRequest>(requestImplementator)
+        , PostData<DeleteRequest>(requestImplementator)
     {
         requestImplementator->setOptionString(OPT_CUSTOMREQUEST, METHOD_TYPE_MAP.at(METHOD_DELETE));
     }
