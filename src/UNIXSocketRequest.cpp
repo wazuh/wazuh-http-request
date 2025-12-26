@@ -42,6 +42,7 @@ void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
                 GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))
                     .url(arg.url.url(), arg.secureCommunication)
                     .unixSocketPath(arg.url.unixSocketPath())
+                    .appendHeaders(arg.httpHeaders)
                     .timeout(timeout)
                     .userAgent(userAgent)
                     .outputFile(outputFile)
@@ -102,6 +103,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<const std::string&>(arg.data)
@@ -128,6 +130,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<std::string_view>(arg.data)
@@ -156,6 +159,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<const std::string&>(data)
@@ -234,6 +238,7 @@ void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
                     GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                 req.url(arg.url.url(), arg.secureCommunication)
                     .unixSocketPath(arg.url.unixSocketPath())
+                    .appendHeaders(arg.httpHeaders)
                     .timeout(timeout)
                     .userAgent(userAgent)
                     .outputFile(outputFile)
@@ -309,6 +314,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<const std::string&>(arg.data)
@@ -336,6 +342,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<std::string_view>(arg.data)
@@ -364,6 +371,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(data)
+                        .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
@@ -445,6 +453,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<const std::string&>(arg.data)
@@ -472,6 +481,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<std::string_view>(arg.data)
@@ -500,6 +510,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<const std::string&>(data)
@@ -581,6 +592,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<const std::string&>(arg.data)
@@ -608,6 +620,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
+                        .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)
                         .userAgent(userAgent)
                         .template postData<std::string_view>(arg.data)
@@ -635,6 +648,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                     auto req {DeleteRequest::builder(
                         FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
                     req.url(arg.url.url(), arg.secureCommunication)
+                        .unixSocketPath(arg.url.unixSocketPath())
                         .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
                         .timeout(timeout)

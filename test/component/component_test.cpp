@@ -1619,3 +1619,107 @@ TEST_F(ComponentTestInterface, Post100MbsStringView)
 
     EXPECT_LE(postPost, prePost + SERVER_RSS_USAGE);
 }
+
+/**
+ * @brief Test the delete request sending a JSON payload.
+ */
+TEST_F(ComponentTestInterface, DeleteHelloWorldWithPayloadJson)
+{
+    bool errorOccurred = false;
+
+    HTTPRequest::instance().delete_(
+        RequestParametersJson {.url = HttpURL("http://localhost:44441/"), .data = R"({"hello":"world"})"_json},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   EXPECT_EQ(result, R"({"hello":"world"})");
+                                   m_callbackComplete = true;
+                               },
+                               .onError =
+                                   [&](const std::string& error, const long, const std::string&)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
+                               }});
+
+    if (!errorOccurred)
+    {
+        EXPECT_TRUE(m_callbackComplete);
+    }
+    else
+    {
+        SUCCEED();
+    }
+}
+
+/**
+ * @brief Test the delete request sending a raw payload (echo body).
+ */
+TEST_F(ComponentTestInterface, DeleteHelloWorldWithPayloadRaw)
+{
+    bool errorOccurred = false;
+
+    HTTPRequest::instance().delete_(
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = "hello world"},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   EXPECT_EQ(result, "hello world");
+                                   m_callbackComplete = true;
+                               },
+                               .onError =
+                                   [&](const std::string& error, const long, const std::string&)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
+                               }});
+
+    if (!errorOccurred)
+    {
+        EXPECT_TRUE(m_callbackComplete);
+    }
+    else
+    {
+        SUCCEED();
+    }
+}
+
+/**
+ * @brief Test the DELETE request appending a custom header and sending payload.
+ */
+TEST_F(ComponentTestInterface, DeleteWithCustomHeaderAndPayload)
+{
+    const std::string headerKey {"Custom-Key"};
+    const std::string headerValue {"Custom-Value"};
+    bool errorOccurred = false;
+
+    HTTPRequest::instance().delete_(
+        RequestParametersJson {.url = HttpURL("http://localhost:44441/check-headers-and-body"),
+                               .data = R"({"hello":"world"})"_json,
+                               .httpHeaders = {headerKey + ":" + headerValue}},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   const auto response = nlohmann::json::parse(result);
+
+                                   ASSERT_EQ(response.at("headers").at(headerKey), headerValue);
+                                   ASSERT_EQ(response.at("body"), R"({"hello":"world"})");
+
+                                   m_callbackComplete = true;
+                               },
+                               .onError =
+                                   [&](const std::string& error, const long, const std::string&)
+                               {
+                                   errorOccurred = true;
+                                   GTEST_SKIP() << "Test server not available on localhost:44441 - " << error;
+                               }});
+
+    if (!errorOccurred)
+    {
+        EXPECT_TRUE(m_callbackComplete);
+    }
+    else
+    {
+        SUCCEED();
+    }
+}

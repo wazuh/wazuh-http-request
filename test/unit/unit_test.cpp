@@ -299,6 +299,74 @@ TEST_F(UrlRequestUnitTest, DeleteApiRequest)
 }
 
 /**
+ * @brief This test checks the API DELETE request with post field.
+ */
+TEST_F(UrlRequestUnitTest, DeleteApiRequestWithPostFields)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+
+    constexpr auto payload = R"({"id":"123"})";
+
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "DELETE")).Times(1);
+    EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+
+    // Payload
+    EXPECT_CALL(*request, setOptionString(optPostFields, payload)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optPostFieldSize, std::string(payload).length())).Times(1);
+
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+
+    DeleteRequest::builder(request)
+        .url("http://www.wazuh.com/")
+        .appendHeader("Content-Type: Application/json")
+        .userAgent("Wazuh-Agent/1.0")
+        .certificate("cert.ca")
+        .timeout(10)
+        .template postData<std::string>(payload)
+        .execute();
+}
+
+/**
+ * @brief This test checks the API DELETE request with post field and unix socket.
+ */
+TEST_F(UrlRequestUnitTest, DeleteApiRequestWithPostFieldsAndUnixSocket)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+
+    constexpr auto payload = R"({"id":"123"})";
+
+    EXPECT_CALL(*request, setOptionString(optUnixSocketPath, "/tmp/wazuh-agent.sock")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUrl, "http://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCustomRequest, "DELETE")).Times(1);
+    EXPECT_CALL(*request, appendHeader("Content-Type: Application/json")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optUserAgent, "Wazuh-Agent/1.0")).Times(1);
+    EXPECT_CALL(*request, setOptionString(optCainfo, "cert.ca")).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optTimeout, 10)).Times(1);
+
+    // Payload
+    EXPECT_CALL(*request, setOptionString(optPostFields, payload)).Times(1);
+    EXPECT_CALL(*request, setOptionLong(optPostFieldSize, std::string(payload).length())).Times(1);
+
+    EXPECT_CALL(*request, setOptionLong(optVerifyPeer, 1L)).Times(1);
+    EXPECT_CALL(*request, execute()).Times(1);
+
+    DeleteRequest::builder(request)
+        .url("http://www.wazuh.com/")
+        .appendHeader("Content-Type: Application/json")
+        .userAgent("Wazuh-Agent/1.0")
+        .certificate("cert.ca")
+        .timeout(10)
+        .template postData<std::string>(payload)
+        .unixSocketPath("/tmp/wazuh-agent.sock")
+        .execute();
+}
+
+/**
  * @brief This test checks the malformed API DELETE request.
  */
 TEST_F(UrlRequestUnitTest, BadConstructorDelete)
