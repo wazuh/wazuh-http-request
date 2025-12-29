@@ -227,7 +227,7 @@ public:
     void execute() override
     {
         HTTPRequest::instance().put(
-            RequestParameters {.url = HttpURL(m_url),
+            TRequestParameters<nlohmann::json> {.url = HttpURL(m_url),
                                .data = m_data,
                                .secureCommunication = m_secureCommunication,
                                .httpHeaders = m_headers},
@@ -286,7 +286,7 @@ public:
     void execute() override
     {
         HTTPRequest::instance().patch(
-            RequestParameters {.url = HttpURL(m_url),
+            TRequestParameters<nlohmann::json> {.url = HttpURL(m_url),
                                .data = m_data,
                                .secureCommunication = m_secureCommunication,
                                .httpHeaders = m_headers},
@@ -309,6 +309,7 @@ class DeleteAction final : public IAction
 {
 private:
     std::string m_url;
+    nlohmann::json m_data;
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
@@ -322,10 +323,12 @@ public:
      * @param timeout Timeout for the request.
      */
     explicit DeleteAction(const std::string& url,
+                          const nlohmann::json& data,
                           const std::unordered_set<std::string>& headers,
                           const SecureCommunication& secureCommunication,
                           const long timeout)
         : m_url(url)
+        , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
@@ -338,17 +341,21 @@ public:
     void execute() override
     {
         HTTPRequest::instance().delete_(
-            RequestParameters {
-                .url = HttpURL(m_url), .secureCommunication = m_secureCommunication, .httpHeaders = m_headers},
-            PostRequestParameters {
+            TRequestParameters<nlohmann::json> {
+                .url = HttpURL(m_url),
+                .data = m_data,
+                .secureCommunication = m_secureCommunication,
+                .httpHeaders = m_headers
+            },
+            PostRequestParameters{
                 .onSuccess = [](const std::string& msg) { std::cout << msg << std::endl; },
-                .onError =
-                    [](const std::string& msg, const long responseCode, const std::string& responseBody)
+                .onError = [](const std::string& msg, const long code, const std::string& body)
                 {
-                    std::cerr << msg << ": " << responseCode << ". Response body: " << responseBody << std::endl;
+                    std::cerr << msg << ": " << code << ". Response body: " << body << std::endl;
                     throw std::runtime_error(msg);
-                }},
-            ConfigurationParameters {.timeout = m_timeout});
+                }
+            },
+            ConfigurationParameters{.timeout = m_timeout});
     }
 };
 

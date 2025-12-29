@@ -236,6 +236,19 @@ private:
                       [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
                       { res.set_content(getHttpHeaders(req).dump(), "text/json"); });
 
+        server.Delete("/check-headers-and-body",
+            [&getHttpHeaders](const httplib::Request& req, httplib::Response& res)
+            {
+                nlohmann::json out;
+                out["headers"] = getHttpHeaders(req);
+                out["body"] = req.body;
+                res.set_content(out.dump(), "text/json");
+            });
+
+        server.Delete("/",
+              [](const httplib::Request& req, httplib::Response& res)
+              { res.set_content(req.body, "text/json"); });
+
         server.set_keep_alive_max_count(1);
         server.listen("localhost", 44441);
     }

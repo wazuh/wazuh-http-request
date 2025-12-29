@@ -578,29 +578,93 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
         std::visit(
             [&](auto&& arg)
             {
-                auto req {DeleteRequest::builder(
-                    FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
-                req.url(arg.url.url(), arg.secureCommunication)
-                    .appendHeaders(arg.httpHeaders)
-                    .timeout(timeout)
-                    .userAgent(userAgent)
-                    .outputFile(outputFile)
-                    .execute();
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
+                {
+                    auto req {DeleteRequest::builder(
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .template postData<const std::string&>(arg.data)
+                        .appendHeaders(arg.httpHeaders)
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .outputFile(outputFile)
+                        .execute();
 
-                std::visit(
-                    [&](auto&& arg)
-                    {
-                        using Tb = std::decay_t<decltype(arg)>;
-                        if constexpr (std::is_same_v<Tb, TPostRequestParameters<const std::string&>>)
+                    std::visit(
+                        [&](auto&& arg)
                         {
-                            arg.onSuccess(response);
-                        }
-                        else if constexpr (std::is_same_v<Tb, TPostRequestParameters<std::string&&>>)
+                            using Tb = std::decay_t<decltype(arg)>;
+                            if constexpr (std::is_same_v<Tb, TPostRequestParameters<const std::string&>>)
+                            {
+                                arg.onSuccess(response);
+                            }
+                            else if constexpr (std::is_same_v<Tb, TPostRequestParameters<std::string&&>>)
+                            {
+                                arg.onSuccess(std::move(response));
+                            }
+                        },
+                        postRequestParameters);
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
+                {
+                    auto req {DeleteRequest::builder(
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .template postData<std::string_view>(arg.data)
+                        .appendHeaders(arg.httpHeaders)
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    std::visit(
+                        [&](auto&& arg)
                         {
-                            arg.onSuccess(std::move(response));
-                        }
-                    },
-                    postRequestParameters);
+                            using Tb = std::decay_t<decltype(arg)>;
+                            if constexpr (std::is_same_v<Tb, TPostRequestParameters<const std::string&>>)
+                            {
+                                arg.onSuccess(response);
+                            }
+                            else if constexpr (std::is_same_v<Tb, TPostRequestParameters<std::string&&>>)
+                            {
+                                arg.onSuccess(std::move(response));
+                            }
+                        },
+                        postRequestParameters);
+                }
+                else if constexpr (std::is_same_v<T, TRequestParameters<nlohmann::json>>)
+                {
+                    const std::string data = arg.data.dump();
+                    auto req {DeleteRequest::builder(
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                    req.url(arg.url.url(), arg.secureCommunication)
+                        .template postData<const std::string&>(data)
+                        .appendHeaders(arg.httpHeaders)
+                        .timeout(timeout)
+                        .userAgent(userAgent)
+                        .outputFile(outputFile)
+                        .execute();
+
+                    std::visit(
+                        [&](auto&& arg)
+                        {
+                            using Tb = std::decay_t<decltype(arg)>;
+                            if constexpr (std::is_same_v<Tb, TPostRequestParameters<const std::string&>>)
+                            {
+                                arg.onSuccess(response);
+                            }
+                            else if constexpr (std::is_same_v<Tb, TPostRequestParameters<std::string&&>>)
+                            {
+                                arg.onSuccess(std::move(response));
+                            }
+                        },
+                        postRequestParameters);
+                }
+                else
+                {
+                    throw std::runtime_error("Invalid type");
+                }
             },
             requestParameters);
     }
