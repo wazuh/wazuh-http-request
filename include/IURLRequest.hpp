@@ -218,7 +218,7 @@ struct TPostRequestParameters
      * @brief File name of to store the output data.
      *
      */
-    const std::string& outputFile = "";
+    std::string outputFile {};
 };
 using PostRequestParameters = TPostRequestParameters<>;
 using PostRequestParametersRValue = TPostRequestParameters<std::string&&>;
