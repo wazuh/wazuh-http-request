@@ -40,6 +40,7 @@ static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP =
     {OPT_SSL_CERT, CURLOPT_SSLCERT},
     {OPT_SSL_KEY, CURLOPT_SSLKEY},
     {OPT_BASIC_AUTH, CURLOPT_USERPWD},
+    {OPT_ACCEPT_ENCODING, CURLOPT_ACCEPT_ENCODING},
 };
 
 auto constexpr MAX_REDIRECTIONS {20l};
@@ -127,6 +128,8 @@ public:
         this->setOptionLong(OPT_FOLLOW_REDIRECT, 1l);
 
         this->setOptionLong(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
+
+        this->setOptionString(OPT_ACCEPT_ENCODING, "gzip");
     }
 
     virtual ~cURLWrapper() = default;

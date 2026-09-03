@@ -941,6 +941,25 @@ TEST_F(ComponentTestInterface, GetWithDefaultHeaders)
 }
 
 /**
+ * @brief Test the GET request without custom HTTP headers. cURL is expected to negotiate gzip compression by
+ * default, without the caller having to add it to httpHeaders.
+ *
+ */
+TEST_F(ComponentTestInterface, GetWithDefaultAcceptEncoding)
+{
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                PostRequestParameters {.onSuccess = [&](const std::string& result)
+                                                       {
+                                                           const auto response = nlohmann::json::parse(result);
+
+                                                           ASSERT_EQ(response.at("Accept-Encoding"), "gzip");
+                                                           m_callbackComplete = true;
+                                                       }});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
  * @brief Test the POST request appending two custom HTTP headers. The headers are expected to be on the server
  * response.
  *
