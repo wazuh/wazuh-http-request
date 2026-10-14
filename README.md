@@ -38,3 +38,7 @@ root@wazuh-dev:~/repos/wazuh-http-request# doxygen doxygen.cfg
 
 After executing this command, open the index.html file that is generated in the `doc/html` folder, to view this technical and implementation documentation.
 
+
+## License
+
+Dual-licensed under `GPL-2.0-only OR AGPL-3.0-or-later`: the GPLv2 components of the Wazuh manager and agent use it under GPLv2, and the Wazuh engine (AGPLv3) under AGPLv3. See [COPYING](COPYING).
