@@ -1,6 +1,6 @@
 /*
  * Wazuh cmdLineParser
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) Wazuh Inc.
  * July 13, 2022.
  *
  * This program is free software; you can redistribute it and/or modify it
