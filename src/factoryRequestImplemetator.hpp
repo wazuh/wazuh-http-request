@@ -54,13 +54,15 @@ public:
      * @param returnValue Reference to the string that will contain the response.
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the cURL handler.
+     * @param maxResponseSize Maximum size in bytes of the decoded response body. Zero means no limit.
      * @return A shared pointer to a cURLRequest.
      */
     static std::shared_ptr<IRequestImplementator> create(std::string& returnValue,
                                                          CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
-                                                         const std::atomic<bool>& shouldRun = true)
+                                                         const std::atomic<bool>& shouldRun = true,
+                                                         const size_t maxResponseSize = 0)
     {
-        return std::make_shared<cURLWrapper>(returnValue, handlerType, shouldRun);
+        return std::make_shared<cURLWrapper>(returnValue, handlerType, shouldRun, maxResponseSize);
     }
 };
 

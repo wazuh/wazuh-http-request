@@ -27,10 +27,12 @@
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <zlib.h>
 
 auto constexpr TEST_FILE_1 {"test1.txt"};
 auto constexpr TEST_FILE_2 {"test2.txt"};
 auto constexpr SERVER_PID_FILE {"fake_server.pid"};
+constexpr std::size_t LARGE_BODY_SIZE {4 * 1024 * 1024};
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -45,6 +47,34 @@ auto constexpr SERVER_PID_FILE {"fake_server.pid"};
  */
 namespace
 {
+/**
+ * @brief Compresses the input in gzip format.
+ */
+std::string gzipCompress(const std::string& input)
+{
+    z_stream stream {};
+    if (deflateInit2(&stream, Z_BEST_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY) != Z_OK)
+    {
+        throw std::runtime_error("deflateInit2 failed");
+    }
+
+    std::string output(deflateBound(&stream, input.size()), '\0');
+    stream.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(input.data()));
+    stream.avail_in = static_cast<uInt>(input.size());
+    stream.next_out = reinterpret_cast<Bytef*>(output.data());
+    stream.avail_out = static_cast<uInt>(output.size());
+
+    const auto result {deflate(&stream, Z_FINISH)};
+    output.resize(stream.total_out);
+    deflateEnd(&stream);
+
+    if (result != Z_STREAM_END)
+    {
+        throw std::runtime_error("deflate failed");
+    }
+    return output;
+}
+
 class FakeServer final
 {
 private:
@@ -249,6 +279,14 @@ private:
         server.Delete("/",
               [](const httplib::Request& req, httplib::Response& res)
               { res.set_content(req.body, "text/json"); });
+
+        // A few KiB on the wire that inflate to LARGE_BODY_SIZE bytes.
+        server.Get("/large-gzip",
+                   [](const httplib::Request& /*req*/, httplib::Response& res)
+                   {
+                       res.set_header("Content-Encoding", "gzip");
+                       res.set_content(gzipCompress(std::string(LARGE_BODY_SIZE, 'A')), "application/octet-stream");
+                   });
 
         server.set_keep_alive_max_count(1);
         server.listen("localhost", 44441);

@@ -36,6 +36,7 @@ void HTTPRequest::download(std::variant<TRequestParameters<std::string>,
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& maxResponseSize {configurationParameters.maxResponseSize};
 
     try
     {
@@ -43,7 +44,8 @@ void HTTPRequest::download(std::variant<TRequestParameters<std::string>,
         std::visit(
             [&](auto&& arg)
             {
-                GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(returnValue, handlerType, shouldRun))
+                GetRequest::builder(
+                    FactoryRequestWrapper<wrapperType>::create(returnValue, handlerType, shouldRun, maxResponseSize))
                     .url(arg.url.url(), arg.secureCommunication)
                     .outputFile(outputFile)
                     .appendHeaders(arg.httpHeaders)
@@ -92,6 +94,7 @@ void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& maxResponseSize {configurationParameters.maxResponseSize};
 
     try
     {
@@ -103,7 +106,7 @@ void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
                     auto req {PostRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -130,7 +133,7 @@ void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
                     auto req {PostRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -158,7 +161,7 @@ void HTTPRequest::post(std::variant<TRequestParameters<std::string>,
                 {
                     const std::string data = arg.data.dump();
                     auto req {PostRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
@@ -228,6 +231,7 @@ void HTTPRequest::get(std::variant<TRequestParameters<std::string>,
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& maxResponseSize {configurationParameters.maxResponseSize};
 
     try
     {
@@ -235,8 +239,8 @@ void HTTPRequest::get(std::variant<TRequestParameters<std::string>,
         std::visit(
             [&](auto&& arg)
             {
-                auto req {
-                    GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                auto req {GetRequest::builder(
+                    FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                 req.url(arg.url.url(), arg.secureCommunication)
                     .appendHeaders(arg.httpHeaders)
                     .timeout(timeout)
@@ -300,6 +304,7 @@ void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& maxResponseSize {configurationParameters.maxResponseSize};
 
     try
     {
@@ -311,7 +316,7 @@ void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
                     auto req {PutRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -338,7 +343,7 @@ void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
                     auto req {PutRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -366,7 +371,7 @@ void HTTPRequest::put(std::variant<TRequestParameters<std::string>,
                 {
                     const std::string data = arg.data.dump();
                     auto req {PutRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
@@ -436,6 +441,7 @@ void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& maxResponseSize {configurationParameters.maxResponseSize};
 
     try
     {
@@ -447,7 +453,7 @@ void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
                     auto req {PatchRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -474,7 +480,7 @@ void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
                     auto req {PatchRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -502,7 +508,7 @@ void HTTPRequest::patch(std::variant<TRequestParameters<std::string>,
                 {
                     const std::string data = arg.data.dump();
                     auto req {PatchRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
@@ -572,6 +578,7 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
     const auto& userAgent {configurationParameters.userAgent};
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
+    const auto& maxResponseSize {configurationParameters.maxResponseSize};
 
     try
     {
@@ -583,7 +590,7 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
                     auto req {DeleteRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -610,7 +617,7 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
                     auto req {DeleteRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<std::string_view>(arg.data)
                         .appendHeaders(arg.httpHeaders)
@@ -638,7 +645,7 @@ void HTTPRequest::delete_(std::variant<TRequestParameters<std::string>,
                 {
                     const std::string data = arg.data.dump();
                     auto req {DeleteRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun))};
+                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(data)
                         .appendHeaders(arg.httpHeaders)
