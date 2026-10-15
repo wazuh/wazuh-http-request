@@ -1,7 +1,6 @@
 /*
  * Wazuh urlRequest TestTool
  * Copyright (C) Wazuh Inc.
- * July 13, 2022.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of either the GNU General Public License, version 2, or
