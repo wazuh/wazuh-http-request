@@ -9,6 +9,7 @@ target_compile_options(urlrequest_component_test PUBLIC "-fsanitize=address,leak
 target_link_options(urlrequest_component_test PUBLIC "-fsanitize=address,leak,undefined")
 
 target_link_libraries(urlrequest_component_test urlrequest
+    z
     gtest
     gmock
     gtest_main

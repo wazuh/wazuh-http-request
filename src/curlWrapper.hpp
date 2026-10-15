@@ -18,10 +18,12 @@
 #include "curl.h"
 #include "curlHandlerCache.hpp"
 #include "customDeleter.hpp"
+#include <algorithm>
 #include <atomic>
 #include <map>
 #include <memory>
 #include <stdexcept>
+#include <string>
 
 static const std::map<OPTION_REQUEST_TYPE, CURLoption> OPTION_REQUEST_TYPE_MAP = {
     {OPT_URL, CURLOPT_URL},
@@ -61,24 +63,48 @@ private:
         double contentLength = 0;
         std::string& m_returnValue;
         ICURLHandler* m_curlHandler;
+        size_t m_maxSize;
+        bool m_maxSizeExceeded;
     };
     ResponseData m_response;
 
     static size_t writeData(char* data, size_t size, size_t nmemb, void* userdata)
     {
         const auto response {static_cast<ResponseData*>(userdata)};
-        if (response->contentLength == 0)
+        const auto length {size * nmemb};
+
+        // Returning less than 'length' makes libcurl abort the transfer. Nothing may throw from here: the exception
+        // would unwind through libcurl's C frames.
+        if (response->m_maxSize != 0 && length > response->m_maxSize - response->m_returnValue.size())
         {
-            curl_easy_getinfo(response->m_curlHandler->getHandler().get(),
-                              CURLINFO_CONTENT_LENGTH_DOWNLOAD,
-                              &response->contentLength);
-            if (response->contentLength > 0)
-            {
-                response->m_returnValue.reserve(static_cast<size_t>(response->contentLength));
-            }
+            response->m_maxSizeExceeded = true;
+            return 0;
         }
-        response->m_returnValue.append(data, size * nmemb);
-        return size * nmemb;
+
+        try
+        {
+            if (response->contentLength == 0)
+            {
+                curl_easy_getinfo(response->m_curlHandler->getHandler().get(),
+                                  CURLINFO_CONTENT_LENGTH_DOWNLOAD,
+                                  &response->contentLength);
+                if (response->contentLength > 0)
+                {
+                    auto reserveSize {static_cast<size_t>(response->contentLength)};
+                    if (response->m_maxSize != 0)
+                    {
+                        reserveSize = std::min(reserveSize, response->m_maxSize);
+                    }
+                    response->m_returnValue.reserve(reserveSize);
+                }
+            }
+            response->m_returnValue.append(data, length);
+        }
+        catch (...)
+        {
+            return 0;
+        }
+        return length;
     }
 
     /**
@@ -100,11 +126,13 @@ public:
      *
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler.
+     * @param maxResponseSize Maximum size in bytes of the decoded response body. Zero means no limit.
      */
     cURLWrapper(std::string& returnValue,
                 CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
-                const std::atomic<bool>& shouldRun = true)
-        : m_response {0, returnValue, nullptr}
+                const std::atomic<bool>& shouldRun = true,
+                const size_t maxResponseSize = 0)
+        : m_response {0, returnValue, nullptr, maxResponseSize, false}
     {
         m_curlHandler = curlHandlerInit(handlerType, shouldRun);
 
@@ -231,6 +259,13 @@ public:
         }
         catch (Curl::CurlException& ex)
         {
+            if (m_response.m_maxSizeExceeded)
+            {
+                throw Curl::CurlException("Response body exceeds the maximum size of " +
+                                              std::to_string(m_response.m_maxSize) + " bytes",
+                                          ex.responseCode());
+            }
+
             // Note: m_returnValue contains the response body, even for errors. Could be empty if
             // the server didn't send any body.
             throw Curl::CurlException(ex.what(), ex.responseCode(), m_response.m_returnValue);

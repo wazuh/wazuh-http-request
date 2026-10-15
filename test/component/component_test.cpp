@@ -1743,3 +1743,64 @@ TEST_F(ComponentTestInterface, DeleteWithCustomHeaderAndPayload)
         SUCCEED();
     }
 }
+
+/**
+ * @brief Test the GET request with a gzip response that is small on the wire but inflates over the maximum response
+ * size.
+ *
+ */
+TEST_F(ComponentTestInterface, GetCompressedOverMaxResponseSize)
+{
+    HTTPRequest::instance().get(
+        RequestParameters {.url = HttpURL("http://localhost:44441/large-gzip")},
+        PostRequestParameters {.onSuccess = [&](const std::string&) { FAIL() << "Unexpected success"; },
+                               .onError =
+                                   [&](const std::string& error, const long, const std::string& body)
+                               {
+                                   EXPECT_EQ(error, "Response body exceeds the maximum size of 1048576 bytes");
+                                   EXPECT_TRUE(body.empty());
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {.maxResponseSize = 1024 * 1024});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Same as GetCompressedOverMaxResponseSize, using the multi handler.
+ *
+ */
+TEST_F(ComponentTestInterface, GetCompressedOverMaxResponseSizeUsingTheMultiHandler)
+{
+    HTTPRequest::instance().get(
+        RequestParameters {.url = HttpURL("http://localhost:44441/large-gzip")},
+        PostRequestParameters {.onSuccess = [&](const std::string&) { FAIL() << "Unexpected success"; },
+                               .onError =
+                                   [&](const std::string& error, const long, const std::string&)
+                               {
+                                   EXPECT_EQ(error, "Response body exceeds the maximum size of 1048576 bytes");
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {
+            .handlerType = CurlHandlerTypeEnum::MULTI, .shouldRun = m_shouldRun, .maxResponseSize = 1024 * 1024});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Test the GET request with a gzip response whose decoded body is exactly the maximum response size.
+ *
+ */
+TEST_F(ComponentTestInterface, GetCompressedAtMaxResponseSize)
+{
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/large-gzip")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           EXPECT_EQ(result, std::string(LARGE_BODY_SIZE, 'A'));
+                                                           m_callbackComplete = true;
+                                                       }},
+                                ConfigurationParameters {.maxResponseSize = LARGE_BODY_SIZE});
+
+    EXPECT_TRUE(m_callbackComplete);
+}

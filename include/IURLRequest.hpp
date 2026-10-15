@@ -192,6 +192,13 @@ struct ConfigurationParameters
      *
      */
     const std::string& userAgent = {};
+
+    /**
+     * @brief Maximum size in bytes of the response body kept in memory, counted after content decoding. Zero means no
+     * limit. Not applied to 'outputFile'.
+     *
+     */
+    const size_t maxResponseSize = 0;
 };
 
 /**
