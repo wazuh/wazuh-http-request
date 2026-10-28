@@ -22,6 +22,7 @@
 #include <atomic>
 #include <map>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -127,11 +128,14 @@ public:
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the handler.
      * @param maxResponseSize Maximum size in bytes of the decoded response body. Zero means no limit.
+     * @param acceptEncoding Value of CURLOPT_ACCEPT_ENCODING: empty = every built-in decoder (libcurl builds the
+     * 'Accept-Encoding' list), std::nullopt = the option is not set (no header, no decoding), else sent verbatim.
      */
     cURLWrapper(std::string& returnValue,
                 CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
                 const std::atomic<bool>& shouldRun = true,
-                const size_t maxResponseSize = 0)
+                const size_t maxResponseSize = 0,
+                const std::optional<std::string>& acceptEncoding = std::string {})
         : m_response {0, returnValue, nullptr, maxResponseSize, false}
     {
         m_curlHandler = curlHandlerInit(handlerType, shouldRun);
@@ -158,7 +162,10 @@ public:
 
         this->setOptionLong(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
 
-        this->setOptionString(OPT_ACCEPT_ENCODING, "gzip");
+        if (acceptEncoding)
+        {
+            this->setOptionString(OPT_ACCEPT_ENCODING, *acceptEncoding);
+        }
     }
 
     virtual ~cURLWrapper() = default;
