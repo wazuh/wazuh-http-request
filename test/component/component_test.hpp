@@ -317,7 +317,10 @@ protected:
 
     void SetUp() override
     {
-        fakeFileServer.reset(new FakeServer());
+        // Stop the previous server before forking the next one: a child that binds while the old process still owns
+        // the port fails silently, the readiness probe is answered by the old server, and the test then finds nobody.
+        fakeFileServer.reset();
+        fakeFileServer = std::make_unique<FakeServer>();
         m_callbackComplete = false;
         m_shouldRun.store(true);
     }
