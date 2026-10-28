@@ -14,6 +14,7 @@
 #define _ACTION_HPP
 #include "HTTPRequest.hpp"
 #include <iostream>
+#include <optional>
 
 /**
  * @brief Action interface.
@@ -40,6 +41,7 @@ private:
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
+    std::optional<std::string> m_acceptEncoding;
 
 public:
     /**
@@ -49,17 +51,20 @@ public:
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
      * @param timeout Timeout for the request.
+     * @param acceptEncoding Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
      */
     explicit DownloadAction(const std::string& url,
                             const std::string& outputFile,
                             const std::unordered_set<std::string>& headers,
                             const SecureCommunication& secureCommunication,
-                            const long timeout)
+                            const long timeout,
+                            const std::optional<std::string>& acceptEncoding = std::string {})
         : m_url(url)
         , m_outputFile(outputFile)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
+        , m_acceptEncoding(acceptEncoding)
     {
     }
 
@@ -79,7 +84,7 @@ public:
                     throw std::runtime_error(msg);
                 },
                 .outputFile = m_outputFile},
-            ConfigurationParameters {.timeout = m_timeout});
+            ConfigurationParameters {.timeout = m_timeout, .acceptEncoding = m_acceptEncoding});
     }
 };
 
@@ -93,6 +98,7 @@ private:
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
+    std::optional<std::string> m_acceptEncoding;
 
 public:
     /**
@@ -101,15 +107,18 @@ public:
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
      * @param timeout Timeout for the request.
+     * @param acceptEncoding Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
      */
     explicit GetAction(const std::string& url,
                        const std::unordered_set<std::string>& headers,
                        const SecureCommunication& secureCommunication,
-                       const long timeout)
+                       const long timeout,
+                       const std::optional<std::string>& acceptEncoding = std::string {})
         : m_url(url)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
+        , m_acceptEncoding(acceptEncoding)
     {
     }
 
@@ -129,7 +138,7 @@ public:
                     std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
-            ConfigurationParameters {.timeout = m_timeout});
+            ConfigurationParameters {.timeout = m_timeout, .acceptEncoding = m_acceptEncoding});
     }
 };
 
@@ -144,6 +153,7 @@ private:
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
+    std::optional<std::string> m_acceptEncoding;
 
 public:
     /**
@@ -153,17 +163,20 @@ public:
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
      * @param timeout Timeout for the request.
+     * @param acceptEncoding Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
      */
     explicit PostAction(const std::string& url,
                         const nlohmann::json& data,
                         const std::unordered_set<std::string>& headers,
                         const SecureCommunication& secureCommunication,
-                        const long timeout)
+                        const long timeout,
+                        const std::optional<std::string>& acceptEncoding = std::string {})
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
+        , m_acceptEncoding(acceptEncoding)
     {
     }
 
@@ -184,7 +197,7 @@ public:
                     throw std::runtime_error(msg);
                 },
             },
-            ConfigurationParameters {.timeout = m_timeout});
+            ConfigurationParameters {.timeout = m_timeout, .acceptEncoding = m_acceptEncoding});
     }
 };
 
@@ -199,6 +212,7 @@ private:
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
+    std::optional<std::string> m_acceptEncoding;
 
 public:
     /**
@@ -208,17 +222,20 @@ public:
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
      * @param timeout Timeout for the request.
+     * @param acceptEncoding Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
      */
     explicit PutAction(const std::string& url,
                        const nlohmann::json& data,
                        const std::unordered_set<std::string>& headers,
                        const SecureCommunication& secureCommunication,
-                       const long timeout)
+                       const long timeout,
+                       const std::optional<std::string>& acceptEncoding = std::string {})
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
+        , m_acceptEncoding(acceptEncoding)
     {
     }
 
@@ -240,7 +257,7 @@ public:
                     std::cerr << msg << ": " << responseCode << ". Response body: " << resultBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
-            ConfigurationParameters {.timeout = m_timeout});
+            ConfigurationParameters {.timeout = m_timeout, .acceptEncoding = m_acceptEncoding});
     }
 };
 
@@ -256,6 +273,7 @@ private:
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
+    std::optional<std::string> m_acceptEncoding;
 
 public:
     /**
@@ -266,17 +284,20 @@ public:
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
      * @param timeout Timeout for the request.
+     * @param acceptEncoding Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
      */
     explicit PatchAction(const std::string& url,
                          const nlohmann::json& data,
                          const std::unordered_set<std::string>& headers,
                          const SecureCommunication& secureCommunication,
-                         const long timeout)
+                         const long timeout,
+                         const std::optional<std::string>& acceptEncoding = std::string {})
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
+        , m_acceptEncoding(acceptEncoding)
     {
     }
 
@@ -299,7 +320,7 @@ public:
                     std::cerr << msg << ": " << responseCode << ". Response body: " << responseBody << std::endl;
                     throw std::runtime_error(msg);
                 }},
-            ConfigurationParameters {.timeout = m_timeout});
+            ConfigurationParameters {.timeout = m_timeout, .acceptEncoding = m_acceptEncoding});
     }
 };
 
@@ -314,6 +335,7 @@ private:
     std::unordered_set<std::string> m_headers;
     SecureCommunication m_secureCommunication;
     long m_timeout;
+    std::optional<std::string> m_acceptEncoding;
 
 public:
     /**
@@ -322,17 +344,20 @@ public:
      * @param headers Headers to send in the request.
      * @param secureCommunication Secure communication settings.
      * @param timeout Timeout for the request.
+     * @param acceptEncoding Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
      */
     explicit DeleteAction(const std::string& url,
                           const nlohmann::json& data,
                           const std::unordered_set<std::string>& headers,
                           const SecureCommunication& secureCommunication,
-                          const long timeout)
+                          const long timeout,
+                          const std::optional<std::string>& acceptEncoding = std::string {})
         : m_url(url)
         , m_data(data)
         , m_headers(headers)
         , m_secureCommunication(secureCommunication)
         , m_timeout(timeout)
+        , m_acceptEncoding(acceptEncoding)
     {
     }
 
@@ -356,7 +381,7 @@ public:
                     throw std::runtime_error(msg);
                 }
             },
-            ConfigurationParameters{.timeout = m_timeout});
+            ConfigurationParameters {.timeout = m_timeout, .acceptEncoding = m_acceptEncoding});
     }
 };
 

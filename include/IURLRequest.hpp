@@ -17,6 +17,7 @@
 #include "secureCommunication.hpp"
 #include <atomic>
 #include <functional>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <variant>
@@ -199,6 +200,15 @@ struct ConfigurationParameters
      *
      */
     const size_t maxResponseSize = 0;
+
+    /**
+     * @brief Content encodings negotiated with the server (the 'Accept-Encoding' request header), passed to libcurl as
+     * CURLOPT_ACCEPT_ENCODING. The default, an empty string, advertises every encoding the linked libcurl can decode
+     * (deflate and gzip, plus br or zstd when built in); std::nullopt sends no 'Accept-Encoding' header and leaves a
+     * received 'Content-Encoding' undecoded; any other value is sent verbatim (e.g. "gzip" or "identity").
+     *
+     */
+    const std::optional<std::string> acceptEncoding = std::string {};
 };
 
 /**

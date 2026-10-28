@@ -16,6 +16,7 @@
 #include "json.hpp"
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <string>
 
 /**
@@ -41,6 +42,21 @@ public:
         , m_password {paramValueOf(argc, argv, "--password", {false, ""})}
         , m_timeout {std::stol(paramValueOf(argc, argv, "--timeout", {false, "0"}))}
     {
+        const auto acceptEncoding {paramValueOf(argc, argv, "--accept-encoding", {false, "all"})};
+
+        if (acceptEncoding == "none")
+        {
+            m_acceptEncoding = std::nullopt;
+        }
+        else if (acceptEncoding == "all")
+        {
+            m_acceptEncoding = std::string {};
+        }
+        else
+        {
+            m_acceptEncoding = acceptEncoding;
+        }
+
         auto postArgumentsFile {paramValueOf(argc, argv, "-p", {false, ""})};
 
         if (!postArgumentsFile.empty())
@@ -137,6 +153,14 @@ public:
     }
 
     /**
+     * @brief Returns the Accept-Encoding mode (std::nullopt: none, empty: all, otherwise verbatim).
+     */
+    const std::optional<std::string>& acceptEncoding() const
+    {
+        return m_acceptEncoding;
+    }
+
+    /**
      * @brief Returns the timeout.
      */
     const long& timeout() const
@@ -165,6 +189,8 @@ public:
             << "\t--username USERNAME\tSpecifies the username to use in the request.\n"
             << "\t--password PASSWORD\tSpecifies the password to use in the request.\n"
             << "\t--timeout TIMEOUT\tSpecifies the timeout in miliseconds for the request.\n"
+            << "\t--accept-encoding VALUE\tAccept-Encoding mode: 'none' sends no header and does not decode, 'all' "
+               "(default) advertises every encoding the linked curl supports, any other value is sent verbatim.\n"
             << "\nExample:"
             << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t download -o out \n"
             << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t get\n"
@@ -175,6 +201,7 @@ public:
             << "\n\t./urlrequest_testtool -u https://httpbin.org/get -t get --cacert cacert.pem --cert cert.pem "
                "--key key.pem --username admin --password admin\n"
             << "\n\t./urlrequest_testtool -u https://httpbin.org/delay/10 -t get --timeout 1000\n"
+            << "\n\t./urlrequest_testtool -u https://httpbin.org/gzip -t get --accept-encoding all\n"
             << std::endl;
     }
 
@@ -214,6 +241,7 @@ private:
     const std::string m_username;
     const std::string m_password;
     const long m_timeout;
+    std::optional<std::string> m_acceptEncoding {std::string {}};
 };
 
 #endif // _CMD_ARGS_PARSER_HPP_

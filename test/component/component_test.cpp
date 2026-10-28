@@ -11,6 +11,7 @@
  */
 
 #include "component_test.hpp"
+#include "UNIXSocketRequest.hpp"
 #include "curlHandlerCache.hpp"
 #include "curlWrapper.hpp"
 #include "factoryRequestImplemetator.hpp"
@@ -941,10 +942,39 @@ TEST_F(ComponentTestInterface, GetWithDefaultHeaders)
     EXPECT_TRUE(m_callbackComplete);
 }
 
+namespace
+{
+#ifndef CURL_VERSION_ZSTD
+// Not defined by older curl headers; same bit libcurl uses.
+constexpr int CURL_VERSION_ZSTD {1 << 26};
+#endif
+
 /**
- * @brief Test the GET request without custom HTTP headers. cURL is expected to negotiate gzip compression by
- * default, without the caller having to add it to httpHeaders.
- *
+ * @brief Accept-Encoding list that curl sends by default, built from the features of the linked libcurl.
+ */
+std::string expectedDefaultAcceptEncoding()
+{
+    const auto features {curl_version_info(CURLVERSION_NOW)->features};
+    std::string expected {"deflate, gzip"};
+    if (features & CURL_VERSION_BROTLI)
+    {
+        expected += ", br";
+    }
+    if (features & CURL_VERSION_ZSTD)
+    {
+        expected += ", zstd";
+    }
+    return expected;
+}
+
+bool curlHasBrotli()
+{
+    return (curl_version_info(CURLVERSION_NOW)->features & CURL_VERSION_BROTLI) != 0;
+}
+} // namespace
+
+/**
+ * @brief An empty acceptEncoding (the default) lets curl negotiate every decoder it was built with.
  */
 TEST_F(ComponentTestInterface, GetWithDefaultAcceptEncoding)
 {
@@ -953,9 +983,141 @@ TEST_F(ComponentTestInterface, GetWithDefaultAcceptEncoding)
                                                        {
                                                            const auto response = nlohmann::json::parse(result);
 
-                                                           ASSERT_EQ(response.at("Accept-Encoding"), "gzip");
+                                                           ASSERT_EQ(response.at("Accept-Encoding"),
+                                                                     expectedDefaultAcceptEncoding());
                                                            m_callbackComplete = true;
                                                        }});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief std::nullopt sends no Accept-Encoding header and curl does not decode the reply.
+ */
+TEST_F(ComponentTestInterface, GetWithoutAcceptEncoding)
+{
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           const auto response = nlohmann::json::parse(result);
+
+                                                           EXPECT_FALSE(response.contains("Accept-Encoding"));
+                                                           m_callbackComplete = true;
+                                                       }},
+                                ConfigurationParameters {.acceptEncoding = std::nullopt});
+    EXPECT_TRUE(m_callbackComplete);
+
+    m_callbackComplete = false;
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/gzip-small")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           EXPECT_NE(result, "plain");
+                                                           EXPECT_EQ(gunzip(result), "plain");
+                                                           m_callbackComplete = true;
+                                                       }},
+                                ConfigurationParameters {.acceptEncoding = std::nullopt});
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief An explicit acceptEncoding is sent verbatim.
+ */
+TEST_F(ComponentTestInterface, GetWithExplicitAcceptEncoding)
+{
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           const auto response = nlohmann::json::parse(result);
+
+                                                           EXPECT_EQ(response.at("Accept-Encoding"), "identity");
+                                                           m_callbackComplete = true;
+                                                       }},
+                                ConfigurationParameters {.acceptEncoding = std::string {"identity"}});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Asking for "br": a curl built with Brotli decodes the reply, one without it fails with a bad
+ * content-encoding error.
+ */
+TEST_F(ComponentTestInterface, GetWithBrotliAcceptEncoding)
+{
+    bool errorFired {false};
+    std::string errorText;
+
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/brotli")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           EXPECT_EQ(result, BROTLI_FIXTURE_TEXT);
+                                                           m_callbackComplete = true;
+                                                       },
+                                                       .onError =
+                                                           [&](const std::string& error, const long, const std::string&)
+                                                       {
+                                                           errorFired = true;
+                                                           errorText = error;
+                                                       }},
+                                ConfigurationParameters {.acceptEncoding = std::string {"br"}});
+
+    if (curlHasBrotli())
+    {
+        EXPECT_TRUE(m_callbackComplete);
+        EXPECT_FALSE(errorFired);
+    }
+    else
+    {
+        EXPECT_FALSE(m_callbackComplete);
+        EXPECT_TRUE(errorFired);
+        EXPECT_NE(errorText.find("Unrecognized or bad HTTP Content or Transfer-Encoding"), std::string::npos)
+            << errorText;
+    }
+}
+
+/**
+ * @brief Same as GetWithDefaultAcceptEncoding, through a unix socket.
+ */
+TEST_F(ComponentTestInterface, UnixSocketGetWithDefaultAcceptEncoding)
+{
+    FakeUnixServer unixServer;
+
+    UNIXSocketRequest::instance().get(
+        RequestParameters {.url = HttpUnixSocketURL(unixServer.socketPath(), "http://localhost/check-headers")},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   const auto response = nlohmann::json::parse(result);
+
+                                   ASSERT_EQ(response.at("Accept-Encoding"), expectedDefaultAcceptEncoding());
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {});
+
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
+ * @brief Same as GetWithoutAcceptEncoding, through a unix socket.
+ */
+TEST_F(ComponentTestInterface, UnixSocketGetWithoutAcceptEncoding)
+{
+    FakeUnixServer unixServer;
+
+    UNIXSocketRequest::instance().get(
+        RequestParameters {.url = HttpUnixSocketURL(unixServer.socketPath(), "http://localhost/check-headers")},
+        PostRequestParameters {.onSuccess =
+                                   [&](const std::string& result)
+                               {
+                                   const auto response = nlohmann::json::parse(result);
+
+                                   EXPECT_FALSE(response.contains("Accept-Encoding"));
+                                   m_callbackComplete = true;
+                               }},
+        ConfigurationParameters {.acceptEncoding = std::nullopt});
 
     EXPECT_TRUE(m_callbackComplete);
 }
@@ -1608,11 +1770,9 @@ TEST_F(ComponentTestInterface, Post100Mbs)
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
-    HTTPRequest::instance().post(RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = data},
-                                 PostRequestParameters {.onSuccess = [&](const std::string& result)
-                                                        {
-                                                            m_callbackComplete = true;
-                                                        }});
+    HTTPRequest::instance().post(
+        RequestParameters {.url = HttpURL("http://localhost:44441/"), .data = data},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { m_callbackComplete = true; }});
     fakeFileServer.reset();
     const auto postPost = getMemoryUsedByTheCurrentProcess();
 
@@ -1629,11 +1789,9 @@ TEST_F(ComponentTestInterface, Post100MbsStringView)
     const auto data = std::string(TEST_SIZE, 'a');
     const auto prePost = getMemoryUsedByTheCurrentProcess();
 
-    HTTPRequest::instance().post(RequestParametersStringView {.url = HttpURL("http://localhost:44441/"), .data = data},
-                                 PostRequestParameters {.onSuccess = [&](const std::string& result)
-                                                        {
-                                                            m_callbackComplete = true;
-                                                        }});
+    HTTPRequest::instance().post(
+        RequestParametersStringView {.url = HttpURL("http://localhost:44441/"), .data = data},
+        PostRequestParameters {.onSuccess = [&](const std::string& result) { m_callbackComplete = true; }});
     fakeFileServer.reset();
     const auto postPost = getMemoryUsedByTheCurrentProcess();
 

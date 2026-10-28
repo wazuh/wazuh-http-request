@@ -53,34 +53,36 @@ public:
         }
 
         auto timeout {args.timeout()};
+        auto acceptEncoding {args.acceptEncoding()};
 
         if (0 == args.type().compare("download"))
         {
             return std::make_unique<DownloadAction>(
-                args.url(), args.outputFile(), headers, secureCommunication, timeout);
+                args.url(), args.outputFile(), headers, secureCommunication, timeout, acceptEncoding);
         }
         else if (0 == args.type().compare("get"))
         {
-            return std::make_unique<GetAction>(args.url(), headers, secureCommunication, timeout);
+            return std::make_unique<GetAction>(args.url(), headers, secureCommunication, timeout, acceptEncoding);
         }
         else if (0 == args.type().compare("post"))
         {
             return std::make_unique<PostAction>(
-                args.url(), args.postArguments(), headers, secureCommunication, timeout);
+                args.url(), args.postArguments(), headers, secureCommunication, timeout, acceptEncoding);
         }
         else if (0 == args.type().compare("put"))
         {
-            return std::make_unique<PutAction>(args.url(), args.postArguments(), headers, secureCommunication, timeout);
+            return std::make_unique<PutAction>(
+                args.url(), args.postArguments(), headers, secureCommunication, timeout, acceptEncoding);
         }
         else if (0 == args.type().compare("patch"))
         {
             return std::make_unique<PatchAction>(
-                args.url(), args.postArguments(), headers, secureCommunication, timeout);
+                args.url(), args.postArguments(), headers, secureCommunication, timeout, acceptEncoding);
         }
         else if (0 == args.type().compare("delete"))
         {
             return std::make_unique<DeleteAction>(
-                args.url(), args.postArguments(), headers, secureCommunication, timeout);
+                args.url(), args.postArguments(), headers, secureCommunication, timeout, acceptEncoding);
         }
         else
         {
