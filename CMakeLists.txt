@@ -17,13 +17,22 @@ if(NOT RESOURCES_URL)
     set(RESOURCES_URL "https://packages.wazuh.com/deps/${EXTERNAL_DEPS_VERSION}/libraries/sources")
 endif(NOT RESOURCES_URL)
 
-if(NOT PRECOMPILED_RESOURCES_URL)
-    set(PRECOMPILED_RESOURCES_URL "https://packages.wazuh.com/deps/${EXTERNAL_DEPS_VERSION}/libraries/linux/amd64")
-endif(NOT PRECOMPILED_RESOURCES_URL)
+# Precompiled curl and brotli come from the wazuh dependency pool (packages.wazuh.com/deps/pool/<ref>/linux/amd64):
+# the refs are the ones src/deps.lock.mk of wazuh/wazuh pins, so the standalone tests run against the same libcurl
+# the manager and the agent link (curl 8.20.0 built --with-brotli, brotli 1.2.1 static).
+if(NOT DEPS_POOL_URL)
+    set(DEPS_POOL_URL "https://packages.wazuh.com/deps/pool")
+endif(NOT DEPS_POOL_URL)
+if(NOT CURL_POOL_REF)
+    set(CURL_POOL_REF "curl/8.20.0-660bcf3805c9")
+endif(NOT CURL_POOL_REF)
+if(NOT BROTLI_POOL_REF)
+    set(BROTLI_POOL_REF "brotli/1.2.1-4fc825275a29")
+endif(NOT BROTLI_POOL_REF)
 
 if(USE_HTTP)
     string(REPLACE "https://" "http://" RESOURCES_URL ${RESOURCES_URL})
-    string(REPLACE "https://" "http://" PRECOMPILED_RESOURCES_URL ${PRECOMPILED_RESOURCES_URL})
+    string(REPLACE "https://" "http://" DEPS_POOL_URL ${DEPS_POOL_URL})
 endif()
 
 function(check_and_download_dep libname url)
@@ -49,15 +58,19 @@ function(check_and_download_dep libname url)
 endfunction(check_and_download_dep)
 
 set(EXTERNAL_RES nlohmann googletest benchmark cpp-httplib)
-set(PRECOMPILED_EXTERNAL_RES curl)
 
 foreach(loop_var ${EXTERNAL_RES})
     check_and_download_dep(${loop_var} ${RESOURCES_URL})
 endforeach(loop_var)
 
-foreach(loop_var ${PRECOMPILED_EXTERNAL_RES})
-    check_and_download_dep(${loop_var} ${PRECOMPILED_RESOURCES_URL})
-endforeach(loop_var)
+# Only the standalone build of this repository fetches its curl; inside wazuh (`CURL_DEP` set by the parent) the
+# externals come from `make deps`, and brotli exists on Linux only.
+if(NOT DEFINED CURL_DEP)
+    check_and_download_dep(curl ${DEPS_POOL_URL}/${CURL_POOL_REF}/linux/amd64)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        check_and_download_dep(brotli ${DEPS_POOL_URL}/${BROTLI_POOL_REF}/linux/amd64)
+    endif()
+endif()
 
 set(BENCHMARK_ENABLE_TESTING "OFF")
 
@@ -68,6 +81,7 @@ include_directories(${SRC_FOLDER}/external/nlohmann/)
 include_directories(BEFORE PRIVATE shared/)
 
 link_directories(${SRC_FOLDER}/external/curl/lib/.libs/)
+link_directories(${SRC_FOLDER}/external/brotli/install/lib/)
 
 file(GLOB URL_REQUEST_SRC src/*.cpp)
 
@@ -78,6 +92,12 @@ if(NOT DEFINED CURL_DEP)
 endif(NOT DEFINED CURL_DEP)
 
 target_link_libraries(urlrequest ${CURL_DEP})
+
+# Standalone builds link the pool's static libcurl, whose Brotli decoder lives in these two archives; inside wazuh
+# (CURL_DEP = wazuhext) they are already whole-archived into libwazuhext.so.
+if(CURL_DEP STREQUAL "curl" AND EXISTS ${SRC_FOLDER}/external/brotli/install/lib/libbrotlidec.a)
+    target_link_libraries(urlrequest brotlidec brotlicommon)
+endif()
 
 if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
     # Enable testing only if compiling this repository.
