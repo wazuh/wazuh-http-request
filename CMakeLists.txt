@@ -84,6 +84,11 @@ if (${CMAKE_PROJECT_NAME} STREQUAL "urlrequest")
     # Always set enable_testing() before add_subdirectory.
     enable_testing()
 
+    # The googletest shipped with the deps/19 sources declares cmake_minimum_required(VERSION 2.8.12), which CMake 4 refuses;
+    # this tells CMake >= 3.31 to treat such projects as 3.5 (older CMake ignores the variable).
+    if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
+        set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+    endif()
     add_subdirectory(external/googletest)
     add_subdirectory(external/benchmark)
 
