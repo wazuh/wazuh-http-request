@@ -34,6 +34,7 @@ void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
     const auto& maxResponseSize {configurationParameters.maxResponseSize};
+    const auto& acceptEncoding {configurationParameters.acceptEncoding};
 
     try
     {
@@ -41,8 +42,8 @@ void UNIXSocketRequest::download(std::variant<TRequestParameters<std::string>,
         std::visit(
             [&](auto&& arg)
             {
-                GetRequest::builder(
-                    FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))
+                GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))
                     .url(arg.url.url(), arg.secureCommunication)
                     .unixSocketPath(arg.url.unixSocketPath())
                     .appendHeaders(arg.httpHeaders)
@@ -93,6 +94,7 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
     const auto& maxResponseSize {configurationParameters.maxResponseSize};
+    const auto& acceptEncoding {configurationParameters.acceptEncoding};
 
     try
     {
@@ -103,8 +105,8 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
-                    auto req {PostRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -130,8 +132,8 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                 }
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
-                    auto req {PostRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -159,8 +161,8 @@ void UNIXSocketRequest::post(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<nlohmann::json>>)
                 {
                     const auto data = arg.data.dump();
-                    auto req {PostRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PostRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -232,6 +234,7 @@ void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
     const auto& maxResponseSize {configurationParameters.maxResponseSize};
+    const auto& acceptEncoding {configurationParameters.acceptEncoding};
 
     try
     {
@@ -239,8 +242,8 @@ void UNIXSocketRequest::get(std::variant<TRequestParameters<std::string>,
         std::visit(
             [&](auto&& arg)
             {
-                auto req {GetRequest::builder(
-                    FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                auto req {GetRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                    response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                 req.url(arg.url.url(), arg.secureCommunication)
                     .unixSocketPath(arg.url.unixSocketPath())
                     .appendHeaders(arg.httpHeaders)
@@ -306,6 +309,7 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
     const auto& maxResponseSize {configurationParameters.maxResponseSize};
+    const auto& acceptEncoding {configurationParameters.acceptEncoding};
 
     try
     {
@@ -316,8 +320,8 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
-                    auto req {PutRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -344,8 +348,8 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                 }
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
-                    auto req {PutRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -373,8 +377,8 @@ void UNIXSocketRequest::put(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<nlohmann::json>>)
                 {
                     const auto data = arg.data.dump();
-                    auto req {PutRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PutRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .template postData<const std::string&>(data)
                         .unixSocketPath(arg.url.unixSocketPath())
@@ -446,6 +450,7 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
     const auto& maxResponseSize {configurationParameters.maxResponseSize};
+    const auto& acceptEncoding {configurationParameters.acceptEncoding};
 
     try
     {
@@ -456,8 +461,8 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
-                    auto req {PatchRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -484,8 +489,8 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                 }
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
-                    auto req {PatchRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -513,8 +518,8 @@ void UNIXSocketRequest::patch(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<nlohmann::json>>)
                 {
                     const auto data = arg.data.dump();
-                    auto req {PatchRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {PatchRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -586,6 +591,7 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
     const auto& handlerType {configurationParameters.handlerType};
     const auto& shouldRun {configurationParameters.shouldRun};
     const auto& maxResponseSize {configurationParameters.maxResponseSize};
+    const auto& acceptEncoding {configurationParameters.acceptEncoding};
 
     try
     {
@@ -596,8 +602,8 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<T, TRequestParameters<std::string>>)
                 {
-                    auto req {DeleteRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -624,8 +630,8 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                 }
                 else if constexpr (std::is_same_v<T, TRequestParameters<std::string_view>>)
                 {
-                    auto req {DeleteRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .appendHeaders(arg.httpHeaders)
@@ -653,8 +659,8 @@ void UNIXSocketRequest::delete_(std::variant<TRequestParameters<std::string>,
                 else if constexpr (std::is_same_v<T, TRequestParameters<nlohmann::json>>)
                 {
                     const auto data = arg.data.dump();
-                    auto req {DeleteRequest::builder(
-                        FactoryRequestWrapper<wrapperType>::create(response, handlerType, shouldRun, maxResponseSize))};
+                    auto req {DeleteRequest::builder(FactoryRequestWrapper<wrapperType>::create(
+                        response, handlerType, shouldRun, maxResponseSize, acceptEncoding))};
                     req.url(arg.url.url(), arg.secureCommunication)
                         .unixSocketPath(arg.url.unixSocketPath())
                         .template postData<const std::string&>(data)

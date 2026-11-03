@@ -17,6 +17,7 @@
 #include "curlWrapper.hpp"
 #include <atomic>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 
 /**
@@ -55,14 +56,17 @@ public:
      * @param handlerType Type of the cURL handler. Default is 'SINGLE'.
      * @param shouldRun Flag used to interrupt the cURL handler.
      * @param maxResponseSize Maximum size in bytes of the decoded response body. Zero means no limit.
+     * @param acceptEncoding Encodings to negotiate: empty = every built-in decoder, std::nullopt = none.
      * @return A shared pointer to a cURLRequest.
      */
     static std::shared_ptr<IRequestImplementator> create(std::string& returnValue,
                                                          CurlHandlerTypeEnum handlerType = CurlHandlerTypeEnum::SINGLE,
                                                          const std::atomic<bool>& shouldRun = true,
-                                                         const size_t maxResponseSize = 0)
+                                                         const size_t maxResponseSize = 0,
+                                                         std::optional<std::string> acceptEncoding = std::string {})
     {
-        return std::make_shared<cURLWrapper>(returnValue, handlerType, shouldRun, maxResponseSize);
+        return std::make_shared<cURLWrapper>(
+            returnValue, handlerType, shouldRun, maxResponseSize, std::move(acceptEncoding));
     }
 };
 

@@ -16,6 +16,38 @@ ninja
 Please see the CMake documentation and CMakeLists.txt for more advanced usage.
 
 
+## Configuration parameters
+
+Every request receives a `ConfigurationParameters` (`include/IURLRequest.hpp`) describing *how* it is performed.
+
+| Field | Type | Default | Meaning |
+|---|---|---|---|
+| `timeout` | `long` | `0` | Maximum time in milliseconds the request may take. `0` means no limit. |
+| `handlerType` | `CurlHandlerTypeEnum` | `SINGLE` | Type of the cURL handler (`SINGLE` or `MULTI`). |
+| `shouldRun` | `std::atomic<bool>` | `true` | Flag that interrupts the handler when `handlerType` is `MULTI`. |
+| `userAgent` | `std::string` | empty | User agent used in the request. |
+| `maxResponseSize` | `size_t` | `0` | Maximum size in bytes of the response body kept in memory, counted after content decoding. `0` means no limit. Not applied to `outputFile`. |
+| `acceptEncoding` | `std::optional<std::string>` | `""` | Content encodings negotiated with the server (the `Accept-Encoding` request header). See below. |
+
+### Accept-Encoding
+
+`acceptEncoding` is passed to libcurl as `CURLOPT_ACCEPT_ENCODING` and has three modes:
+
+- `""` (default): advertise every encoding the linked libcurl can decode and decode the response transparently.
+- `std::nullopt`: send no `Accept-Encoding` header and do not decode; a received `Content-Encoding` is left as is.
+- any other string: sent verbatim (for example `"gzip"` or `"identity"`).
+
+The advertised list in the default mode depends on the curl the library is linked against (`curl_version_info()`): `deflate, gzip`, plus `br` or `zstd` when that curl was built with them.
+
+The test tool exposes the field as `--accept-encoding none|all|<value>`; when the flag is absent the default applies:
+
+```bash
+./urlrequest_testtool -u https://httpbin.org/gzip -t get --accept-encoding none
+./urlrequest_testtool -u https://httpbin.org/gzip -t get --accept-encoding all
+./urlrequest_testtool -u https://httpbin.org/headers -t get --accept-encoding gzip
+```
+
+
 ## Contribution Requirements
 
 ### CPP Migration tools
