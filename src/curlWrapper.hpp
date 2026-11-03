@@ -162,9 +162,14 @@ public:
 
         this->setOptionLong(OPT_MAX_REDIRECTIONS, MAX_REDIRECTIONS);
 
+        // Cleared explicitly: a request that failed before execute() leaves its options on the cached handle.
         if (acceptEncoding)
         {
             this->setOptionString(OPT_ACCEPT_ENCODING, *acceptEncoding);
+        }
+        else
+        {
+            this->setOptionPtr(OPT_ACCEPT_ENCODING, nullptr);
         }
     }
 

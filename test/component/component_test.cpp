@@ -1022,6 +1022,33 @@ TEST_F(ComponentTestInterface, GetWithoutAcceptEncoding)
 }
 
 /**
+ * @brief A request whose setup fails before the transfer leaves its options on the thread's cached handle; a later
+ * std::nullopt request on that handle must still send no 'Accept-Encoding' and leave the body undecoded.
+ */
+TEST_F(ComponentTestInterface, GetWithoutAcceptEncodingAfterFailedDownload)
+{
+    auto errorCalled {false};
+    HTTPRequest::instance().download(
+        RequestParameters {.url = HttpURL("http://localhost:44441/")},
+        PostRequestParameters {.onError = [&](const std::string&, const long, const std::string&)
+                               { errorCalled = true; },
+                               .outputFile = "/nonexistent-dir/accept-encoding.out"});
+    EXPECT_TRUE(errorCalled);
+
+    HTTPRequest::instance().get(RequestParameters {.url = HttpURL("http://localhost:44441/check-headers")},
+                                PostRequestParameters {.onSuccess =
+                                                           [&](const std::string& result)
+                                                       {
+                                                           const auto response = nlohmann::json::parse(result);
+
+                                                           EXPECT_FALSE(response.contains("Accept-Encoding"));
+                                                           m_callbackComplete = true;
+                                                       }},
+                                ConfigurationParameters {.acceptEncoding = std::nullopt});
+    EXPECT_TRUE(m_callbackComplete);
+}
+
+/**
  * @brief An explicit acceptEncoding is sent verbatim.
  */
 TEST_F(ComponentTestInterface, GetWithExplicitAcceptEncoding)
