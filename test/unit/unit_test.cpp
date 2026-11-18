@@ -383,19 +383,45 @@ TEST_F(UrlRequestUnitTest, HttpsCertExists)
 }
 
 /**
- * @brief This test checks the HTTPS GET request not using a certificate.
+ * @brief This test checks the HTTPS GET request using the last default certificate path.
  */
-TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
+TEST_F(UrlRequestUnitTest, HttpsCertExistsInLastDefaultPath)
 {
     auto request {std::make_shared<RequestWrapper>()};
 
     EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
-    EXPECT_CALL(*request, setOption(optVerifyPeer, false)).Times(1);
+    EXPECT_CALL(*request, setOption(optCainfo, "/etc/ssl/ca-bundle.pem")).Times(1);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, true)).Times(1);
     EXPECT_CALL(*request, execute()).Times(1);
+    EXPECT_CALL(*request, appendHeader(_)).Times(0);
+
+    auto getRequest {cURLRequest<MockRequest<MockFsWrapper>, MockFsWrapper>::builder(request)};
+
+    EXPECT_CALL(getRequest, exists(_)).Times(5).WillRepeatedly(Return(false));
+    EXPECT_CALL(getRequest, exists("/etc/ssl/ca-bundle.pem")).Times(1).WillOnce(Return(true));
+    EXPECT_NO_THROW(getRequest.url("https://www.wazuh.com/").execute());
+}
+
+/**
+ * @brief This test checks that the HTTPS GET request is rejected when no certificate is found,
+ * before any credential is set.
+ */
+TEST_F(UrlRequestUnitTest, HttpsNoCertNotExists)
+{
+    auto request {std::make_shared<RequestWrapper>()};
+    auto secureCommunication = SecureCommunication::builder();
+    secureCommunication.basicAuth("admin:admin").sslCertificate("ssl_cert.pem").sslKey("ssl_key.pem");
+
+    EXPECT_CALL(*request, setOption(optUrl, "https://www.wazuh.com/")).Times(1);
+    EXPECT_CALL(*request, setOption(optSslCert, An<const std::string&>())).Times(0);
+    EXPECT_CALL(*request, setOption(optSslKey, An<const std::string&>())).Times(0);
+    EXPECT_CALL(*request, setOption(optBasicAuth, An<const std::string&>())).Times(0);
+    EXPECT_CALL(*request, setOption(optVerifyPeer, An<long>())).Times(0);
+    EXPECT_CALL(*request, execute()).Times(0);
     EXPECT_CALL(*request, appendHeader(_)).Times(0);
 
     auto getRequestNoCert {cURLRequest<MockRequest<MockFsWrapper>, MockFsWrapper>::builder(request)};
 
-    EXPECT_CALL(getRequestNoCert, exists(_)).Times(5).WillRepeatedly(Return(false));
-    EXPECT_NO_THROW(getRequestNoCert.url("https://www.wazuh.com/").execute());
+    EXPECT_CALL(getRequestNoCert, exists(_)).Times(6).WillRepeatedly(Return(false));
+    EXPECT_THROW(getRequestNoCert.url("https://www.wazuh.com/", secureCommunication).execute(), std::runtime_error);
 }

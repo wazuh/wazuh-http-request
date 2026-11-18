@@ -50,6 +50,7 @@ static const std::vector<std::string> DEFAULT_CAINFO_PATHS = {
     "/usr/share/ssl/certs/ca-bundle.crt",     // RedHat
     "/usr/local/share/certs/ca-root-nss.crt", // FreeBSD
     "/etc/ssl/cert.pem",                      // OpenBSD, FreeBSD, MacOS
+    "/etc/ssl/ca-bundle.pem",                 // SUSE (SLES, openSUSE)
 };
 
 /**
@@ -162,7 +163,7 @@ public:
         m_requestImplementator->setOption(OPT_URL, m_url);
 
         // If the URL starts with "https", we need set CAINFO option.
-        // Otherwise, we need to set the SSL_VERIFYPEER option to false.
+        // Without a CA the peer cannot be verified, so the request is rejected.
         if (m_url.find("https") == 0)
         {
             // If the certificate is not set, we try to find it in the default paths.
@@ -188,15 +189,15 @@ public:
                     }
                 }
 
+                if (m_certificate.empty())
+                {
+                    throw std::runtime_error("No CA certificate found to verify '" + m_url + "'");
+                }
+
                 if (!sslKey.empty() && !sslCert.empty())
                 {
                     clientAuth(sslCert, sslKey);
                 }
-            }
-
-            if (m_certificate.empty())
-            {
-                m_requestImplementator->setOption(OPT_VERIFYPEER, 0L);
             }
         }
 
