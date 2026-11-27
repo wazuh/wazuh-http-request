@@ -2,9 +2,9 @@ name: CMake-debug
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "4.10.x" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "4.10.x" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
